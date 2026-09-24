@@ -21,9 +21,10 @@ docs/HANDOVER.md    Hồ sơ bàn giao chi tiết: tính năng, lỗi đã biế
 
 ## Cách cùng làm
 1. **Đọc `docs/HANDOVER.md` trước.** Mục 10 là các lỗi đã biết, mục 11 là việc cần làm, mục 15 là các câu hỏi còn mở.
-2. Mỗi thay đổi tạo một nhánh (branch) riêng rồi mở Pull Request để chủ dự án duyệt. Không sửa thẳng nhánh `main`.
-3. Ghi lại thay đổi vào mục 18 "Nhật ký thay đổi" trong `docs/HANDOVER.md`.
-4. Số liệu giá, model, tài khoản trong file là **dữ liệu mẫu, chưa xác minh**. Không dùng như số thật.
+2. Người được mời **tự sửa và tự gộp (merge), không cần chủ dự án duyệt**. Có thể sửa thẳng trên nhánh `main`, hoặc tạo nhánh riêng khi thử nghiệm thay đổi lớn rồi tự gộp vào `main`.
+3. Trước khi sửa, bấm **Sync / Pull** để lấy bản mới nhất, tránh ghi đè thay đổi của người khác.
+4. Ghi lại thay đổi vào mục 18 "Nhật ký thay đổi" trong `docs/HANDOVER.md`.
+5. Số liệu giá, model, tài khoản trong file là **dữ liệu mẫu, chưa xác minh**. Không dùng như số thật.
 
 ## Quy tắc dự án
 - Không bịa số liệu. Chưa chắc thì ghi rõ là chưa chắc.
