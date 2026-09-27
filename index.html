@@ -1,1780 +1,472 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LG ELECTRONICS - CỔNG ĐĂNG KÝ BÁN HÀNG NỘI BỘ & XÁC NHẬN NỘP TIỀN</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --lg-red: #A50034;
-      --lg-red-dark: #7A0026;
-      --lg-red-light: #FFF0F3;
-      --lg-red-border: #F5C6D0;
-      --lg-gray-dark: #1E293B;
-      --lg-gray-muted: #64748B;
-      --lg-bg: #F1F5F9;
-      --lg-card-bg: #FFFFFF;
-      --lg-border: #E2E8F0;
-      --lg-green: #059669;
-      --lg-green-bg: #ECFDF5;
-      --lg-green-border: #A7F3D0;
-      --lg-amber: #D97706;
-      --lg-amber-bg: #FFFBEB;
-      --lg-amber-border: #FDE68A;
-      --font-main: 'Inter', system-ui, -apple-system, sans-serif;
-      --font-heading: 'Outfit', 'Inter', sans-serif;
-    }
-
-    [data-theme="dark"] {
-      --lg-bg: #0F172A;
-      --lg-card-bg: #1E293B;
-      --lg-gray-dark: #F8FAFC;
-      --lg-gray-muted: #94A3B8;
-      --lg-border: #334155;
-      --lg-red-light: #31111D;
-      --lg-green-bg: #064E3B;
-      --lg-amber-bg: #451A03;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: var(--font-main);
-      background-color: var(--lg-bg);
-      color: var(--lg-gray-dark);
-      line-height: 1.5;
-      font-size: 13.5px;
-      padding: 24px 16px;
-      display: flex;
-      justify-content: center;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 1280px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* Header Banner */
-    .top-header {
-      background: linear-gradient(135deg, var(--lg-red) 0%, #60001D 100%);
-      color: #FFF;
-      border-radius: 16px;
-      padding: 24px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 10px 30px rgba(165, 0, 52, 0.25);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .top-header::before {
-      content: '';
-      position: absolute;
-      top: -50px;
-      right: -50px;
-      width: 200px;
-      height: 200px;
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
-    .lg-badge {
-      width: 54px;
-      height: 54px;
-      background: #FFF;
-      color: var(--lg-red);
-      font-family: var(--font-heading);
-      font-weight: 900;
-      font-size: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      border: 3px solid rgba(255, 255, 255, 0.8);
-    }
-
-    .header-titles h1 {
-      font-family: var(--font-heading);
-      font-size: 21px;
-      font-weight: 800;
-      letter-spacing: -0.2px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
-
-    .header-titles p {
-      font-size: 13px;
-      color: #FFCCD5;
-      margin-top: 3px;
-      font-weight: 500;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 10px;
-      z-index: 2;
-    }
-
-    .btn-action {
-      background: #FFFFFF;
-      color: var(--lg-red);
-      border: none;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 9px 18px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      transition: all 0.2s ease;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-    }
-
-    .btn-action:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 14px rgba(0,0,0,0.25);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.18);
-      color: #FFF;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      backdrop-filter: blur(4px);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    /* Tabs Navigation */
-    .nav-tabs {
-      display: flex;
-      gap: 8px;
-      border-bottom: 2px solid var(--lg-border);
-      padding-bottom: 2px;
-      overflow-x: auto;
-    }
-
-    .tab-btn {
-      padding: 12px 20px;
-      background: var(--lg-card-bg);
-      border: 1px solid var(--lg-border);
-      border-bottom: none;
-      border-radius: 12px 12px 0 0;
-      font-weight: 700;
-      font-size: 13px;
-      color: var(--lg-gray-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-
-    .tab-btn:hover:not(.active) {
-      background: rgba(165, 0, 52, 0.05);
-      color: var(--lg-red);
-    }
-
-    .tab-btn.active {
-      background: var(--lg-red);
-      color: #FFF;
-      border-color: var(--lg-red);
-      box-shadow: 0 -2px 10px rgba(165, 0, 52, 0.2);
-    }
-
-    .tab-badge {
-      background: rgba(255, 255, 255, 0.25);
-      padding: 2px 7px;
-      border-radius: 10px;
-      font-size: 11px;
-    }
-
-    .tab-btn.active .tab-badge {
-      background: #FFFFFF;
-      color: var(--lg-red);
-      font-weight: 800;
-    }
-
-    /* Main Tab Content Card */
-    .tab-content {
-      display: none;
-      background: var(--lg-card-bg);
-      border: 1px solid var(--lg-border);
-      border-radius: 14px;
-      padding: 28px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-      animation: fadeIn 0.25s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Section Cards */
-    .sec-card {
-      background: rgba(248, 250, 252, 0.7);
-      border: 1px solid var(--lg-border);
-      border-left: 4px solid var(--lg-red);
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin: 18px 0;
-    }
-
-    [data-theme="dark"] .sec-card {
-      background: rgba(30, 41, 59, 0.5);
-    }
-
-    .sec-card-teal {
-      border-left-color: #0D7A70;
-      background: var(--lg-green-bg);
-      border-color: var(--lg-green-border);
-    }
-
-    .sec-card-amber {
-      border-left-color: var(--lg-amber);
-      background: var(--lg-amber-bg);
-      border-color: var(--lg-amber-border);
-    }
-
-    .sec-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--lg-gray-dark);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Email Preview Container */
-    .email-container {
-      background: #FFFFFF;
-      border: 1px solid #D0D7DE;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-    }
-
-    [data-theme="dark"] .email-container {
-      background: #1E293B;
-      border-color: #334155;
-    }
-
-    .email-header-meta {
-      background: #F8FAFC;
-      padding: 16px 24px;
-      border-bottom: 1px solid #E2E8F0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 12.5px;
-    }
-
-    [data-theme="dark"] .email-header-meta {
-      background: #0F172A;
-      border-color: #334155;
-    }
-
-    .meta-row {
-      display: flex;
-      gap: 12px;
-    }
-
-    .meta-label {
-      width: 90px;
-      font-weight: 700;
-      color: var(--lg-gray-muted);
-    }
-
-    .meta-val {
-      color: var(--lg-gray-dark);
-      font-weight: 600;
-    }
-
-    .subject-val {
-      color: var(--lg-red);
-      font-weight: 800;
-    }
-
-    .email-body {
-      padding: 30px 36px;
-      color: var(--lg-gray-dark);
-      line-height: 1.65;
-      font-size: 13.5px;
-    }
-
-    .email-logo-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 2px solid var(--lg-red);
-      margin-bottom: 24px;
-    }
-
-    .email-lg-title {
-      font-family: var(--font-heading);
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--lg-red);
-    }
-
-    /* Tables */
-    .custom-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      margin: 14px 0;
-      font-size: 12.5px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--lg-border);
-    }
-
-    .custom-table th {
-      background: #1E293B;
-      color: #FFF;
-      padding: 10px 12px;
-      text-align: left;
-      font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 0.2px;
-    }
-
-    .custom-table td {
-      padding: 11px 12px;
-      border-bottom: 1px solid var(--lg-border);
-      color: var(--lg-gray-dark);
-      vertical-align: middle;
-    }
-
-    .custom-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .custom-table tr:nth-child(even) {
-      background: rgba(248, 250, 252, 0.6);
-    }
-
-    [data-theme="dark"] .custom-table tr:nth-child(even) {
-      background: rgba(15, 23, 42, 0.4);
-    }
-
-    /* Badges & Tags */
-    .badge-code {
-      background: #E2E8F0;
-      color: #0F172A;
-      font-family: monospace;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 11.5px;
-    }
-
-    .badge-ordinal {
-      background: #DCFCE7;
-      color: #15803D;
-      font-weight: 800;
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 11.5px;
-      border: 1px solid #BBF7D0;
-    }
-
-    .badge-payer {
-      background: #EFF6FF;
-      color: #1D4ED8;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid #BFDBFE;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .badge-status-ok {
-      background: #DCFCE7;
-      color: #166534;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11.5px;
-    }
-
-    .btn-view-slip {
-      background: #EEF2FF;
-      color: #4F46E5;
-      border: 1px solid #C7D2FE;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 6px;
-      font-size: 11.5px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s;
-    }
-
-    .btn-view-slip:hover {
-      background: #4F46E5;
-      color: #FFF;
-    }
-
-    /* Form Styles */
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 12px;
-    }
-
-    @media (max-width: 900px) {
-      .form-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 600px) {
-      .form-grid { grid-template-columns: 1fr; }
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group.full-width {
-      grid-column: 1 / -1;
-    }
-
-    .form-label {
-      font-weight: 700;
-      font-size: 12.5px;
-      color: var(--lg-gray-dark);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .form-label .req {
-      color: var(--lg-red);
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 9px 13px;
-      border: 1.5px solid var(--lg-border);
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 13px;
-      background: var(--lg-card-bg);
-      color: var(--lg-gray-dark);
-      transition: all 0.2s;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--lg-red);
-      box-shadow: 0 0 0 3.5px rgba(165, 0, 52, 0.12);
-    }
-
-    .btn-submit {
-      background: linear-gradient(135deg, var(--lg-red) 0%, var(--lg-red-dark) 100%);
-      color: #FFF;
-      border: none;
-      padding: 12px 28px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 800;
-      border-radius: 24px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 14px rgba(165, 0, 52, 0.3);
-      transition: all 0.2s;
-    }
-
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(165, 0, 52, 0.4);
-    }
-
-    /* Upload Box Styling */
-    .file-upload-box {
-      border: 2px dashed #CBD5E1;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      background: #F8FAFC;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-
-    [data-theme="dark"] .file-upload-box {
-      background: #0F172A;
-      border-color: #334155;
-    }
-
-    .file-upload-box:hover {
-      border-color: var(--lg-red);
-      background: #FFF0F3;
-    }
-
-    .preview-thumbnail {
-      max-width: 160px;
-      max-height: 100px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      margin-top: 10px;
-      display: none;
-      border: 2px solid var(--lg-red);
-    }
-
-    /* Filter & Control Bar */
-    .filter-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .search-box {
-      position: relative;
-      flex: 1;
-      min-width: 260px;
-    }
-
-    .search-box input {
-      padding-left: 36px;
-    }
-
-    .search-box::before {
-      content: '🔍';
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 13px;
-    }
-
-    /* Modal Popup */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(4px);
-      z-index: 999;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-card {
-      background: var(--lg-card-bg);
-      border-radius: 16px;
-      max-width: 600px;
-      width: 100%;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      position: relative;
-      animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 16px; right: 16px;
-      background: rgba(100, 116, 139, 0.15);
-      border: none; font-size: 18px; width: 32px; height: 32px;
-      border-radius: 50%; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; color: var(--lg-gray-dark);
-    }
-
-    /* Copy Section Box */
-    .copy-box {
-      margin-top: 16px;
-      background: #0F172A;
-      color: #F8FAFC;
-      border-radius: 10px;
-      padding: 18px;
-      position: relative;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 12px;
-      white-space: pre-wrap;
-      max-height: 350px;
-      overflow-y: auto;
-      border: 1px solid #334155;
-    }
-
-    .btn-copy {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: var(--lg-red);
-      color: #FFF;
-      border: none;
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 11.5px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-copy:hover {
-      background: var(--lg-red-dark);
-    }
-
-    /* SOP Steps Grid */
-    .sop-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    @media (max-width: 900px) {
-      .sop-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    .sop-card {
-      background: var(--lg-card-bg);
-      border: 1px solid var(--lg-border);
-      border-radius: 12px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      position: relative;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-
-    .sop-card.active-step {
-      border-color: var(--lg-red);
-      box-shadow: 0 4px 16px rgba(165, 0, 52, 0.15);
-    }
-
-    .sop-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--lg-red);
-      color: #FFF;
-      font-weight: 900;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(165, 0, 52, 0.3);
-    }
-
-    .sop-title {
-      font-weight: 800;
-      font-size: 13.5px;
-      color: var(--lg-gray-dark);
-    }
-
-    .sop-desc {
-      font-size: 12px;
-      color: var(--lg-gray-muted);
-      line-height: 1.5;
-    }
-
-    .highlight-pill {
-      display: inline-block;
-      background: #FFE6EC;
-      color: var(--lg-red);
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-    }
-
-    @media print {
-      body { background: #FFF; padding: 0; }
-      .header-actions, .nav-tabs, .btn-copy, .filter-bar, .btn-submit, #payment-upload-card { display: none !important; }
-      .tab-content { display: block !important; border: none; box-shadow: none; padding: 0; margin-bottom: 30px; }
-    }
-  </style>
-</head>
-<body>
-  <div class="app-container">
-    <!-- Top Header Banner -->
-    <header class="top-header">
-      <div class="brand-group">
-        <div class="lg-badge">LG</div>
-        <div class="header-titles">
-          <h1>CỔNG ĐĂNG KÝ BÁN HÀNG NỘI BỘ (INTERNAL SALES PORTAL)</h1>
-          <p>Hệ Thống Đăng Ký Trực Tuyến & Xác Nhận Nộp Tiền Ngân Hàng - Chuẩn Hóa LGEVH</p>
-        </div>
+<title>Đăng Ký Bán Hàng Nội Bộ DW-MWO</title>
+<style>
+  @font-face{font-family:"LG EI Headline";src:url("fonts/LGEIHeadline-Regular.otf")format("opentype");font-weight:400;font-style:normal;font-display:block}
+  @font-face{font-family:"LG EI Headline";src:url("fonts/LGEIHeadline-Semibold.otf")format("opentype");font-weight:600;font-style:normal;font-display:block}
+  @font-face{font-family:"LG EI Headline";src:url("fonts/LGEIHeadline-Bold.otf")format("opentype");font-weight:700;font-style:normal;font-display:block}
+  @font-face{font-family:"LG EI Text";src:url("fonts/LGEIText-Regular.otf")format("opentype");font-weight:400;font-style:normal;font-display:block}
+  @font-face{font-family:"LG EI Text";src:url("fonts/LGEIText-SemiBold.otf")format("opentype");font-weight:600;font-style:normal;font-display:block}
+  @font-face{font-family:"LG EI Text";src:url("fonts/LGEIText-Bold.otf")format("opentype");font-weight:700;font-style:normal;font-display:block}
+
+  :root{
+    /* LG BI Guidelines V5.2 — core palette + warm-gray ramp (references/color.md) */
+    --lg-active-red:#FD312E;
+    --lg-red:#A50034;            /* Heritage Red */
+    --lg-white:#FFFFFF;
+    --lg-black:#000000;
+    --wg01:#262626; --wg02:#4A4946; --wg03:#716F6A; --wg04:#CBC8C2;
+    --wg05:#E6E1D6; --wg06:#F0ECE4; --wg07:#F6F3EB;
+
+    --ground:var(--wg07); --panel:var(--wg06);
+    --ink:var(--wg01); --body:var(--wg02); --mute:var(--wg03); --line:var(--wg04);
+    --accent:var(--lg-active-red);
+
+    --font-head:"LG EI Headline", system-ui, sans-serif;
+    --font-body:"LG EI Text", system-ui, sans-serif;
+
+    /* grid margin = 5% of the shortest reference edge (BI p.76), computed for a 1200px page */
+    --margin: 60px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:var(--wg01); --panel:var(--wg02);
+      --ink:var(--wg07); --body:var(--wg05); --mute:var(--wg04); --line:var(--wg03);
+      --accent:var(--lg-active-red);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:var(--wg01); --panel:var(--wg02);
+    --ink:var(--wg07); --body:var(--wg05); --mute:var(--wg04); --line:var(--wg03);
+    --accent:var(--lg-active-red);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--ground); color:var(--body);
+    font-family:var(--font-body); font-size:14px; line-height:1.65;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:var(--margin) 24px 64px;}
+
+  header.masthead{
+    background:var(--lg-red);
+    border-radius:4px;
+    padding:22px 28px;
+    display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;
+  }
+  header.masthead .id{display:flex;align-items:center;gap:18px;}
+  header.masthead img.logo{height:38px;width:auto;display:block;}
+  header.masthead h1{
+    font-family:var(--font-head);font-weight:600;color:var(--lg-white);
+    font-size:18px;letter-spacing:.1px;margin:0 0 3px;text-wrap:balance;
+  }
+  header.masthead p{margin:0;color:#F3C9D5;font-size:12px;font-family:var(--font-body);}
+  .top-actions{display:flex;gap:8px;}
+  .btn{
+    font-family:var(--font-body);font-weight:600;font-size:12.5px;
+    border-radius:2px;border:1px solid rgba(255,255,255,.55);
+    background:transparent;color:var(--lg-white);padding:8px 16px;cursor:pointer;
+  }
+  .btn.solid{background:var(--lg-white);color:var(--lg-red);border-color:transparent;}
+  .btn:focus-visible, .tab:focus-visible, button:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+
+  nav.tabs{display:flex;gap:2px;margin-top:28px;border-bottom:1px solid var(--line);overflow-x:auto;}
+  .tab{
+    font-family:var(--font-head);font-weight:600;font-size:12.5px;
+    background:transparent;border:1px solid transparent;color:var(--mute);
+    padding:11px 18px;cursor:pointer;white-space:nowrap;
+  }
+  .tab[aria-selected="true"]{color:var(--lg-red);border-bottom:2px solid var(--lg-red);margin-bottom:-1px;}
+
+  section.panel{display:none;background:var(--ground);padding:28px 2px;}
+  section.panel.active{display:block;}
+  .panel h2{font-family:var(--font-head);font-weight:600;font-size:19px;color:var(--ink);margin:0 0 6px;text-wrap:balance;}
+  .panel > p.lede{color:var(--mute);margin:0 0 22px;max-width:66ch;font-size:13px;}
+
+  .mail{border:1px solid var(--line);background:var(--ground);}
+  .mail-meta{background:var(--panel);padding:14px 20px;border-bottom:1px solid var(--line);
+    display:flex;flex-direction:column;gap:6px;font-size:12.5px;}
+  .mail-meta .row{display:flex;gap:10px;}
+  .mail-meta .k{width:78px;flex-shrink:0;font-weight:600;color:var(--mute);}
+  .mail-meta .v{font-weight:600;color:var(--ink);}
+  .mail-meta .subj{color:var(--lg-red);}
+  .mail-body{padding:26px 30px;}
+  .mail-body .brandline{
+    display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:2px solid var(--lg-red);padding-bottom:14px;margin-bottom:18px;flex-wrap:wrap;gap:8px;
+  }
+  .mail-body .brandline strong{font-family:var(--font-head);font-weight:600;color:var(--lg-red);font-size:14px;}
+  .mail-body .brandline span{font-size:10.5px;color:var(--mute);}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--lg-red);padding:14px 18px;margin:16px 0;}
+  .card.alt{border-left-color:var(--wg03);}
+  .card .ct{font-family:var(--font-head);font-weight:600;color:var(--ink);font-size:13px;margin-bottom:8px;}
+  .card ul{margin:6px 0 0;padding-left:20px;}
+  .card li{margin-bottom:4px;}
+
+  table.tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0;}
+  table.tbl th{background:var(--ink);color:var(--ground);text-align:left;padding:8px 10px;font-family:var(--font-head);font-weight:600;}
+  table.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);}
+  table.tbl tr:nth-child(even) td{background:var(--panel);}
+  code, .code-pill{font-family:var(--font-body);font-weight:600;background:var(--wg05);color:var(--lg-red);padding:2px 6px;border-radius:2px;font-size:12px;}
+  :root[data-theme="dark"] code, .lg-dark-scope code{background:var(--wg02);color:var(--wg07);}
+  .pill-ok{background:var(--wg05);color:var(--wg01);font-weight:600;padding:2px 9px;font-size:11.5px;}
+
+  .codebox{margin-top:16px;background:var(--wg01);color:var(--wg07);padding:18px;position:relative;
+    font-family:var(--font-body);font-size:11.5px;white-space:pre-wrap;max-height:360px;overflow-y:auto;line-height:1.7;}
+  .copy{position:absolute;top:10px;right:10px;background:var(--lg-red);color:#fff;border:none;
+    padding:5px 12px;border-radius:2px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-body);}
+  .copy:hover{background:#7A0027;}
+
+  .gen{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--lg-red);padding:16px 18px;margin-bottom:20px;}
+  .gen .ct{color:var(--ink);font-family:var(--font-head);font-weight:600;font-size:13px;margin-bottom:4px;}
+  .gen p{margin:0 0 12px;color:var(--mute);font-size:12.5px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .field label{display:block;font-weight:600;font-size:11.5px;margin-bottom:4px;color:var(--ink);}
+  .field input{width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:2px;
+    font-family:var(--font-body);font-size:12.5px;background:var(--ground);color:var(--ink);}
+  .gen .full{margin-top:10px;}
+  .gen button.make{margin-top:12px;background:var(--lg-red);color:#fff;border:none;padding:9px 20px;
+    font-weight:600;border-radius:2px;cursor:pointer;font-family:var(--font-body);font-size:12.5px;}
+
+  .fill{background:var(--wg05);color:var(--body);padding:2px 8px;font-weight:600;}
+
+  .sop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .sop-card{background:var(--panel);border:1px solid var(--line);padding:16px;}
+  .sop-num{width:28px;height:28px;background:var(--lg-red);color:#fff;display:flex;align-items:center;
+    justify-content:center;font-weight:700;font-family:var(--font-head);margin-bottom:8px;border-radius:2px;}
+  .sop-card h3{font-family:var(--font-head);font-weight:600;font-size:13px;margin:0 0 4px;color:var(--ink);}
+  .sop-card p{margin:0;font-size:11.5px;color:var(--mute);}
+
+  footer.brandfoot{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  footer.brandfoot img{height:20px;width:auto;opacity:.85;}
+  footer.brandfoot span{font-size:11px;color:var(--mute);}
+
+  @media (max-width:720px){.grid3{grid-template-columns:1fr;} .sop-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:480px){.sop-grid{grid-template-columns:1fr;}}
+
+  @media print{
+    body{background:#fff;}
+    header .top-actions, nav.tabs, .copy, .gen{display:none;}
+    section.panel{display:block !important;}
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="id">
+      <img class="logo" src="logo/LGE_Logo_HeritageRed_White_RGB.png" alt="LG">
+      <div>
+        <h1>Đăng ký &amp; phản hồi mua hàng — chương trình DW-MWO</h1>
+        <p>Mẫu thư chuẩn hoá · Internal Sales Program · LG Electronics Vietnam</p>
       </div>
-      <div class="header-actions">
-        <button class="btn-action" onclick="window.print()">🖨️ In / Xuất PDF</button>
-        <button class="btn-action btn-secondary" onclick="toggleTheme()">🌓 Đêm / Sáng</button>
+    </div>
+    <div class="top-actions">
+      <button class="btn solid" onclick="window.print()">In / xuất PDF</button>
+      <button class="btn" id="themeBtn" onclick="toggleTheme()">Chế độ tối</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="t1">1 · Thư thông báo</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="t2">2 · Thư đăng ký</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="t3">3 · Danh sách &amp; bảo mật</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="t4">4 · Quy trình</button>
+  </nav>
+
+  <!-- TAB 1 -->
+  <section class="panel active" id="t1">
+    <h2>Mẫu 1 — Thư thông báo mở bán (PM Support gửi toàn thể nhân viên)</h2>
+    <p class="lede">Thông báo chương trình, khung giờ đăng ký cố định, nguyên tắc First Come First Serve và cách phản hồi. Danh sách sản phẩm chi tiết nằm ở file đính kèm — không đưa vào thân email.</p>
+
+    <div class="mail">
+      <div class="mail-meta">
+        <div class="row"><span class="k">Từ:</span><span class="v">Dương Thị Nguyệt — HS PM Support &lt;nguyet.duong@lge.com&gt;</span></div>
+        <div class="row"><span class="k">Đến:</span><span class="v">Toàn thể CBNV LG &lt;all.vietnam@lge.com&gt;</span></div>
+        <div class="row"><span class="k">Tiêu đề:</span><span class="v subj">[THÔNG BÁO] Chương trình bán hàng nội bộ sản phẩm DW-MWO</span></div>
+        <div class="row"><span class="k">Đính kèm:</span><span class="v">Danh_sach_dang_ky_noi_bo_MAT.xlsx (đặt mật khẩu)</span></div>
       </div>
-    </header>
+      <div class="mail-body">
+        <div class="brandline"><strong>LG ELECTRONICS VIETNAM — INTERNAL SALES</strong><span>Mã đợt: DW-MWO-2026-07</span></div>
 
-    <!-- Tabs Navigation -->
-    <nav class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('tab1', this)">
-        📧 1. Thư Thông Báo Mở Bán <span class="tab-badge">Announcement</span>
-      </button>
-      <button class="tab-btn" onclick="switchTab('tab2', this)">
-        💻 2. Đăng Ký Trực Tuyến Trên Hệ Thống <span class="tab-badge" style="background:#FFE6EC; color:var(--lg-red);">Portal Live</span>
-      </button>
-      <button class="tab-btn" onclick="switchTab('tab3', this)">
-        ✅ 3. Xác Nhận Mua & Nộp Tiền <span class="tab-badge" id="tab3-count-badge">5 Đã Xác Nhận</span>
-      </button>
-      <button class="tab-btn" onclick="switchTab('tab4', this)">
-        📎 4. File Danh Sách & Slot ID <span class="tab-badge">Excel List</span>
-      </button>
-      <button class="tab-btn" onclick="switchTab('tab5', this)">
-        ⚙️ 5. Quy Trình Chuẩn (SOP) <span class="tab-badge">Standard</span>
-      </button>
-    </nav>
+        <p>Dear all LG team members,</p>
+        <p>Chúng tôi trân trọng thông báo chương trình bán hàng nội bộ sản phẩm DW-MWO. Thông tin sản phẩm chi tiết vui lòng xem file đính kèm.</p>
 
-    <!-- TAB 1: THƯ THÔNG BÁO MỞ BÁN NỘI BỘ -->
-    <div id="tab1" class="tab-content active">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <div>
-          <h2 style="font-size:17px; color:var(--lg-red); font-family:var(--font-heading);">Mẫu Thư Thông Báo Mở Bán Sản Phẩm Nội Bộ (PM Gửi Toàn Nhân Viên)</h2>
-          <p style="color:var(--lg-gray-muted); font-size:12.5px;">Thông báo chương trình bán hàng nội bộ trên hệ thống trực tuyến, đảm bảo tính minh bạch, thời gian mở bán cố định và quy tắc đăng ký.</p>
-        </div>
-        <button onclick="goToPortal()" class="btn-submit" style="font-size:12px; padding:8px 18px;">👉 Đăng Ký Ngay Trên Hệ Thống</button>
-      </div>
-
-      <div class="email-container">
-        <div class="email-header-meta">
-          <div class="meta-row">
-            <span class="meta-label">Từ (From):</span>
-            <span class="meta-val">Ms. Duong Thi Nguyet - HS PM Support &lt;nguyet.duong@lge.com&gt;</span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Đến (To):</span>
-            <span class="meta-val">All LG Team Members &lt;all.vietnam@lge.com&gt;</span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Tiêu Đề:</span>
-            <span class="meta-val subject-val">[INTERNAL SALES ANNOUNCEMENT] Thông Báo Mở Đăng Ký Bán Hàng Nội Bộ Qua Hệ Thống Trực Tuyến (Đợt T8/2026)</span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Link Đăng Ký:</span>
-            <span class="meta-val">🔗 <a href="javascript:goToPortal()" style="color:var(--lg-red); font-weight:800; text-decoration:underline;">https://internalsales.lge.com/register</a></span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Đính Kèm:</span>
-            <span class="meta-val">📎 <code>LG_Internal_Sales_Product_List_Aug2026.xlsx</code> (Mật khẩu: MÃ_NV)</span>
-          </div>
+        <div class="card">
+          <div class="ct">1 · Nguyên tắc đăng ký</div>
+          <ul>
+            <li><code>FIRST COME, FIRST SERVE</code> — căn cứ theo thời gian (timestamp) email phản hồi.</li>
+            <li>Hạn chót: <strong>trước 10:00, 31/07/2026</strong> · 01 model / nhân viên.</li>
+            <li>Chỉ phản hồi (Reply) duy nhất cho <strong>Ms. Nguyệt — HS PM Support</strong> (nguyet.duong@lge.com). Không dùng Reply All.</li>
+          </ul>
         </div>
 
-        <div class="email-body">
-          <div class="email-logo-bar">
-            <span class="email-lg-title">LG ELECTRONICS VIETNAM — INTERNAL SALES SYSTEM</span>
-            <span style="font-weight:700; color:var(--lg-gray-muted); font-size:11.5px;">Mã Đợt: IS-2026-AUG-01</span>
-          </div>
-
-          <p>Kính gửi Toàn thể Cán bộ Nhân viên LG Electronics Việt Nam (Dear All LG Team Members),</p>
-          <br>
-          <p>Bộ phận PM Support xin thông báo chương trình <strong>Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)</strong> dành riêng cho nhân viên LG với mức giá ưu đãi đặc biệt cho dòng sản phẩm <strong>Dishwasher (DW), Microwave Oven (MWO) & LG Styler</strong>.</p>
-          <p style="margin-top:8px;">💡 <em>Cải tiến mới: Các trường thông tin về Nhân Viên Nộp Tiền được tách thành các trường riêng độc lập!</em></p>
-
-          <div class="sec-card">
-            <div class="sec-title">📌 1. THÔNG TIN CHƯƠNG TRÌNH & THỜI GIAN MỞ ĐĂNG KÝ HỆ THỐNG</div>
-            <ul style="padding-left: 20px; line-height: 1.7;">
-              <li><strong>Thời gian thông báo trước:</strong> 24 Giờ (Giúp nhân viên xem trước danh sách sản phẩm và mã Slot ID).</li>
-              <li><strong>Thời gian chính thức mở cổng đăng ký:</strong> Từ <strong>10:00 AM, Ngày 31/07/2026</strong>.</li>
-              <li><strong>Hạn chót đăng ký (Deadline):</strong> Trước <strong>17:00 PM, Ngày 02/08/2026</strong>.</li>
-              <li><strong>Nguyên tắc xét duyệt:</strong> <code>FIRST COME, FIRST SERVED</code> (Căn cứ theo Timestamp hệ thống tự động ghi nhận khi nhấn Gửi Đăng Ký).</li>
-              <li><strong>Hạn mức mua:</strong> Tối đa <strong>01 Sản phẩm / 01 Nhân viên</strong>.</li>
-            </ul>
-          </div>
-
-          <div class="sec-card sec-card-teal">
-            <div class="sec-title">💻 2. HƯỚNG DẪN ĐĂNG KÝ THẲNG TRÊN HỆ THỐNG (SYSTEM DIRECT REGISTRATION)</div>
-            <p>Nhân viên truy cập tab <strong>"2. Đăng Ký Trực Tuyến Trên Hệ Thống"</strong> và điền đầy đủ các trường thông tin quy định độc lập:</p>
-            <ul style="padding-left: 20px; margin-top: 6px; line-height: 1.7;">
-              <li><strong>Trường 1-3:</strong> Bộ Phận (Division) | Mã Nhân Viên Đăng Ký | Họ Tên NV Đăng Ký</li>
-              <li><strong>Trường 4-7:</strong> Mã Model | Mã Slot ID (#001, #002...) | SĐT Liên Hệ | Địa Chỉ Giao Hàng</li>
-              <li><strong style="color:var(--lg-red);">Trường 8 (Độc Lập): Họ và Tên Nhân Viên Nộp Tiền</strong></li>
-              <li><strong style="color:var(--lg-red);">Trường 9 (Độc Lập): Mã NV Người Nộp Tiền</strong></li>
-            </ul>
-          </div>
-
-          <div class="sec-card">
-            <div class="sec-title">💳 3. PHƯƠNG THỨC THANH TOÁN & NỘP CHỨNG TỪ TIỀN GỬI NGÂN HÀNG</div>
-            <p>Sau khi hệ thống xác nhận đăng ký slot thành công, nhân viên thực hiện chuyển khoản 100% giá trị đơn hàng và <strong>Upload File Ảnh Biên Lai Nộp Tiền</strong> tại Tab 3:</p>
-            <ul style="padding-left:20px; margin-top:8px; line-height:1.7;">
-              <li><strong>Tên Tài Khoản:</strong> CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG</li>
-              <li><strong>Số Tài Khoản:</strong> <code>0991000012525</code></li>
-              <li><strong>Ngân Hàng:</strong> VIETCOMBANK - Chi Nhánh Tây Hồ</li>
-              <li><strong>Cú pháp chuyển khoản (Bắt buộc):</strong> <code>[Mã NV] - [Họ Tên] - [Mã Model] - [STT Ordinal]</code></li>
-              <li><strong>Upload File Biên Lai:</strong> Vào Tab 3 -> Điền mẫu biểu xác nhận nộp tiền -> Tải file ảnh/PDF biên lai nộp tiền lên hệ thống.</li>
-            </ul>
-          </div>
-
-          <div class="sec-card sec-card-amber">
-            <div class="sec-title" style="color: #B45309;">⚠️ 4. ĐIỀU KHOẢN VÀ CHÍNH SÁCH BẢO HÀNH & TUÂN THỦ JEONG-DO</div>
-            <ul style="padding-left:20px; line-height:1.7; color:#92400E;">
-              <li><strong>Vận chuyển:</strong> Công ty hỗ trợ vận chuyển đến địa chỉ đăng ký của nhân viên.</li>
-              <li><strong>Bảo hành:</strong> Sản phẩm bán nội bộ Clearance/Internal Sales không áp dụng chế độ bảo hành (No Warranty).</li>
-              <li><strong>Đổi trả:</strong> Trong vòng 07 ngày làm việc kể từ ngày nhận hàng, chỉ chấp nhận đổi sản phẩm nếu sản phẩm bị lỗi chức năng cơ bản.</li>
-              <li><strong>Cam kết Jeong-Do Management:</strong> Nghiêm cấm bán lại cho bên thứ 3 (Resale prohibited). Vi phạm sẽ xử lý kỷ luật theo quy chế công ty.</li>
-            </ul>
-          </div>
-
-          <p style="margin-top:20px;">Trân trọng cảm ơn,</p>
-          <p><strong>Ms. Dương Thị Nguyệt</strong><br>HS PM Support | LG Electronics Vietnam<br>Email: nguyet.duong@lge.com</p>
+        <div class="card alt">
+          <div class="ct">2 · Định dạng đăng ký</div>
+          <table class="tbl">
+            <thead><tr><th>Bộ phận</th><th>Mã NV</th><th>Họ tên</th><th>Model</th><th>STT</th><th>Địa chỉ giao hàng</th></tr></thead>
+            <tbody>
+              <tr><td>HS PM</td><td><code>VH12345</code></td><td>Nguyễn Thị Quỳnh Như</td><td>MS3032JAS.BBKPLVN</td><td><span class="pill-ok">1</span></td><td>Tầng 12, tòa Thisofic, 10 Mai Chí Thọ, An Khánh, TP.HCM</td></tr>
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <!-- Copyable Raw Text Announcement -->
-      <h3 style="font-size:14px; margin-top:24px; color:var(--lg-gray-dark);">📋 Bản Copy Nội Dung Text Email Thông Báo (Dùng để gửi Outlook):</h3>
-      <div class="copy-box" id="raw-text-1">
-<button class="btn-copy" onclick="copyContent('raw-text-1')">Sao chép Text</button>
+        <div class="card">
+          <div class="ct">3 · Thanh toán</div>
+          <ul>
+            <li>Chuyển khoản 1 lần từ tài khoản Vietcombank cá nhân.</li>
+            <li>Tên TK: <strong>CTY TNHH LG ELECTRONICS VN HAI PHONG</strong> · Số TK <code>0991000012525</code> · Vietcombank, CN Tây Hồ.</li>
+            <li>Nội dung CK: <code>Mã NV - Họ tên - Model - STT</code>, ví dụ <code>VH12345 - Nguyen Thi Quynh Nhu - MS3032JAS.BBKPLVN - 1</code>.</li>
+          </ul>
+        </div>
+
+        <div class="card alt">
+          <div class="ct">4 · Chính sách khác</div>
+          <ul>
+            <li>Giao hàng: công ty hỗ trợ · Bảo hành: không áp dụng.</li>
+            <li>Đổi trả trong 7 ngày làm việc, chỉ với lỗi chức năng cơ bản.</li>
+            <li>Không bán lại cho bên thứ ba, không áp dụng chuyển kho, không hỗ trợ lắp đặt/phụ kiện.</li>
+          </ul>
+        </div>
+
+        <p>Trân trọng,<br><strong>Dương Thị Nguyệt</strong> — HS PM Support</p>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--font-head);font-weight:600;font-size:13px;margin:20px 0 6px;color:var(--ink);">Bản văn bản thuần (dán vào Outlook)</h3>
+    <div class="codebox" id="raw1">
+      <button class="copy" onclick="copyBox('raw1')">Sao chép</button>
 Dear all LG team members,
 
-We would like to inform you about the internal sales program of DW-MWO-Styler products. Employees register DIRECTLY on the online portal with original registration criteria preserved.
+We would like to inform you about the internal sales program of DW-MWO products. Please kindly check product information in the attached file and as below:
 
-1. REGISTRATION TIME:
-- Announcement time: 24h prior to registration open
-- System Registration Start Time: 10:00 AM, 31st July 2026
-- Registration Deadline: 17:00 PM, 02nd August 2026
-
-2. REGISTRATION RULES & SYSTEM PORTAL:
-- FIRST COME FIRST SERVED (Based on System Timestamp)
+1. REGISTRATION RULES: FIRST COME FIRST SERVE
+- Deadline: before 10:00, 31st July 2026
 - 01 model / employee
-- Registration Link: Direct System Portal (https://internalsales.lge.com)
-- Required Criteria Fields:
-  1. Division
-  2. Employee Code
-  3. Employee Name
-  4. Model Name
-  5. Slot ID
-  6. Phone Number
-  7. Delivery Address
-  8. Payer Employee Full Name (Họ và Tên Nhân Viên Nộp Tiền)
-  9. Payer Employee Code (Mã NV Người Nộp Tiền)
+- Reply only to Ms. Nguyet - HS PM Support (Nguyet.duong@lge.com), format:
+  Division | Employee code | Name | Model | Ordinal number | Delivery address
 
-3. PAYMENT METHOD & PAYER VERIFICATION:
-- Transfer 100% to Company Vietcombank Account: 0991000012525 (CTY TNHH LG ELECTRONICS VN HAI PHONG - Vietcombank Tay Ho)
-- Transfer Syntax: [Employee Code] - [Employee Name] - [Model Name] - [Slot ID]
-- Upload Deposit Receipt: Employee fills confirmation form in Step 3 and uploads bank transfer slip photo/file.
+2. PAYMENT: 1-time transfer from your Vietcombank account
+- Account name: CTY TNHH LG ELECTRONICS VN HAI PHONG
+- Account no: 0991000012525 - Vietcombank, Tay Ho Branch
+- Content: [Employee code] - [Name] - [Model] - [Ordinal number]
 
-4. OTHER POLICIES:
-- Delivery: Company supported
-- Warranty: No warranty (Clearance Sales)
-- Jeong-Do Rule: Resale to 3rd parties is strictly prohibited.
+3. OTHER POLICIES
+- Delivery: company support / Warranty: none
+- Return: within 7 working days, basic function defect only
+- Not permitted resale to 3rd parties / not applicable to warehouse transfer / no installation support
 
-Best Regards,
-Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
+Please send confirmation of successful payment with phone number and delivery address to Ms. Nguyet - HS PM Support.
+
+Best regards,
+Nguyet Duong - HS PM Support</div>
+  </section>
+
+  <!-- TAB 2 -->
+  <section class="panel" id="t2">
+    <h2>Mẫu 2 — Thư nhân viên phản hồi đăng ký</h2>
+    <p class="lede">Nhân viên điền thông tin vào công cụ bên dưới để tự sinh nội dung email đăng ký đúng chuẩn, sau đó dán vào Outlook và gửi riêng cho PM Support.</p>
+
+    <div class="gen">
+      <div class="ct">Công cụ tạo nhanh nội dung đăng ký</div>
+      <p>Điền thông tin cá nhân — nội dung email mẫu bên dưới sẽ tự cập nhật.</p>
+      <div class="grid3">
+        <div class="field"><label>Bộ phận</label><input id="iDiv" placeholder="HS PM"></div>
+        <div class="field"><label>Mã nhân viên</label><input id="iCode" placeholder="VH12345"></div>
+        <div class="field"><label>Họ và tên</label><input id="iName" placeholder="Nguyễn Văn A"></div>
+        <div class="field"><label>Model đăng ký</label><input id="iModel" placeholder="MS3032JAS.BBKPLVN"></div>
+        <div class="field"><label>Số điện thoại</label><input id="iPhone" placeholder="0912345678"></div>
+        <div class="field"><label>STT (nếu có)</label><input id="iSlot" placeholder="1"></div>
+      </div>
+      <div class="field full"><label>Địa chỉ nhận hàng</label><input id="iAddr" placeholder="Số 10 ..., Phường ..., TP. HCM"></div>
+      <button class="make" onclick="generate()">Cập nhật nội dung mail</button>
+    </div>
+
+    <div class="mail">
+      <div class="mail-meta">
+        <div class="row"><span class="k">Từ:</span><span class="v" id="vFrom">[Họ tên nhân viên] &lt;email@lge.com&gt;</span></div>
+        <div class="row"><span class="k">Đến:</span><span class="v">Dương Thị Nguyệt — HS PM Support &lt;nguyet.duong@lge.com&gt;</span></div>
+        <div class="row"><span class="k">Tiêu đề:</span><span class="v subj" id="vSubj">[Đăng ký] Chương trình DW-MWO — [Mã NV] [Họ tên]</span></div>
+      </div>
+      <div class="mail-body">
+        <p>Kính gửi Chị Nguyệt,</p>
+        <p>Tôi xin đăng ký tham gia chương trình mua sản phẩm nội bộ với thông tin như sau:</p>
+        <div class="card alt">
+          <div class="ct">Bảng thông tin đăng ký</div>
+          <table class="tbl">
+            <tbody>
+              <tr><td style="width:180px;font-weight:600;">Bộ phận</td><td><span class="fill" id="fDiv">[ ..................... ]</span></td></tr>
+              <tr><td style="font-weight:600;">Mã nhân viên</td><td><span class="fill" id="fCode">[ ..................... ]</span></td></tr>
+              <tr><td style="font-weight:600;">Họ và tên</td><td><strong id="fName">[ ..................... ]</strong></td></tr>
+              <tr><td style="font-weight:600;">Model đăng ký</td><td><strong id="fModel">[ ..................... ]</strong></td></tr>
+              <tr><td style="font-weight:600;">Số điện thoại</td><td id="fPhone">[ ..................... ]</td></tr>
+              <tr><td style="font-weight:600;">Địa chỉ nhận hàng</td><td id="fAddr">[ ..................................................... ]</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="ct">Cam kết của nhân viên</div>
+          <ul>
+            <li>Thông tin đăng ký trên là chính xác, đúng quy định 01 sản phẩm/nhân viên.</li>
+            <li>Sẽ chuyển khoản đúng cú pháp ngay sau khi nhận email xác nhận từ PM Support.</li>
+            <li>Sản phẩm mua phục vụ nhu cầu cá nhân, không bán lại cho bên thứ ba.</li>
+          </ul>
+        </div>
+        <p>Trân trọng cảm ơn.<br><strong id="fSign">[Họ tên]</strong> — <span id="fSignDiv">[Bộ phận]</span></p>
       </div>
     </div>
 
-    <!-- TAB 2: ĐĂNG KÝ TRỰC TUYẾN TRÊN HỆ THỐNG -->
-    <div id="tab2" class="tab-content">
-      <div style="margin-bottom:20px;">
-        <h2 style="font-size:17px; color:var(--lg-red); font-family:var(--font-heading);">💻 Portal Đăng Ký Mua Hàng Trực Tuyến Trên Hệ Thống (Direct Registration Form)</h2>
-        <p style="color:var(--lg-gray-muted); font-size:12.5px;">Nhân viên điền trực tiếp thông tin vào biểu mẫu bên dưới. Trường thông tin <strong>Họ tên người nộp tiền</strong> và <strong>Mã NV người nộp tiền</strong> được tách bạch thành 2 trường độc lập riêng biệt!</p>
-      </div>
+    <h3 style="font-family:var(--font-head);font-weight:600;font-size:13px;margin:20px 0 6px;color:var(--ink);">Bản văn bản thuần</h3>
+    <div class="codebox" id="raw2">
+      <button class="copy" onclick="copyBox('raw2')">Sao chép</button>
+Kính gửi Chị Nguyệt,
 
-      <form id="system-reg-form" onsubmit="handleFormSubmit(event)" style="background:var(--lg-card-bg); border:1.5px solid var(--lg-border); border-radius:14px; padding:24px; box-shadow:0 4px 16px rgba(0,0,0,0.03);">
-        <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid var(--lg-border); margin-bottom:16px;">
-          <span style="font-weight:800; font-size:14px; color:var(--lg-red);">📝 THÔNG TIN ĐĂNG KÝ CÁ NHÂN (TÁCH BIỆT TRƯỜNG NHÂN VIÊN NỘP TIỀN ĐỘC LẬP)</span>
-          <span style="font-size:12px; background:#ECFDF5; color:#047857; font-weight:700; padding:3px 10px; border-radius:12px; border:1px solid #A7F3D0;">🔴 Cổng Đăng Ký Đang Mở Live</span>
-        </div>
+Tôi xin đăng ký tham gia chương trình mua sản phẩm nội bộ DW-MWO:
 
-        <div class="form-grid">
-          <!-- 1. Division -->
-          <div class="form-group">
-            <label class="form-label" for="reg-division">1. Bộ phận (Division) <span class="req">*</span></label>
-            <select class="form-control" id="reg-division" required>
-              <option value="">-- Chọn Bộ Phận --</option>
-              <option value="HS PM Support">HS PM Support</option>
-              <option value="Audit & Jeong-Do">Audit & Jeong-Do Team</option>
-              <option value="HE Sales Division">HE Sales Division</option>
-              <option value="HA Production">HA Production Division</option>
-              <option value="HR & Admin">HR & Admin Department</option>
-              <option value="Finance & Accounting">Finance & Accounting</option>
-              <option value="R&D Center">R&D Center Vietnam</option>
-              <option value="Supply Chain Management">Supply Chain Management (SCM)</option>
-            </select>
-          </div>
+Bộ phận: [ ..................... ]
+Mã nhân viên: [ ..................... ]
+Họ và tên: [ ..................... ]
+Model đăng ký: [ ..................... ]
+Số điện thoại: [ ..................... ]
+Địa chỉ nhận hàng: [ ..................... ]
 
-          <!-- 2. Employee Code -->
-          <div class="form-group">
-            <label class="form-label" for="reg-emp-code">2. Mã Nhân Viên Đăng Ký (EMP Code) <span class="req">*</span></label>
-            <input type="text" class="form-control" id="reg-emp-code" placeholder="Ví dụ: VH12345" required>
-          </div>
+Tôi cam kết thông tin trên là chính xác và đồng ý với các điều khoản của chương trình
+(không bảo hành, không bán lại cho bên thứ ba, đổi trả 7 ngày làm việc với lỗi chức năng cơ bản).
 
-          <!-- 3. Employee Full Name -->
-          <div class="form-group">
-            <label class="form-label" for="reg-emp-name">3. Họ và Tên Nhân Viên Đăng Ký <span class="req">*</span></label>
-            <input type="text" class="form-control" id="reg-emp-name" placeholder="Ví dụ: Nguyễn Thị Quỳnh Như" required>
-          </div>
+Trân trọng,
+[Họ tên] — [Bộ phận]</div>
+  </section>
 
-          <!-- 4. Model Selection -->
-          <div class="form-group">
-            <label class="form-label" for="reg-model">4. Mã Model Sản Phẩm <span class="req">*</span></label>
-            <select class="form-control" id="reg-model" required>
-              <option value="">-- Chọn Mã Model --</option>
-              <option value="MS3032JAS.BBKPLVN">MS3032JAS.BBKPLVN - Lò vi sóng LG 30L (1,850,000 VNĐ)</option>
-              <option value="LDFB7623S.ABMETVN">LDFB7623S.ABMETVN - Máy rửa bát QuadWash (12,500,000 VNĐ)</option>
-              <option value="S5GOC.ABMETVN">S5GOC.ABMETVN - Tủ chăm sóc quần áo LG Styler (22,000,000 VNĐ)</option>
-              <option value="GR-X257MC.AMCKVN">GR-X257MC.AMCKVN - Tủ lạnh InstaView 635L (28,900,000 VNĐ)</option>
-            </select>
-          </div>
+  <!-- TAB 3 -->
+  <section class="panel" id="t3">
+    <h2>Danh sách đăng ký &amp; nguyên tắc bảo mật</h2>
+    <p class="lede">Danh sách chỉ tồn tại dưới dạng file nội bộ có mật khẩu, không phải form hay sheet chia sẻ công khai.</p>
 
-          <!-- 5. Slot ID -->
-          <div class="form-group">
-            <label class="form-label" for="reg-slot-id">5. Mã Slot ID Đăng Ký <span class="req">*</span></label>
-            <select class="form-control" id="reg-slot-id" required>
-              <option value="">-- Chọn Mã Slot ID --</option>
-              <option value="#001">#001 (Microwave - Slot 1)</option>
-              <option value="#002">#002 (Microwave - Slot 2)</option>
-              <option value="#003">#003 (Dishwasher - Slot 1)</option>
-              <option value="#004">#004 (LG Styler - Slot 1)</option>
-              <option value="#005">#005 (InstaView Refrigerator - Slot 1)</option>
-            </select>
-          </div>
-
-          <!-- 6. Phone Number -->
-          <div class="form-group">
-            <label class="form-label" for="reg-phone">6. Số Điện Thoại Liên Hệ <span class="req">*</span></label>
-            <input type="tel" class="form-control" id="reg-phone" placeholder="Ví dụ: 0912345678" required>
-          </div>
-
-          <!-- 7. Delivery Address -->
-          <div class="form-group full-width">
-            <label class="form-label" for="reg-address">7. Địa Chỉ Giao Hàng Chi Tiết <span class="req">*</span></label>
-            <input type="text" class="form-control" id="reg-address" placeholder="Ví dụ: Tầng 12, Tòa nhà Thiso Hall, 10 Mai Chí Thọ, P. An Khánh, TP. Thủ Đức, TP. HCM" required>
-          </div>
-
-          <!-- 8. SEPARATE INDEPENDENT FIELD: PAYER FULL NAME -->
-          <div class="form-group" style="background:#EFF6FF; padding:14px; border-radius:10px; border:1.5px solid #BFDBFE;">
-            <label class="form-label" for="reg-payer-name" style="color:#1D4ED8; font-size:12.5px;">
-              👤 8. Họ và Tên Nhân Viên Nộp Tiền (Trường Độc Lập) <span class="req">*</span>
-            </label>
-            <p style="font-size:11px; color:#475569; margin-bottom:6px;">Tên người thực hiện chuyển khoản ngân hàng (Mặc định tự điền theo NV đăng ký, có thể đổi nếu nộp hộ).</p>
-            <input type="text" class="form-control" id="reg-payer-name" placeholder="Ví dụ: Nguyễn Thị Quỳnh Như (Hoặc người nộp hộ)" required>
-          </div>
-
-          <!-- 9. SEPARATE INDEPENDENT FIELD: PAYER EMP CODE -->
-          <div class="form-group" style="background:#EFF6FF; padding:14px; border-radius:10px; border:1.5px solid #BFDBFE;">
-            <label class="form-label" for="reg-payer-code" style="color:#1D4ED8; font-size:12.5px;">
-              🪪 9. Mã NV Người Nộp Tiền (Trường Độc Lập) <span class="req">*</span>
-            </label>
-            <p style="font-size:11px; color:#475569; margin-bottom:6px;">Mã số nhân viên của người thực hiện nộp tiền qua ngân hàng.</p>
-            <input type="text" class="form-control" id="reg-payer-code" placeholder="Ví dụ: VH12345 (Hoặc mã NV nộp hộ)" required>
-          </div>
-        </div>
-
-        <!-- Jeong-Do Commitment Agreement -->
-        <div style="margin-top:16px; background:rgba(248, 250, 252, 0.8); padding:14px 18px; border-radius:8px; border:1px solid var(--lg-border);">
-          <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:12.5px;">
-            <input type="checkbox" id="reg-agree" required style="margin-top:3px; accent-color:var(--lg-red);">
-            <span>
-              Tôi cam kết thông tin đăng ký là chính xác, tuân thủ hạn mức 01 sản phẩm/nhân viên, thực hiện nộp tiền thanh toán đúng cú pháp ngay khi nhận thông báo và không bán lại cho bên thứ 3 theo nguyên tắc <strong>Jeong-Do Management LGEVH</strong>.
-            </span>
-          </label>
-        </div>
-
-        <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:12px;">
-          <button type="reset" class="btn-action btn-secondary" style="color:var(--lg-gray-dark); border-color:var(--lg-border);">🔄 Nhập Lại Form</button>
-          <button type="submit" class="btn-submit">🚀 Gửi Đăng Ký Lên Hệ Thống (Record Timestamp)</button>
-        </div>
-      </form>
+    <div class="card alt">
+      <div class="ct">Cấu trúc file đính kèm (Danh_sach_dang_ky_noi_bo_MAT.xlsx)</div>
+      <table class="tbl">
+        <thead><tr><th>STT</th><th>Timestamp</th><th>Mã NV</th><th>Họ tên</th><th>Model</th><th>SĐT</th><th>Trạng thái</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>31/07 08:05</td><td><code>VH00123</code></td><td>Nguyễn Văn A</td><td>MS3032JAS.BBKPLVN</td><td>090xxxxxxx</td><td><span class="pill-ok">Trúng suất</span></td></tr>
+          <tr><td>2</td><td>31/07 08:12</td><td><code>VH00456</code></td><td>Trần Thị B</td><td>MS3032JAS.BBKPLVN</td><td>090xxxxxxx</td><td>Hàng chờ</td></tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- TAB 3: XÁC NHẬN MUA & NỘP TIỀN + MẪU BIỂU UPLOAD CHỨNG TỪ -->
-    <div id="tab3" class="tab-content">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h2 style="font-size:17px; color:var(--lg-red); font-family:var(--font-heading);">
-            ✅ Mẫu Biểu Xác Nhận Mua & Upload File Nộp Tiền Ngân Hàng
-          </h2>
-          <p style="color:var(--lg-gray-muted); font-size:12.5px;">
-            Nhân viên điền thông tin xác nhận nộp tiền và <strong>Tải lên (Upload) file biên lai/ảnh chụp màn hình chuyển khoản ngân hàng</strong> để PM đối soát.
-          </p>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button onclick="togglePaymentUploadForm()" class="btn-action" style="font-size:12px; padding:7px 14px; background:var(--lg-red); color:#FFF;">
-            📤 Điền Thông Tin & Upload File Nộp Tiền
-          </button>
-          <button onclick="exportToCSV()" class="btn-action" style="font-size:12px; padding:7px 14px; background:#059669; color:#FFF;">
-            📥 Xuất Excel
-          </button>
-        </div>
-      </div>
+    <div class="card">
+      <div class="ct">Nguyên tắc bảo mật &amp; chống tranh chấp</div>
+      <ul>
+        <li><strong>Kênh duy nhất:</strong> phản hồi qua email trực tiếp đến một đầu mối; không có form/link công khai.</li>
+        <li><strong>Cần biết mới được biết:</strong> chỉ PM Support, quản lý phê duyệt và kế toán đối soát được xem toàn bộ danh sách.</li>
+        <li><strong>Không Reply All:</strong> tránh lộ số điện thoại, địa chỉ của người đăng ký khác.</li>
+        <li><strong>Đính kèm có mật khẩu:</strong> khi cần bàn giao cho các bên liên quan, gửi file có mật khẩu, không dán danh sách vào thân email số đông.</li>
+        <li><strong>Timestamp làm bằng chứng:</strong> thời gian nhận email được dùng để phân xử tranh chấp thứ tự First Come First Serve.</li>
+        <li><strong>Tách bạch vai trò:</strong> người duyệt danh sách không đồng thời là người thu tiền, để kiểm soát chéo.</li>
+      </ul>
+    </div>
+  </section>
 
-      <!-- FORM UPLOAD BIÊN LAI NỘP TIỀN CỦA NHÂN VIÊN -->
-      <div id="payment-upload-card" style="background:var(--lg-red-light); border:1.5px solid var(--lg-red-border); border-radius:14px; padding:22px; margin-bottom:24px; box-shadow:0 4px 16px rgba(165,0,52,0.06);">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--lg-red-border); padding-bottom:12px; margin-bottom:16px;">
-          <span style="font-weight:800; font-size:14px; color:var(--lg-red); display:flex; align-items:center; gap:8px;">
-            📄 MẪU BIỂU ĐIỀN THÔNG TIN NỘP TIỀN & UPLOAD CHỨNG TỪ CHUYỂN KHOẢN
-          </span>
-          <span style="font-size:11.5px; background:var(--lg-red); color:#FFF; font-weight:700; padding:3px 10px; border-radius:12px;">
-            Dành cho Nhân Viên
-          </span>
-        </div>
+  <!-- TAB 4 -->
+  <section class="panel" id="t4">
+    <h2>Quy trình xử lý đăng ký (SOP)</h2>
+    <p class="lede">Bốn bước cốt lõi từ lúc mở chương trình đến khi giao hàng.</p>
 
-        <form id="payment-form" onsubmit="handlePaymentSubmit(event)">
-          <div class="form-grid">
-            <!-- Order Slot Selection -->
-            <div class="form-group">
-              <label class="form-label" for="pay-slot-select">1. Chọn Mã Slot ID Đã Đăng Ký <span class="req">*</span></label>
-              <select class="form-control" id="pay-slot-select" onchange="autoFillPaymentOrderInfo()" required>
-                <option value="">-- Chọn Mã Slot ID Của Bạn --</option>
-                <option value="#001">#001 - Nguyễn Thị Quỳnh Như (MS3032JAS - 1,850,000 VNĐ)</option>
-                <option value="#002">#002 - Trần Văn Nam (MS3032JAS - 1,850,000 VNĐ)</option>
-                <option value="#003">#003 - Lê Hoàng Anh (LDFB7623S - 12,500,000 VNĐ)</option>
-                <option value="#004">#004 - Hoàng Minh Trí (S5GOC - 22,000,000 VNĐ)</option>
-                <option value="#005">#005 - Đặng Thanh Hà (GR-X257MC - 28,900,000 VNĐ)</option>
-              </select>
-            </div>
-
-            <!-- EMP Code -->
-            <div class="form-group">
-              <label class="form-label" for="pay-emp-code">2. Mã NV Đăng Ký <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-emp-code" placeholder="Ví dụ: VH12345" required>
-            </div>
-
-            <!-- EMP Name -->
-            <div class="form-group">
-              <label class="form-label" for="pay-emp-name">3. Họ & Tên NV Đăng Ký <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-emp-name" placeholder="Ví dụ: Nguyễn Thị Quỳnh Như" required>
-            </div>
-
-            <!-- SEPARATE INDEPENDENT FIELD: PAYER FULL NAME -->
-            <div class="form-group" style="background:#FFFFFF; border:1px solid #BFDBFE; padding:10px; border-radius:8px;">
-              <label class="form-label" for="pay-payer-name" style="color:#1D4ED8;">👤 4. Họ và Tên Nhân Viên Nộp Tiền (Trường Độc Lập) <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-payer-name" placeholder="Họ và tên người nộp tiền thực tế" required>
-            </div>
-
-            <!-- SEPARATE INDEPENDENT FIELD: PAYER CODE -->
-            <div class="form-group" style="background:#FFFFFF; border:1px solid #BFDBFE; padding:10px; border-radius:8px;">
-              <label class="form-label" for="pay-payer-code" style="color:#1D4ED8;">🪪 5. Mã NV Người Nộp Tiền (Trường Độc Lập) <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-payer-code" placeholder="Mã NV của người nộp tiền" required>
-            </div>
-
-            <!-- Amount Paid -->
-            <div class="form-group">
-              <label class="form-label" for="pay-amount">6. Số Tiền Đã Chuyển Khoản (VNĐ) <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-amount" placeholder="Ví dụ: 1,850,000" required>
-            </div>
-
-            <!-- Bank & Txn Ref -->
-            <div class="form-group">
-              <label class="form-label" for="pay-txn-id">7. Ngân Hàng & Mã Giao Dịch <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-txn-id" placeholder="Ví dụ: Vietcombank - VCB-TXN9823411" required>
-            </div>
-
-            <!-- Payment Date Time -->
-            <div class="form-group">
-              <label class="form-label" for="pay-date">8. Ngày Giờ Nộp Tiền <span class="req">*</span></label>
-              <input type="text" class="form-control" id="pay-date" placeholder="Ví dụ: 31/07/2026 10:15:00" required>
-            </div>
-
-            <!-- UPLOAD FILE CHỨNG TỪ NỘP TIỀN NGÂN HÀNG -->
-            <div class="form-group full-width">
-              <label class="form-label" style="font-size:13px; color:var(--lg-red);">
-                📎 9. Upload File Chứng Từ / Ảnh Chụp Màn Hình Biên Lai Nộp Tiền Ngân Hàng <span class="req">*</span>
-              </label>
-              <div class="file-upload-box" onclick="document.getElementById('file-input-receipt').click()">
-                <div style="font-size:32px; margin-bottom:6px;">🧾 Upload File Biên Lai</div>
-                <p style="font-size:13px; font-weight:700; color:var(--lg-gray-dark);">
-                  Nhấn vào đây để tải file ảnh hoặc kéo thả chứng từ biên lai nộp tiền (JPG, PNG, PDF)
-                </p>
-                <p style="font-size:11.5px; color:var(--lg-gray-muted); margin-top:4px;">
-                  Hỗ trợ định dạng: .PNG, .JPG, .JPEG, .PDF (Tối đa 10MB)
-                </p>
-                <input type="file" id="file-input-receipt" accept="image/*,application/pdf" style="display:none;" onchange="handleFileSelected(event)">
-                <img id="file-preview-img" class="preview-thumbnail" alt="Xem trước biên lai">
-                <div id="file-name-display" style="margin-top:8px; font-weight:800; color:var(--lg-red); font-size:12px;"></div>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:10px;">
-            <button type="reset" class="btn-action btn-secondary" style="color:var(--lg-gray-dark); border-color:var(--lg-border);">Hủy Bỏ</button>
-            <button type="submit" class="btn-submit">
-              📤 Gửi Xác Nhận Nộp Tiền & Upload File Chứng Từ
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Filter Bar -->
-      <div class="filter-bar">
-        <div class="search-box">
-          <input type="text" class="form-control" id="table-search" oninput="filterTable()" placeholder="Tìm theo Mã NV, Tên NV Đăng Ký, Tên NV Nộp Tiền, Model, Mã GD...">
-        </div>
-        <div style="display:flex; gap:10px;">
-          <select class="form-control" id="status-filter" onchange="filterTable()" style="width:auto;">
-            <option value="ALL">-- Tất Cả Trạng Thái --</option>
-            <option value="CONFIRMED">🟢 Đã Xác Nhận Nộp Tiền</option>
-            <option value="PENDING">🟡 Chờ Nộp Tiền Ngân Hàng</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Main Confirmation Table with SEPARATE COLUMNS FOR PAYER NAME & PAYER CODE -->
-      <div style="overflow-x:auto;">
-        <table class="custom-table" id="confirmation-table">
-          <thead>
-            <tr>
-              <th style="width:65px;">Slot ID</th>
-              <th>Mã NV Đăng Ký</th>
-              <th>Họ & Tên NV Đăng Ký</th>
-              <th style="background:#1E40AF; color:#FFF; font-weight:800; border-left:2px solid #FFF;">
-                👤 Họ Tên NV Nộp Tiền (Trường 1)
-              </th>
-              <th style="background:#1E3A8A; color:#FFF; font-weight:800;">
-                🪪 Mã NV Nộp Tiền (Trường 2)
-              </th>
-              <th>Bộ Phận</th>
-              <th>Mã Model Sản Phẩm</th>
-              <th>Số Tiền (VNĐ)</th>
-              <th>Ngân Hàng & Mã GD</th>
-              <th style="background:#047857; color:#FFF; font-weight:800;">📄 File Chứng Từ Nộp Tiền</th>
-              <th>Thời Gian Nộp Tiền</th>
-              <th style="width:140px;">Trạng Thái PM Xác Nhận</th>
-            </tr>
-          </thead>
-          <tbody id="confirmation-tbody">
-            <!-- Pre-populated verified records with receipt file preview -->
-            <tr>
-              <td><span class="badge-ordinal">#001</span></td>
-              <td><span class="badge-code">VH12345</span></td>
-              <td><strong>Nguyễn Thị Quỳnh Như</strong></td>
-              <td><strong style="color:#1D4ED8;">Nguyễn Thị Quỳnh Như</strong></td>
-              <td><span class="badge-code" style="background:#DBEAFE; color:#1E40AF;">VH12345</span></td>
-              <td>HS PM Support</td>
-              <td>MS3032JAS.BBKPLVN</td>
-              <td><strong>1,850,000</strong></td>
-              <td>VCB - TXN9823411</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #001', 'Nguyễn Thị Quỳnh Như (VH12345)', '1,850,000 VNĐ', 'VCB-TXN9823411')">
-                  🔍 Xem Biên Lai (.PNG)
-                </button>
-              </td>
-              <td>31/07/2026 10:04:12</td>
-              <td><span class="badge-status-ok">🟢 Đã Nộp & Xác Nhận</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#002</span></td>
-              <td><span class="badge-code">VH88921</span></td>
-              <td><strong>Trần Văn Nam</strong></td>
-              <td><strong style="color:#1D4ED8;">Trần Văn Nam</strong></td>
-              <td><span class="badge-code" style="background:#DBEAFE; color:#1E40AF;">VH88921</span></td>
-              <td>Audit & Jeong-Do</td>
-              <td>MS3032JAS.BBKPLVN</td>
-              <td><strong>1,850,000</strong></td>
-              <td>VCB - TXN9823455</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #002', 'Trần Văn Nam (VH88921)', '1,850,000 VNĐ', 'VCB-TXN9823455')">
-                  🔍 Xem Biên Lai (.JPG)
-                </button>
-              </td>
-              <td>31/07/2026 10:06:45</td>
-              <td><span class="badge-status-ok">🟢 Đã Nộp & Xác Nhận</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#003</span></td>
-              <td><span class="badge-code">VH55432</span></td>
-              <td><strong>Lê Hoàng Anh</strong></td>
-              <td><strong style="color:#B45309;">Phạm Thị Mai (Nộp hộ)</strong></td>
-              <td><span class="badge-code" style="background:#FEF3C7; color:#B45309;">VH77123</span></td>
-              <td>HE Sales Division</td>
-              <td>LDFB7623S.ABMETVN</td>
-              <td><strong>12,500,000</strong></td>
-              <td>VCB - TXN9823901</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #003', 'Phạm Thị Mai (VH77123) Nộp hộ Lê Hoàng Anh', '12,500,000 VNĐ', 'VCB-TXN9823901')">
-                  🔍 Xem Biên Lai (.PDF)
-                </button>
-              </td>
-              <td>31/07/2026 10:12:03</td>
-              <td><span class="badge-status-ok">🟢 Đã Nộp & Xác Nhận</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#004</span></td>
-              <td><span class="badge-code">VH33211</span></td>
-              <td><strong>Hoàng Minh Trí</strong></td>
-              <td><strong style="color:#1D4ED8;">Hoàng Minh Trí</strong></td>
-              <td><span class="badge-code" style="background:#DBEAFE; color:#1E40AF;">VH33211</span></td>
-              <td>HA Production</td>
-              <td>S5GOC.ABMETVN</td>
-              <td><strong>22,000,000</strong></td>
-              <td>VCB - TXN9824102</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #004', 'Hoàng Minh Trí (VH33211)', '22,000,000 VNĐ', 'VCB-TXN9824102')">
-                  🔍 Xem Biên Lai (.PNG)
-                </button>
-              </td>
-              <td>31/07/2026 10:15:22</td>
-              <td><span class="badge-status-ok">🟢 Đã Nộp & Xác Nhận</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#005</span></td>
-              <td><span class="badge-code">VH99120</span></td>
-              <td><strong>Đặng Thanh Hà</strong></td>
-              <td><strong style="color:#1D4ED8;">Đặng Thanh Hà</strong></td>
-              <td><span class="badge-code" style="background:#DBEAFE; color:#1E40AF;">VH99120</span></td>
-              <td>Finance & Accounting</td>
-              <td>GR-X257MC.AMCKVN</td>
-              <td><strong>28,900,000</strong></td>
-              <td>VCB - TXN9824589</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #005', 'Đặng Thanh Hà (VH99120)', '28,900,000 VNĐ', 'VCB-TXN9824589')">
-                  🔍 Xem Biên Lai (.JPG)
-                </button>
-              </td>
-              <td>31/07/2026 10:18:50</td>
-              <td><span class="badge-status-ok">🟢 Đã Nộp & Xác Nhận</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="sec-card sec-card-teal" style="margin-top:20px;">
-        <div class="sec-title">ℹ️ GHI CHÚ VỀ TRƯỜNG THÔNG TIN "NHÂN VIÊN NỘP TIỀN" ĐẢM BẢO ĐỘC LẬP</div>
-        <ul style="padding-left:20px; line-height:1.7; font-size:12.5px;">
-          <li><strong>Tách riêng 2 trường độc lập:</strong> Trường 8: "Họ và Tên Nhân Viên Nộp Tiền" và Trường 9: "Mã NV Người Nộp Tiền" được bố trí riêng biệt, không gộp chung ô.</li>
-          <li><strong>Minh bạch trong bảng báo cáo:</strong> Bảng tổng hợp chốt đơn tách riêng 2 cột: <code>👤 Họ Tên NV Nộp Tiền</code> và <code>🪪 Mã NV Nộp Tiền</code> để PM & Kế toán dễ đối soát sao kê ngân hàng.</li>
-        </ul>
-      </div>
+    <div class="sop-grid">
+      <div class="sop-card"><div class="sop-num">1</div><h3>Gửi thư thông báo</h3><p>PM Support gửi thư mời kèm điều kiện chương trình đến toàn thể nhân viên, mở đăng ký đúng thời điểm quy định.</p></div>
+      <div class="sop-card"><div class="sop-num">2</div><h3>Nhân viên phản hồi</h3><p>Nhân viên Reply theo đúng mẫu, gửi riêng cho đầu mối duy nhất, không Reply All.</p></div>
+      <div class="sop-card"><div class="sop-num">3</div><h3>Ghi nhận &amp; xác nhận</h3><p>PM Support chốt thứ tự theo timestamp, đối chiếu trùng lặp, gửi email xác nhận riêng từng người.</p></div>
+      <div class="sop-card"><div class="sop-num">4</div><h3>Thanh toán &amp; giao hàng</h3><p>Nhân viên chuyển khoản đúng cú pháp; Kế toán đối soát; công ty hỗ trợ giao hàng.</p></div>
     </div>
 
-    <!-- TAB 4: FILE ĐÍNH KỀM & BẢO MẬT THÔNG TIN -->
-    <div id="tab4" class="tab-content">
-      <h2 style="font-size:17px; margin-bottom:12px; color:var(--lg-red); font-family:var(--font-heading);">
-        📎 Mẫu Cấu Trúc File Đính Kèm (Confidential Product Registration List)
-      </h2>
-      <p style="color:var(--lg-gray-muted); margin-bottom:16px;">
-        Danh sách sản phẩm mở bán nội bộ đợt T8/2026 được mã hóa mã Slot Ordinal ID cố định trên hệ thống để nhân viên lựa chọn chính xác.
-      </p>
-
-      <div class="sec-card" style="border-left-color:#0D7A70;">
-        <div class="sec-title">📊 DANH SÁCH MÃ SLOT ID SẢN PHẨM TRÊN HỆ THỐNG</div>
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>Mã Slot ID</th>
-              <th>Danh Mục</th>
-              <th>Mã Sản Phẩm (Model Name)</th>
-              <th>Mô Tả Sản Phẩm Chi Tiết</th>
-              <th>Giá Niêm Yết (RRP)</th>
-              <th>Giá Nội Bộ (VNĐ)</th>
-              <th>Trạng Thái Hệ Thống</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="badge-ordinal">#001</span></td>
-              <td>Microwave (MWO)</td>
-              <td>MS3032JAS.BBKPLVN</td>
-              <td>Lò vi sóng LG 30L tráng men kháng khuẩn EasyClean</td>
-              <td>3,990,000</td>
-              <td><strong style="color:var(--lg-red);">1,850,000</strong></td>
-              <td><span class="badge-status-ok">🔴 Đã Đăng Ký Mua</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#002</span></td>
-              <td>Microwave (MWO)</td>
-              <td>MS3032JAS.BBKPLVN</td>
-              <td>Lò vi sóng LG 30L tráng men kháng khuẩn EasyClean</td>
-              <td>3,990,000</td>
-              <td><strong style="color:var(--lg-red);">1,850,000</strong></td>
-              <td><span class="badge-status-ok">🔴 Đã Đăng Ký Mua</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#003</span></td>
-              <td>Dishwasher (DW)</td>
-              <td>LDFB7623S.ABMETVN</td>
-              <td>Máy rửa bát LG QuadWash TrueSteam 14 bộ bát đĩa</td>
-              <td>24,900,000</td>
-              <td><strong style="color:var(--lg-red);">12,500,000</strong></td>
-              <td><span class="badge-status-ok">🔴 Đã Đăng Ký Mua</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#004</span></td>
-              <td>LG Styler</td>
-              <td>S5GOC.ABMETVN</td>
-              <td>Tủ chăm sóc quần áo thông minh LG Styler 5 móc</td>
-              <td>45,000,000</td>
-              <td><strong style="color:var(--lg-red);">22,000,000</strong></td>
-              <td><span class="badge-status-ok">🔴 Đã Đăng Ký Mua</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#005</span></td>
-              <td>Refrigerator</td>
-              <td>GR-X257MC.AMCKVN</td>
-              <td>Tủ lạnh LG InstaView Door-in-Door 635L Side by Side</td>
-              <td>52,000,000</td>
-              <td><strong style="color:var(--lg-red);">28,900,000</strong></td>
-              <td><span class="badge-status-ok">🔴 Đã Đăng Ký Mua</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="sec-card">
-        <div class="sec-title">🔒 BẢO MẬT DỮ LIỆU CÁ NHÂN & CHỐNG TRANH CHẤP TIMESTAMP</div>
-        <ul style="padding-left:20px; line-height:1.7;">
-          <li><strong>Timestamp mili-giây:</strong> Mỗi lượt nhấn Đăng Ký trên Portal được máy chủ lưu dấu thời gian UTC+7 chính xác.</li>
-          <li><strong>Bảo mật thông tin địa chỉ cá nhân:</strong> Số điện thoại và địa chỉ giao hàng chỉ hiển thị cho bộ phận Vận chuyển & PM Support.</li>
-          <li><strong>Công khai minh bạch:</strong> Bảng xác nhận công khai bổ sung 2 trường độc lập (Họ Tên NV Nộp Tiền + Mã NV Nộp Tiền) + Link xem file biên lai để toàn thể nhân viên kiểm tra.</li>
-        </ul>
-      </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="ct">So với quy trình hiện tại</div>
+      <table class="tbl">
+        <thead><tr><th>Tiêu chí</th><th>Hiện tại</th><th>Đề xuất chuẩn hoá</th></tr></thead>
+        <tbody>
+          <tr><td>Xét thứ tự</td><td>Ghi STT thủ công, dễ tranh chấp</td><td>Căn cứ timestamp email đến, PM chốt và lưu email gốc</td></tr>
+          <tr><td>Định dạng phản hồi</td><td>Không thống nhất</td><td>Bảng chuẩn hoá bắt buộc theo mẫu</td></tr>
+          <tr><td>Bảo mật thông tin</td><td>Có thể lộ qua Reply All</td><td>Kênh riêng, cần-biết-mới-được-biết, không Reply All</td></tr>
+          <tr><td>Đối soát thanh toán</td><td>Thủ công, rời rạc</td><td>Nội dung CK chuẩn hoá, đối soát định kỳ với danh sách</td></tr>
+        </tbody>
+      </table>
     </div>
+  </section>
 
-    <!-- TAB 5: QUY TRÌNH CHUẨN (SOP STANDARD) -->
-    <div id="tab5" class="tab-content">
-      <h2 style="font-size:17px; margin-bottom:16px; color:var(--lg-red); font-family:var(--font-heading);">
-        ⚙️ Sơ Đồ Quy Trình Chuẩn Hóa Đăng Ký & Xác Nhận Nộp Tiền (SOP Workflow)
-      </h2>
+  <footer class="brandfoot">
+    <img src="logo/LGE_Logo_HeritageRed_Grey_RGB.png" alt="LG Electronics">
+    <span>LG Electronics Vietnam — Nội bộ · Tài liệu tuân thủ LG BI Guidelines V5.2</span>
+  </footer>
+</div>
 
-      <div class="sop-grid">
-        <div class="sop-card">
-          <div class="sop-num">1</div>
-          <div class="sop-title">Gửi Mail Thông Báo</div>
-          <div class="sop-desc">PM gửi mail thông báo trước 24h kèm link hệ thống Portal và mã hóa file danh sách sản phẩm.</div>
-        </div>
-
-        <div class="sop-card">
-          <div class="sop-num">2</div>
-          <div class="sop-title">Đăng Ký Trực Tuyến</div>
-          <div class="sop-desc">Nhân viên đăng ký thẳng trên hệ thống portal với đầy đủ các trường tiêu chí bắt buộc độc lập.</div>
-        </div>
-
-        <div class="sop-card active-step">
-          <div class="sop-num">3</div>
-          <div class="sop-title">Nộp Tiền & Upload File</div>
-          <div class="sop-desc">Nhân viên CK Vietcombank, điền form nộp tiền & <span class="highlight-pill">Upload File Biên Lai</span> + <span class="highlight-pill">Trường Độc Lập NV Nộp Tiền</span>.</div>
-        </div>
-
-        <div class="sop-card">
-          <div class="sop-num">4</div>
-          <div class="sop-title">Xuất Kho & Giao Hàng</div>
-          <div class="sop-desc">PM kiểm tra file chứng từ nộp tiền, xác nhận đơn hàng thành công và bàn giao Logistics vận chuyển.</div>
-        </div>
-      </div>
-
-      <div class="sec-card" style="margin-top:24px;">
-        <div class="sec-title">🎯 ĐIỂM CẢI TIẾN NỔI BẬT THEO YÊU CẦU MỚI</div>
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>Tiêu Chí Quy Trình</th>
-              <th>Quy Trình Email Cũ</th>
-              <th>Quy Trình Mới Trực Tuyến Trên Hệ Thống</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Phương thức đăng ký</strong></td>
-              <td>Reply email thủ công</td>
-              <td><strong>Đăng ký trực tiếp thẳng trên Portal hệ thống</strong></td>
-            </tr>
-            <tr>
-              <td><strong>Trường thông tin NV Nộp Tiền</strong></td>
-              <td>Gộp chung hoặc dễ gõ thiếu</td>
-              <td><strong>Tách thành 2 trường thông tin riêng biệt độc lập (Họ Tên & Mã NV Nộp Tiền)</strong></td>
-            </tr>
-            <tr>
-              <td><strong>Xác nhận nộp tiền (Bước 3)</strong></td>
-              <td>Không có file chứng từ/nộp hộ</td>
-              <td><strong>Mẫu biểu nộp tiền + Upload File Biên Lai + Đối soát 2 cột NV Nộp Tiền độc lập</strong></td>
-            </tr>
-            <tr>
-              <td><strong>Độ chính xác thời gian</strong></td>
-              <td>Tranh chấp thứ tự mail</td>
-              <td><strong>Ghi nhận Timestamp máy chủ chính xác mili-giây</strong></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL XEM BIÊN LAI NỘP TIỀN -->
-  <div class="modal-overlay" id="receipt-modal">
-    <div class="modal-card">
-      <button class="modal-close" onclick="closeReceiptModal()">✕</button>
-      <h3 style="color:var(--lg-red); font-size:16px; font-family:var(--font-heading); margin-bottom:6px;" id="modal-title">
-        🧾 CHỨNG TỪ BIÊN LAI NỘP TIỀN NGÂN HÀNG
-      </h3>
-      <p style="font-size:12px; color:var(--lg-gray-muted); margin-bottom:14px;" id="modal-subtitle">
-        Chi tiết giao dịch chuyển khoản Vietcombank
-      </p>
-
-      <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
-        <div id="modal-slip-box" style="background:#FFF; border:2px dashed #CBD5E1; padding:20px; border-radius:10px; display:flex; flex-direction:column; align-items:center; gap:10px;">
-          <div style="width:60px; height:60px; background:#DCFCE7; color:#166534; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px;">
-            ✓
-          </div>
-          <span style="font-weight:900; font-size:16px; color:#0F172A;">VIETCOMBANK - XÁC NHẬN CHUYỂN KHOẢN THÀNH CÔNG</span>
-          <span style="font-size:20px; font-weight:900; color:var(--lg-red);" id="modal-amount">1,850,000 VNĐ</span>
-          <div style="font-size:12px; color:#475569; line-height:1.6; text-align:left; width:100%; max-width:400px; background:#F1F5F9; padding:12px; border-radius:8px; margin-top:8px;">
-            <div><strong>Tài khoản thụ hưởng:</strong> CTY TNHH LG ELECTRONICS VN HAI PHONG</div>
-            <div><strong>Số tài khoản:</strong> 0991000012525 (Vietcombank Tay Ho)</div>
-            <div><strong>Người nộp tiền thực tế:</strong> <span id="modal-payer-name" style="color:var(--lg-red); font-weight:800;">-</span></div>
-            <div><strong>Mã giao dịch:</strong> <code id="modal-txn-code" style="background:#E2E8F0; padding:2px 6px; border-radius:4px; font-weight:700;">-</code></div>
-            <div><strong>Trạng thái:</strong> <span style="color:#059669; font-weight:800;">Đã ghi nhận Nộp Tiền Thành Công</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button class="btn-action btn-secondary" onclick="closeReceiptModal()" style="color:var(--lg-gray-dark); border-color:var(--lg-border);">Đóng</button>
-        <button class="btn-action" onclick="alert('Đã tải xuống bản sao file chứng từ biên lai nộp tiền!')">📥 Tải File Biên Lai</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    let uploadedFileBase64 = null;
-    let uploadedFileName = '';
-
-    // Tab Switching Logic
-    function switchTab(tabId, element) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
-      if (element) {
-        element.classList.add('active');
-      } else {
-        const matchingBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
-        if (matchingBtn) matchingBtn.classList.add('active');
-      }
-      
-      document.getElementById(tabId).classList.add('active');
-    }
-
-    function goToPortal() {
-      const portalBtn = document.querySelectorAll('.tab-btn')[1];
-      switchTab('tab2', portalBtn);
-    }
-
-    // Toggle Payment Upload Form in Tab 3
-    function togglePaymentUploadForm() {
-      const formCard = document.getElementById('payment-upload-card');
-      if (formCard.style.display === 'none') {
-        formCard.style.display = 'block';
-        formCard.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        formCard.style.display = 'none';
-      }
-    }
-
-    // Theme Toggle Logic
-    function toggleTheme() {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      if (isDark) {
-        document.documentElement.removeAttribute('data-theme');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-    }
-
-    // Copy Content Helper
-    function copyContent(elementId) {
-      const copyBtn = document.querySelector(`#${elementId} .btn-copy`);
-      const text = document.getElementById(elementId).innerText.replace('Sao chép Text', '').replace('Sao chép', '').trim();
-      navigator.clipboard.writeText(text).then(() => {
-        if(copyBtn) {
-          const origText = copyBtn.innerText;
-          copyBtn.innerText = '✓ Đã Sao Chép!';
-          copyBtn.style.background = '#059669';
-          setTimeout(() => {
-            copyBtn.innerText = origText;
-            copyBtn.style.background = '';
-          }, 2000);
-        }
-      });
-    }
-
-    // Auto sync Payer Info from Employee Info in Registration Form
-    document.getElementById('reg-emp-name').addEventListener('input', function(e) {
-      const payerInput = document.getElementById('reg-payer-name');
-      if (!payerInput.dataset.userModified) {
-        payerInput.value = e.target.value;
-      }
+<script>
+  document.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected','false'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      btn.setAttribute('aria-selected','true');
+      document.getElementById(btn.dataset.tab).classList.add('active');
     });
+  });
 
-    document.getElementById('reg-emp-code').addEventListener('input', function(e) {
-      const payerCodeInput = document.getElementById('reg-payer-code');
-      if (!payerCodeInput.dataset.userModified) {
-        payerCodeInput.value = e.target.value;
-      }
+  function toggleTheme(){
+    const root = document.documentElement;
+    const cur = root.getAttribute('data-theme');
+    if(cur === 'dark'){ root.setAttribute('data-theme','light'); document.getElementById('themeBtn').textContent='Chế độ tối'; }
+    else { root.setAttribute('data-theme','dark'); document.getElementById('themeBtn').textContent='Chế độ sáng'; }
+  }
+
+  function copyBox(id){
+    const el = document.getElementById(id);
+    const text = el.innerText.replace('Sao chép','').trim();
+    navigator.clipboard.writeText(text).then(()=>{
+      const btn = el.querySelector('.copy');
+      const old = btn.textContent; btn.textContent='Đã sao chép';
+      setTimeout(()=>btn.textContent=old, 1400);
     });
+  }
 
-    document.getElementById('reg-payer-name').addEventListener('input', function() {
-      this.dataset.userModified = "true";
-    });
+  function val(id, fallback){
+    const v = document.getElementById(id).value.trim();
+    return v || fallback;
+  }
 
-    document.getElementById('reg-payer-code').addEventListener('input', function() {
-      this.dataset.userModified = "true";
-    });
+  function generate(){
+    const div = val('iDiv', '[ ..................... ]');
+    const code = val('iCode', '[ ..................... ]');
+    const name = val('iName', '[ ..................... ]');
+    const model = val('iModel', '[ ..................... ]');
+    const phone = val('iPhone', '[ ..................... ]');
+    const slot = val('iSlot', '');
+    const addr = val('iAddr', '[ ..................................................... ]');
 
-    // File Selection Handler
-    function handleFileSelected(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    document.getElementById('fDiv').textContent = div;
+    document.getElementById('fCode').textContent = code;
+    document.getElementById('fName').textContent = name;
+    document.getElementById('fModel').textContent = model;
+    document.getElementById('fPhone').textContent = phone;
+    document.getElementById('fAddr').textContent = addr;
+    document.getElementById('fSign').textContent = name;
+    document.getElementById('fSignDiv').textContent = div;
+    document.getElementById('vFrom').textContent = name + ' <email@lge.com>';
+    document.getElementById('vSubj').textContent = '[Đăng ký] Chương trình DW-MWO — ' + code + ' ' + name;
 
-      uploadedFileName = file.name;
-      document.getElementById('file-name-display').innerText = `📄 File đã chọn: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    const raw = `Kính gửi Chị Nguyệt,
 
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          uploadedFileBase64 = e.target.result;
-          const img = document.getElementById('file-preview-img');
-          img.src = e.target.result;
-          img.style.display = 'inline-block';
-        };
-        reader.readAsDataURL(file);
-      } else {
-        uploadedFileBase64 = null;
-        document.getElementById('file-preview-img').style.display = 'none';
-      }
-    }
+Tôi xin đăng ký tham gia chương trình mua sản phẩm nội bộ DW-MWO:
 
-    // Auto fill payment form from slot selection
-    function autoFillPaymentOrderInfo() {
-      const slotVal = document.getElementById('pay-slot-select').value;
-      if (slotVal === '#001') {
-        document.getElementById('pay-emp-code').value = 'VH12345';
-        document.getElementById('pay-emp-name').value = 'Nguyễn Thị Quỳnh Như';
-        document.getElementById('pay-payer-name').value = 'Nguyễn Thị Quỳnh Như';
-        document.getElementById('pay-payer-code').value = 'VH12345';
-        document.getElementById('pay-amount').value = '1,850,000';
-        document.getElementById('pay-txn-id').value = 'Vietcombank - VCB-TXN9823411';
-        document.getElementById('pay-date').value = '31/07/2026 10:15:00';
-      } else if (slotVal === '#003') {
-        document.getElementById('pay-emp-code').value = 'VH55432';
-        document.getElementById('pay-emp-name').value = 'Lê Hoàng Anh';
-        document.getElementById('pay-payer-name').value = 'Phạm Thị Mai (Nộp hộ)';
-        document.getElementById('pay-payer-code').value = 'VH77123';
-        document.getElementById('pay-amount').value = '12,500,000';
-        document.getElementById('pay-txn-id').value = 'Vietcombank - VCB-TXN9823901';
-        document.getElementById('pay-date').value = '31/07/2026 10:20:00';
-      }
-    }
+Bộ phận: ${div}
+Mã nhân viên: ${code}
+Họ và tên: ${name}
+Model đăng ký: ${model}${slot ? '\nSTT (nếu có): ' + slot : ''}
+Số điện thoại: ${phone}
+Địa chỉ nhận hàng: ${addr}
 
-    // Handle Registration Form Submit (Tab 2)
-    function handleFormSubmit(event) {
-      event.preventDefault();
+Tôi cam kết thông tin trên là chính xác và đồng ý với các điều khoản của chương trình
+(không bảo hành, không bán lại cho bên thứ ba, đổi trả 7 ngày làm việc với lỗi chức năng cơ bản).
 
-      const division = document.getElementById('reg-division').value;
-      const empCode = document.getElementById('reg-emp-code').value.trim();
-      const empName = document.getElementById('reg-emp-name').value.trim();
-      const model = document.getElementById('reg-model').value;
-      const slotId = document.getElementById('reg-slot-id').value;
-      const payerName = document.getElementById('reg-payer-name').value.trim();
-      const payerCode = document.getElementById('reg-payer-code').value.trim();
+Trân trọng,
+${name} — ${div}`;
 
-      const now = new Date();
-      const timestampStr = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN');
-
-      let priceStr = '1,850,000';
-      if (model.includes('LDFB7623S')) priceStr = '12,500,000';
-      if (model.includes('S5GOC')) priceStr = '22,000,000';
-      if (model.includes('GR-X257MC')) priceStr = '28,900,000';
-
-      const tbody = document.getElementById('confirmation-tbody');
-      const newRow = document.createElement('tr');
-      newRow.style.background = '#ECFDF5';
-      newRow.innerHTML = `
-        <td><span class="badge-ordinal">${slotId}</span></td>
-        <td><span class="badge-code">${empCode}</span></td>
-        <td><strong>${empName}</strong></td>
-        <td><strong style="color:#1D4ED8;">${payerName}</strong></td>
-        <td><span class="badge-code" style="background:#DBEAFE; color:#1E40AF;">${payerCode}</span></td>
-        <td>${division}</td>
-        <td>${model}</td>
-        <td><strong>${priceStr}</strong></td>
-        <td>VCB - TXN${Math.floor(1000000 + Math.random() * 9000000)}</td>
-        <td>
-          <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Ngân Hàng ${slotId}', '${payerName} (${payerCode})', '${priceStr} VNĐ', 'VCB-TXN${Math.floor(1000000 + Math.random() * 9000000)}')">
-            🔍 Xem Biên Lai (.PNG)
-          </button>
-        </td>
-        <td>${timestampStr}</td>
-        <td><span class="badge-status-ok">🟢 Đã Nộp & Xác Nhận</span></td>
-      `;
-
-      tbody.insertBefore(newRow, tbody.firstChild);
-
-      const totalCount = tbody.querySelectorAll('tr').length;
-      document.getElementById('tab3-count-badge').innerText = `${totalCount} Đã Xác Nhận`;
-
-      alert(`🎉 ĐĂNG KÝ THÀNH CÔNG VÀ ĐÃ GHI NHẬN LÊN HỆ THỐNG!\n\n• Mã Slot: ${slotId}\n• Nhân viên đăng ký: ${empName} (${empCode})\n• Trường 8 (Tên NV nộp tiền): ${payerName}\n• Trường 9 (Mã NV nộp tiền): ${payerCode}\n• Thời gian Timestamp: ${timestampStr}\n\nVui lòng sang Tab 3 để điền mẫu biểu và Upload File Biên Lai Nộp Tiền!`);
-
-      const tab3Btn = document.querySelectorAll('.tab-btn')[2];
-      switchTab('tab3', tab3Btn);
-    }
-
-    // Handle Payment Submission & Receipt Upload (Tab 3)
-    function handlePaymentSubmit(event) {
-      event.preventDefault();
-
-      const slotId = document.getElementById('pay-slot-select').value;
-      const empCode = document.getElementById('pay-emp-code').value.trim();
-      const empName = document.getElementById('pay-emp-name').value.trim();
-      const payerName = document.getElementById('pay-payer-name').value.trim();
-      const payerCode = document.getElementById('pay-payer-code').value.trim();
-      const amount = document.getElementById('pay-amount').value.trim();
-      const txnId = document.getElementById('pay-txn-id').value.trim();
-      const payDate = document.getElementById('pay-date').value.trim();
-
-      const fileName = uploadedFileName || `Bien_Lai_Chuyen_Khoan_${slotId.replace('#','')}.png`;
-
-      alert(`✅ ĐÃ UPLOAD CHỨNG TỪ NỘP TIỀN THÀNH CÔNG!\n\n• Mã Slot: ${slotId}\n• Họ Tên NV Nộp Tiền: ${payerName}\n• Mã NV Người Nộp Tiền: ${payerCode}\n• Số tiền: ${amount} VNĐ\n• Mã Giao Dịch: ${txnId}\n• File chứng từ: ${fileName}\n\nPM Support đã nhận được bằng chứng nộp tiền và tiến hành duyệt xuất kho!`);
-
-      const rows = document.querySelectorAll('#confirmation-tbody tr');
-      let found = false;
-      rows.forEach(row => {
-        if (row.innerText.includes(slotId)) {
-          found = true;
-          row.style.background = '#ECFDF5';
-          row.cells[3].innerHTML = `<strong style="color:#1D4ED8;">${payerName}</strong>`;
-          row.cells[4].innerHTML = `<span class="badge-code" style="background:#DBEAFE; color:#1E40AF;">${payerCode}</span>`;
-          row.cells[8].innerText = txnId;
-          row.cells[9].innerHTML = `
-            <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền ${slotId}', '${payerName} (${payerCode})', '${amount} VNĐ', '${txnId}')">
-              🔍 Xem Biên Lai (${fileName})
-            </button>
-          `;
-          row.cells[10].innerText = payDate;
-          row.cells[11].innerHTML = `<span class="badge-status-ok">🟢 Đã Nộp & Xác Nhận</span>`;
-        }
-      });
-
-      if (!found) {
-        const tbody = document.getElementById('confirmation-tbody');
-        const newRow = document.createElement('tr');
-        newRow.style.background = '#ECFDF5';
-        newRow.innerHTML = `
-          <td><span class="badge-ordinal">${slotId}</span></td>
-          <td><span class="badge-code">${empCode}</span></td>
-          <td><strong>${empName}</strong></td>
-          <td><strong style="color:#1D4ED8;">${payerName}</strong></td>
-          <td><span class="badge-code" style="background:#DBEAFE; color:#1E40AF;">${payerCode}</span></td>
-          <td>N/A</td>
-          <td>Internal Model</td>
-          <td><strong>${amount}</strong></td>
-          <td>${txnId}</td>
-          <td>
-            <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền ${slotId}', '${payerName} (${payerCode})', '${amount} VNĐ', '${txnId}')">
-              🔍 Xem Biên Lai (${fileName})
-            </button>
-          </td>
-          <td>${payDate}</td>
-          <td><span class="badge-status-ok">🟢 Đã Nộp & Xác Nhận</span></td>
-        `;
-        tbody.insertBefore(newRow, tbody.firstChild);
-      }
-    }
-
-    // Modal Receipt Viewing Functions
-    function openReceiptModal(title, payer, amount, txnCode) {
-      document.getElementById('modal-title').innerText = '🧾 ' + title;
-      document.getElementById('modal-payer-name').innerText = payer;
-      document.getElementById('modal-amount').innerText = amount;
-      document.getElementById('modal-txn-code').innerText = txnCode;
-      document.getElementById('receipt-modal').classList.add('active');
-    }
-
-    function closeReceiptModal() {
-      document.getElementById('receipt-modal').classList.remove('active');
-    }
-
-    // Filter Table Function
-    function filterTable() {
-      const search = document.getElementById('table-search').value.toLowerCase();
-      const statusFilter = document.getElementById('status-filter').value;
-      const rows = document.querySelectorAll('#confirmation-tbody tr');
-
-      rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        const matchesSearch = text.includes(search);
-        
-        let matchesStatus = true;
-        if (statusFilter === 'CONFIRMED') {
-          matchesStatus = row.innerText.includes('Đã Nộp');
-        } else if (statusFilter === 'PENDING') {
-          matchesStatus = row.innerText.includes('Chờ Nộp');
-        }
-
-        if (matchesSearch && matchesStatus) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
-    }
-
-    // Export Table to CSV
-    function exportToCSV() {
-      const rows = Array.from(document.querySelectorAll('#confirmation-table tr'));
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-      
-      rows.forEach(row => {
-        const cols = Array.from(row.querySelectorAll('th, td'));
-        const rowData = cols.map(c => `"${c.innerText.replace(/\n/g, ' ').replace(/"/g, '""')}"`).join(",");
-        csvContent += rowData + "\r\n";
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "Xac_Nhan_Dang_Ky_Banh_Hang_Noi_Bo_LGEVH.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  </script>
-</body>
-</html>
+    const box = document.getElementById('raw2');
+    box.innerHTML = '<button class="copy" onclick="copyBox(\'raw2\')">Sao chép</button>' + raw;
+  }
+</script>
