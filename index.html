@@ -214,7 +214,7 @@
         2. Đăng Ký Trực Tuyến Trên Hệ Thống <span class="tab-badge" style="background:var(--lg-panel-2); color:var(--lg-red);">Portal Live</span>
       </button>
       <button class="tab-btn" onclick="switchTab('tab3', this)">
-        3. Xác Nhận Mua & Nộp Tiền <span class="tab-badge" id="tab3-count-badge">5 Đơn</span>
+        3. Xác Nhận Mua & Nộp Tiền <span class="tab-badge" id="tab3-count-badge">0 Đơn</span>
       </button>
       <button class="tab-btn" onclick="switchTab('tab4', this)">
         4. File Danh Sách & Slot ID <span class="tab-badge">Excel List</span>
@@ -254,7 +254,7 @@
           </div>
           <div class="meta-row">
             <span class="meta-label">Đính Kèm:</span>
-            <span class="meta-val"><code>LG_Internal_Sales_Product_List_Aug2026.xlsx</code> (Mật khẩu: MÃ_NV)</span>
+            <span class="meta-val">Danh sách 90 Slot ID (xem Tab 4)</span>
           </div>
         </div>
 
@@ -266,7 +266,7 @@
 
           <p>Kính gửi Toàn thể Cán bộ Nhân viên LG Electronics Việt Nam (Dear All LG Team Members),</p>
           <br>
-          <p>Bộ phận PM Support xin thông báo chương trình <strong>Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)</strong> dành riêng cho nhân viên LG với mức giá ưu đãi đặc biệt cho dòng sản phẩm <strong>Dishwasher (DW), Microwave Oven (MWO) & LG Styler</strong>.</p>
+          <p>Bộ phận PM Support xin thông báo chương trình <strong>Đăng Ký Bán Hàng Nội Bộ (Internal Sales Program)</strong> dành riêng cho nhân viên LG. Đợt này mở bán <strong>90 sản phẩm (43 model) tại 3 kho AYA, AYB, AYC</strong>. Danh sách Slot ID đầy đủ xem ở Tab 4.</p>
           <p style="margin-top:8px;"><em>Thông tin Nhân Viên Nộp Tiền (Họ tên & Mã NV, tách 2 trường riêng) được khai ở bước Xác nhận nộp tiền.</em></p>
 
           <div class="sec-card">
@@ -298,7 +298,7 @@
               <li><strong>Tên Tài Khoản:</strong> CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG</li>
               <li><strong>Số Tài Khoản:</strong> <code>0991000012525</code></li>
               <li><strong>Ngân Hàng:</strong> VIETCOMBANK - Chi Nhánh Tây Hồ</li>
-              <li><strong>Cú pháp chuyển khoản (Bắt buộc):</strong> <code>[Mã NV] - [Họ Tên] - [Mã Model] - [STT Ordinal]</code></li>
+              <li><strong>Cú pháp chuyển khoản (Bắt buộc):</strong> <code>[Mã NV] - [Họ Tên] - [Mã Model] - [Slot ID]</code></li>
               <li><strong>Upload File Biên Lai:</strong> Vào Tab 3 -> Điền mẫu biểu xác nhận nộp tiền -> Tải file ảnh/PDF biên lai nộp tiền lên hệ thống.</li>
             </ul>
           </div>
@@ -324,7 +324,7 @@
 <button class="btn-copy" onclick="copyContent('raw-text-1')">Sao chép Text</button>
 Dear all LG team members,
 
-We would like to inform you about the internal sales program of DW-MWO-Styler products. Employees register DIRECTLY on the online portal with original registration criteria preserved.
+We would like to inform you about the internal sales program: 90 products (43 models) across 3 warehouses AYA, AYB, AYC. See the full Slot ID list in Tab 4. Employees register DIRECTLY on the online portal with original registration criteria preserved.
 
 1. REGISTRATION TIME:
 - Announcement time: 24h prior to registration open
@@ -797,6 +797,24 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
         </div>
       </div>
 
+      <!-- TRA CỨU ĐƠN CỦA TÔI -->
+      <div class="sec-card" id="lookup-card" style="margin-bottom:20px;">
+        <div class="sec-title">TRA CỨU ĐƠN CỦA TÔI</div>
+        <p style="font-size:12.5px; color:var(--lg-text-2); margin-bottom:10px;">Nhập Mã NV và 4 số cuối điện thoại đã khai khi đăng ký để xem trạng thái đơn.</p>
+        <form id="lookup-form" onsubmit="handleLookup(event)" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
+          <div class="form-group" style="margin:0; min-width:160px;">
+            <label class="form-label" for="lookup-emp">Mã NV</label>
+            <input type="text" class="form-control" id="lookup-emp" placeholder="Ví dụ: VH12345" required>
+          </div>
+          <div class="form-group" style="margin:0; width:150px;">
+            <label class="form-label" for="lookup-phone">4 số cuối SĐT</label>
+            <input type="text" class="form-control" id="lookup-phone" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Ví dụ: 5678" required>
+          </div>
+          <button type="submit" class="btn-action">Tra cứu</button>
+        </form>
+        <div id="lookup-result" style="margin-top:12px; font-size:13px;"></div>
+      </div>
+
       <!-- FORM UPLOAD BIÊN LAI NỘP TIỀN CỦA NHÂN VIÊN -->
       <div id="payment-upload-card" style="background:var(--lg-red-light); border:1.5px solid var(--lg-red-border); border-radius:14px; padding:22px; margin-bottom:24px; box-shadow:0 4px 16px transparent;">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--lg-red-border); padding-bottom:12px; margin-bottom:16px;">
@@ -927,92 +945,7 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
             </tr>
           </thead>
           <tbody id="confirmation-tbody">
-            <!-- Pre-populated verified records with receipt file preview -->
-            <tr>
-              <td><span class="badge-ordinal">#001</span></td>
-              <td><span class="badge-code">VH12345</span></td>
-              <td><strong>Nguyễn Thị Quỳnh Như</strong></td>
-              <td><strong style="color:var(--lg-text);">Nguyễn Thị Quỳnh Như</strong></td>
-              <td><span class="badge-code" style="background:var(--lg-panel-2); color:var(--lg-text);">VH12345</span></td>
-              <td>HS PM Support</td>
-              <td>MS3032JAS.BBKPLVN</td>
-              <td>VCB - TXN9823411</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #001', 'Nguyễn Thị Quỳnh Như (VH12345)', '', 'VCB-TXN9823411')">
-                  Xem Biên Lai (.PNG)
-                </button>
-              </td>
-              <td>31/07/2026 10:04:12</td>
-              <td><span class="badge-status-ok">Đã Nộp & Xác Nhận</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#002</span></td>
-              <td><span class="badge-code">VH88921</span></td>
-              <td><strong>Trần Văn Nam</strong></td>
-              <td><strong style="color:var(--lg-text);">Trần Văn Nam</strong></td>
-              <td><span class="badge-code" style="background:var(--lg-panel-2); color:var(--lg-text);">VH88921</span></td>
-              <td>Audit & Jeong-Do</td>
-              <td>MS3032JAS.BBKPLVN</td>
-              <td>VCB - TXN9823455</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #002', 'Trần Văn Nam (VH88921)', '', 'VCB-TXN9823455')">
-                  Xem Biên Lai (.JPG)
-                </button>
-              </td>
-              <td>31/07/2026 10:06:45</td>
-              <td><span class="badge-status-ok">Đã Nộp & Xác Nhận</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#003</span></td>
-              <td><span class="badge-code">VH55432</span></td>
-              <td><strong>Lê Hoàng Anh</strong></td>
-              <td><strong style="color:var(--lg-heritage);">Phạm Thị Mai (Nộp hộ)</strong></td>
-              <td><span class="badge-code" style="background:var(--lg-panel-2); color:var(--lg-heritage);">VH77123</span></td>
-              <td>HE Sales Division</td>
-              <td>LDFB7623S.ABMETVN</td>
-              <td>VCB - TXN9823901</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #003', 'Phạm Thị Mai (VH77123) Nộp hộ Lê Hoàng Anh', '', 'VCB-TXN9823901')">
-                  Xem Biên Lai (.PDF)
-                </button>
-              </td>
-              <td>31/07/2026 10:12:03</td>
-              <td><span class="badge-status-ok">Đã Nộp & Xác Nhận</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#004</span></td>
-              <td><span class="badge-code">VH33211</span></td>
-              <td><strong>Hoàng Minh Trí</strong></td>
-              <td><strong style="color:var(--lg-text);">Hoàng Minh Trí</strong></td>
-              <td><span class="badge-code" style="background:var(--lg-panel-2); color:var(--lg-text);">VH33211</span></td>
-              <td>HA Production</td>
-              <td>S5GOC.ABMETVN</td>
-              <td>VCB - TXN9824102</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #004', 'Hoàng Minh Trí (VH33211)', '', 'VCB-TXN9824102')">
-                  Xem Biên Lai (.PNG)
-                </button>
-              </td>
-              <td>31/07/2026 10:15:22</td>
-              <td><span class="badge-status-ok">Đã Nộp & Xác Nhận</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#005</span></td>
-              <td><span class="badge-code">VH99120</span></td>
-              <td><strong>Đặng Thanh Hà</strong></td>
-              <td><strong style="color:var(--lg-text);">Đặng Thanh Hà</strong></td>
-              <td><span class="badge-code" style="background:var(--lg-panel-2); color:var(--lg-text);">VH99120</span></td>
-              <td>Finance & Accounting</td>
-              <td>GR-X257MC.AMCKVN</td>
-              <td>VCB - TXN9824589</td>
-              <td>
-                <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Vietcombank #005', 'Đặng Thanh Hà (VH99120)', '', 'VCB-TXN9824589')">
-                  Xem Biên Lai (.JPG)
-                </button>
-              </td>
-              <td>31/07/2026 10:18:50</td>
-              <td><span class="badge-status-ok">Đã Nộp & Xác Nhận</span></td>
-            </tr>
+            <tr id="tbody-empty"><td colspan="11" style="text-align:center; color:var(--lg-text-2); padding:18px;">Chưa có đơn nào được gửi từ máy này. Muốn xem đơn đã gửi trước đó, dùng ô <strong>Tra cứu đơn của tôi</strong> ở trên.</td></tr>
           </tbody>
         </table>
       </div>
@@ -1029,70 +962,125 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
     <!-- TAB 4: FILE ĐÍNH KỀM & BẢO MẬT THÔNG TIN -->
     <div id="tab4" class="tab-content">
       <h2 style="font-size:17px; margin-bottom:12px; color:var(--lg-red); font-family:var(--font-heading);">
-        Mẫu Cấu Trúc File Đính Kèm (Confidential Product Registration List)
+        Danh Sách Slot ID Mở Bán
       </h2>
       <p style="color:var(--lg-gray-muted); margin-bottom:16px;">
-        Danh sách sản phẩm mở bán nội bộ đợt T8/2026 được mã hóa mã Slot Ordinal ID cố định trên hệ thống để nhân viên lựa chọn chính xác.
+        90 slot, 43 model, 3 kho: AYA (44), AYB (1), AYC (45). Giá bán không hiển thị vì là thông tin bảo mật. Slot nào đã có người đăng ký sẽ được máy chủ báo khi gửi đơn.
       </p>
 
       <div class="sec-card" style="border-left-color:var(--lg-info);">
         <div class="sec-title">DANH SÁCH MÃ SLOT ID SẢN PHẨM TRÊN HỆ THỐNG</div>
+        <div style="max-height:480px; overflow-y:auto;">
         <table class="custom-table">
           <thead>
             <tr>
               <th>Mã Slot ID</th>
-              <th>Danh Mục</th>
+              <th>Kho</th>
               <th>Mã Sản Phẩm (Model Name)</th>
-              <th>Mô Tả Sản Phẩm Chi Tiết</th>
-              <th>Trạng Thái Hệ Thống</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td><span class="badge-ordinal">#001</span></td>
-              <td>Microwave (MWO)</td>
-              <td>MS3032JAS.BBKPLVN</td>
-              <td>Lò vi sóng LG 30L tráng men kháng khuẩn EasyClean</td>
-              <td><span class="badge-status-ok">Đã Đăng Ký Mua</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#002</span></td>
-              <td>Microwave (MWO)</td>
-              <td>MS3032JAS.BBKPLVN</td>
-              <td>Lò vi sóng LG 30L tráng men kháng khuẩn EasyClean</td>
-              <td><span class="badge-status-ok">Đã Đăng Ký Mua</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#003</span></td>
-              <td>Dishwasher (DW)</td>
-              <td>LDFB7623S.ABMETVN</td>
-              <td>Máy rửa bát LG QuadWash TrueSteam 14 bộ bát đĩa</td>
-              <td><span class="badge-status-ok">Đã Đăng Ký Mua</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#004</span></td>
-              <td>LG Styler</td>
-              <td>S5GOC.ABMETVN</td>
-              <td>Tủ chăm sóc quần áo thông minh LG Styler 5 móc</td>
-              <td><span class="badge-status-ok">Đã Đăng Ký Mua</span></td>
-            </tr>
-            <tr>
-              <td><span class="badge-ordinal">#005</span></td>
-              <td>Refrigerator</td>
-              <td>GR-X257MC.AMCKVN</td>
-              <td>Tủ lạnh LG InstaView Door-in-Door 635L Side by Side</td>
-              <td><span class="badge-status-ok">Đã Đăng Ký Mua</span></td>
-            </tr>
+            <tr><td><span class="badge-ordinal">#001</span></td><td>AYA</td><td>OLED77G5PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#002</span></td><td>AYA</td><td>65QNED92ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#003</span></td><td>AYA</td><td>65QNED92ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#004</span></td><td>AYA</td><td>43QNED81ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#005</span></td><td>AYA</td><td>55QNED80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#006</span></td><td>AYA</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#007</span></td><td>AYA</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#008</span></td><td>AYA</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#009</span></td><td>AYA</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#010</span></td><td>AYA</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#011</span></td><td>AYA</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#012</span></td><td>AYA</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#013</span></td><td>AYA</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#014</span></td><td>AYA</td><td>55NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#015</span></td><td>AYA</td><td>55NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#016</span></td><td>AYA</td><td>55NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#017</span></td><td>AYA</td><td>55NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#018</span></td><td>AYA</td><td>55NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#019</span></td><td>AYA</td><td>55NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#020</span></td><td>AYA</td><td>55NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#021</span></td><td>AYA</td><td>65UA7350PSB.ATVQ</td></tr>
+            <tr><td><span class="badge-ordinal">#022</span></td><td>AYA</td><td>65UA7350PSB.ATVQ</td></tr>
+            <tr><td><span class="badge-ordinal">#023</span></td><td>AYA</td><td>50UA7350PSB.ATVQ</td></tr>
+            <tr><td><span class="badge-ordinal">#024</span></td><td>AYA</td><td>50UA7350PSB.ATVQ</td></tr>
+            <tr><td><span class="badge-ordinal">#025</span></td><td>AYA</td><td>43UA7350PSB.ATVQ</td></tr>
+            <tr><td><span class="badge-ordinal">#026</span></td><td>AYA</td><td>43UA7350PSB.ATVQ</td></tr>
+            <tr><td><span class="badge-ordinal">#027</span></td><td>AYC</td><td>75QNED80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#028</span></td><td>AYC</td><td>75QNED80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#029</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#030</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#031</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#032</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#033</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#034</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#035</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#036</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#037</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#038</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#039</span></td><td>AYC</td><td>75NANO80ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#040</span></td><td>AYB</td><td>50UA7350PSB.ATVQ</td></tr>
+            <tr><td><span class="badge-ordinal">#041</span></td><td>AYC</td><td>65QNED70ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#042</span></td><td>AYC</td><td>65QNED70ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#043</span></td><td>AYC</td><td>65QNED70ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#044</span></td><td>AYC</td><td>65QNED70ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#045</span></td><td>AYC</td><td>43QNED70ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#046</span></td><td>AYC</td><td>43QNED70ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#047</span></td><td>AYC</td><td>65UA8450PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#048</span></td><td>AYC</td><td>55UA8450PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#049</span></td><td>AYC</td><td>27LX6TDGA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#050</span></td><td>AYC</td><td>43UA8450PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#051</span></td><td>AYC</td><td>43UQ7050PSA.ATVQ</td></tr>
+            <tr><td><span class="badge-ordinal">#052</span></td><td>AYC</td><td>55QNED86ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#053</span></td><td>AYC</td><td>55QNED86BSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#054</span></td><td>AYC</td><td>55UA8450PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#055</span></td><td>AYC</td><td>65QNED80BSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#056</span></td><td>AYC</td><td>65QNED86ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#057</span></td><td>AYC</td><td>65QNED86BSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#058</span></td><td>AYC</td><td>75QNED82ASA.AGADLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#059</span></td><td>AYC</td><td>75QNED86BSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#060</span></td><td>AYC</td><td>75QNED9MASA.AGAFLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#061</span></td><td>AYC</td><td>OLED65G5PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#062</span></td><td>AYC</td><td>OLED77C44LA.AEUQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#063</span></td><td>AYC</td><td>OLED77C54LA.AEUQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#064</span></td><td>AYC</td><td>OLED83B5PSA.AGAQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#065</span></td><td>AYC</td><td>OLED83M4PUA.AUSYLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#066</span></td><td>AYC</td><td>OLED97M5PSA.AAU</td></tr>
+            <tr><td><span class="badge-ordinal">#067</span></td><td>AYC</td><td>OLED77C6PJA.AJLQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#068</span></td><td>AYC</td><td>OLED77B6PCA.ACNQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#069</span></td><td>AYC</td><td>75QNED70BSA.AGAFLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#070</span></td><td>AYC</td><td>75QNED81B6A.AEUNLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#071</span></td><td>AYC</td><td>65NU850BPUA.AUSFLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#072</span></td><td>AYC</td><td>75MRGB86BSA.AGADLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#073</span></td><td>AYA</td><td>100QNED89AS.AGAFLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#074</span></td><td>AYA</td><td>27LX6TDGA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#075</span></td><td>AYA</td><td>27LX6TDGA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#076</span></td><td>AYA</td><td>27LX6TDGA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#077</span></td><td>AYA</td><td>43LB6500PSB.AWZSLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#078</span></td><td>AYA</td><td>65UA8055PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#079</span></td><td>AYA</td><td>75QNED86ASA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#080</span></td><td>AYA</td><td>75QNED9MASA.AGAFLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#081</span></td><td>AYA</td><td>OLED48B5PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#082</span></td><td>AYA</td><td>OLED65G5PSA.ATV</td></tr>
+            <tr><td><span class="badge-ordinal">#083</span></td><td>AYA</td><td>OLED77C44LA.AEUQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#084</span></td><td>AYA</td><td>OLED77C54LA.AEUQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#085</span></td><td>AYA</td><td>OLED83B5PSA.AGAQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#086</span></td><td>AYA</td><td>OLED83C5PSA.AWZQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#087</span></td><td>AYA</td><td>OLED77C6PJA.AJLQLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#088</span></td><td>AYA</td><td>75QNED70BSA.AGAFLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#089</span></td><td>AYA</td><td>65NU850BPUA.AUSFLHX</td></tr>
+            <tr><td><span class="badge-ordinal">#090</span></td><td>AYA</td><td>75MRGB86BSA.AGADLHX</td></tr>
           </tbody>
         </table>
+        </div>
       </div>
 
       <div class="sec-card">
         <div class="sec-title">BẢO MẬT DỮ LIỆU CÁ NHÂN & CHỐNG TRANH CHẤP TIMESTAMP</div>
         <ul style="padding-left:20px; line-height:1.7;">
-          <li><strong>Timestamp mili-giây:</strong> Mỗi lượt nhấn Đăng Ký trên Portal được máy chủ lưu dấu thời gian UTC+7 chính xác.</li>
+          <li><strong>Timestamp máy chủ:</strong> Thời điểm đăng ký do máy chủ Google ghi (giờ Việt Nam, chính xác đến giây), không lấy giờ trên máy nhân viên. Nhiều người gửi cùng lúc thì máy chủ xử lý lần lượt từng đơn, đơn tới trước giữ slot.</li>
           <li><strong>Bảo mật thông tin địa chỉ cá nhân:</strong> Số điện thoại và địa chỉ giao hàng chỉ hiển thị cho bộ phận Vận chuyển & PM Support.</li>
-          <li><strong>Công khai minh bạch:</strong> Bảng xác nhận công khai bổ sung 2 trường độc lập (Họ Tên NV Nộp Tiền + Mã NV Nộp Tiền) + Link xem file biên lai để toàn thể nhân viên kiểm tra.</li>
+          <li><strong>Tra cứu riêng tư:</strong> Mỗi nhân viên chỉ xem được đơn của mình, bằng Mã NV kèm 4 số cuối điện thoại. Biên lai chỉ PM xem trên Google Drive.</li>
         </ul>
       </div>
     </div>
@@ -1212,24 +1200,37 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
     // Để trống = chế độ bản mẫu, dữ liệu KHÔNG được lưu.
     const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwb-pp3WQoWjqk54MYqndew-Sny3Yeha80INufk6aSxCuF7zMIAt2cWsJI3urZVHbEC4w/exec';
 
-    async function postToSheet(payload) {
+    // Gửi lên máy chủ; nếu máy chủ báo bận hoặc rớt mạng thì tự gửi lại (tối đa 4 lần)
+    async function postToSheet(payload, onRetry) {
       if (!SHEET_API_URL) return { ok: false, offline: true };
       payload.userAgent = navigator.userAgent;
-      try {
-        const res = await fetch(SHEET_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // tránh preflight CORS
-          body: JSON.stringify(payload)
-        });
-        return await res.json();
-      } catch (err) {
-        return { ok: false, message: 'Không kết nối được máy chủ: ' + err.message };
+      const waits = [0, 2000, 4000, 7000];
+      let last = null;
+      for (let i = 0; i < waits.length; i++) {
+        if (waits[i]) {
+          if (onRetry) onRetry(i + 1, waits.length);
+          await new Promise(r => setTimeout(r, waits[i] + Math.floor(Math.random() * 1000)));
+        }
+        try {
+          const res = await fetch(SHEET_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // tránh preflight CORS
+            body: JSON.stringify(payload)
+          });
+          last = await res.json();
+          if (!last.busy) return last;
+        } catch (err) {
+          last = { ok: false, message: 'Không kết nối được máy chủ: ' + err.message };
+          // Máy chủ nhận ra đơn gửi lại của cùng người nên gửi lại không tạo đơn trùng
+        }
       }
+      return last;
     }
 
     function setBusy(form, busy) {
       const btn = form.querySelector('button[type="submit"]');
       if (!btn) return;
+      if (busy === 'retry') return;
       if (busy) { btn.dataset.label = btn.innerHTML; btn.innerHTML = 'Đang gửi…'; btn.disabled = true; }
       else { btn.innerHTML = btn.dataset.label || btn.innerHTML; btn.disabled = false; }
     }
@@ -1410,26 +1411,9 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
 
     // Auto fill payment form from slot selection
     function autoFillPaymentOrderInfo() {
-      if (SHEET_API_URL) return; // Bản thật: không tự điền dữ liệu mẫu
-      const slotVal = document.getElementById('pay-slot-select').value;
-      if (slotVal === '#001') {
-        document.getElementById('pay-emp-code').value = 'VH12345';
-        document.getElementById('pay-emp-name').value = 'Nguyễn Thị Quỳnh Như';
-        document.getElementById('pay-payer-name').value = 'Nguyễn Thị Quỳnh Như';
-        document.getElementById('pay-payer-code').value = 'VH12345';
-        document.getElementById('pay-amount').value = '';
-        document.getElementById('pay-txn-id').value = 'Vietcombank - VCB-TXN9823411';
-        document.getElementById('pay-date').value = '31/07/2026 10:15:00';
-      } else if (slotVal === '#003') {
-        document.getElementById('pay-emp-code').value = 'VH55432';
-        document.getElementById('pay-emp-name').value = 'Lê Hoàng Anh';
-        document.getElementById('pay-payer-name').value = 'Phạm Thị Mai (Nộp hộ)';
-        document.getElementById('pay-payer-code').value = 'VH77123';
-        document.getElementById('pay-amount').value = '';
-        document.getElementById('pay-txn-id').value = 'Vietcombank - VCB-TXN9823901';
-        document.getElementById('pay-date').value = '31/07/2026 10:20:00';
-      }
+      // Không tự điền dữ liệu mẫu. Thông tin được điền sẵn sau khi đăng ký ở Tab 2.
     }
+
 
     // Handle Registration Form Submit (Tab 2)
     async function handleFormSubmit(event) {
@@ -1453,7 +1437,8 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
       let timestampStr = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN');
 
       setBusy(form, true);
-      const res = await postToSheet({ action: 'register', division, empCode, empName, kho, model, slotId, phone, address, agree });
+      const res = await postToSheet({ action: 'register', division, empCode, empName, kho, model, slotId, phone, address, agree },
+        (n, max) => { const b = form.querySelector('button[type="submit"]'); if (b) b.innerHTML = `Nhiều người đang gửi, đang thử lại (lần ${n}/${max})…`; });
       setBusy(form, false);
       if (res.slotTaken) {
         // Đánh dấu slot đã có người, bắt chọn slot khác
@@ -1486,6 +1471,7 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
         <td><span class="badge-status-ok badge-status-pending">Chờ nộp tiền</span></td>
       `;
 
+      const emptyRow = document.getElementById('tbody-empty'); if (emptyRow) emptyRow.remove();
       tbody.insertBefore(newRow, tbody.firstChild);
 
       const totalCount = tbody.querySelectorAll('tr').length;
@@ -1524,7 +1510,8 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
 
       setBusy(form, true);
       const res = await postToSheet({ action: 'payment', slotId, empCode, empName, payerName, payerCode,
-        amount, bankTxn: txnId, payTime: payDate, fileName: uploadedFileName, fileBase64: uploadedFileBase64 });
+        amount, bankTxn: txnId, payTime: payDate, fileName: uploadedFileName, fileBase64: uploadedFileBase64 },
+        (n, max) => { const b = form.querySelector('button[type="submit"]'); if (b) b.innerHTML = `Nhiều người đang gửi, đang thử lại (lần ${n}/${max})…`; });
       setBusy(form, false);
       if (!res.ok && !res.offline) {
         alert('CHƯA GỬI ĐƯỢC KHAI NỘP TIỀN.\n\n' + (res.message || 'Lỗi không xác định.'));
@@ -1575,8 +1562,27 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
           <td>${payDate}</td>
           <td><span class="badge-status-ok badge-status-pending">Chờ đối soát</span></td>
         `;
+        const emptyRow = document.getElementById('tbody-empty'); if (emptyRow) emptyRow.remove();
         tbody.insertBefore(newRow, tbody.firstChild);
       }
+    }
+
+    // Tra cứu đơn của tôi (Tab 3)
+    async function handleLookup(event) {
+      event.preventDefault();
+      const form = event.target;
+      const out = document.getElementById('lookup-result');
+      const empCode = document.getElementById('lookup-emp').value.trim();
+      const phoneLast4 = document.getElementById('lookup-phone').value.trim();
+      const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      if (!SHEET_API_URL) { out.innerHTML = 'Bản mẫu chưa kết nối Google Sheet nên chưa tra cứu được.'; return; }
+      setBusy(form, true); out.innerHTML = 'Đang tra cứu…';
+      const res = await postToSheet({ action: 'lookup', empCode, phoneLast4 });
+      setBusy(form, false);
+      if (!res || !res.ok) { out.innerHTML = `<span style="color:var(--lg-heritage); font-weight:600;">${esc((res && res.message) || 'Không tra cứu được.')}</span>`; return; }
+      out.innerHTML = `<div style="overflow-x:auto;"><table class="custom-table"><thead><tr><th>Thời gian đăng ký</th><th>Slot</th><th>Kho</th><th>Model</th><th>Trạng thái</th><th>Đã khai nộp tiền</th><th>Biên lai</th></tr></thead><tbody>` +
+        res.orders.map(o => `<tr><td>${esc(o.time)}</td><td><span class="badge-ordinal">${esc(o.slot)}</span></td><td>${esc(o.kho)}</td><td>${esc(o.model)}</td><td><strong>${esc(o.status)}</strong></td><td>${o.paid ? 'Đã khai' : 'Chưa khai'}</td><td>${o.receipt ? 'Đã tải lên' : 'Chưa có'}</td></tr>`).join('') +
+        `</tbody></table></div>`;
     }
 
     // Modal Receipt Viewing Functions
