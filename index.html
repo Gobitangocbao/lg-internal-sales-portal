@@ -1208,7 +1208,7 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
     // ===== Kết nối Google Sheet (Apps Script Web App) =====
     // Dán URL Web App (dạng https://script.google.com/macros/s/.../exec) vào đây.
     // Để trống = chế độ bản mẫu, dữ liệu KHÔNG được lưu.
-    const SHEET_API_URL = '';
+    const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwb-pp3WQoWjqk54MYqndew-Sny3Yeha80INufk6aSxCuF7zMIAt2cWsJI3urZVHbEC4w/exec';
 
     async function postToSheet(payload) {
       if (!SHEET_API_URL) return { ok: false, offline: true };
