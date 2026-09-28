@@ -11,6 +11,15 @@
  * Cách cài: xem docs/SETUP_APPS_SCRIPT.md
  */
 
+// ID của Google Sheet "LG Internal Sales Database"
+var SPREADSHEET_ID = '10aN5O3HL79asPGfug75IPv1w_ssGPo8edsASMuG3_aM';
+
+// Chạy được cả khi script gắn vào sheet lẫn khi là dự án riêng
+function book_() {
+  try { var a = SpreadsheetApp.getActiveSpreadsheet(); if (a) return a; } catch (e) {}
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
 var SHEET_REG = 'Registrations';
 var SHEET_SLOTS = 'Slots';
 var SHEET_CONFIG = 'Config';
@@ -60,7 +69,7 @@ function register_(d) {
   }
   if (d.agree !== true) return { ok: false, message: 'Chưa xác nhận cam kết Jeong-Do.' };
 
-  var ss = SpreadsheetApp.getActive();
+  var ss = book_();
   var reg = ss.getSheetByName(SHEET_REG);
   var slotId = str_(d.slotId), empCode = str_(d.empCode).toUpperCase();
   var warnings = [], notes = [];
@@ -123,7 +132,7 @@ function payment_(d) {
   for (var i = 0; i < req.length; i++) {
     if (!str_(d[req[i]])) return { ok: false, message: 'Thiếu thông tin: ' + req[i] };
   }
-  var ss = SpreadsheetApp.getActive();
+  var ss = book_();
   var reg = ss.getSheetByName(SHEET_REG);
   var slotId = str_(d.slotId), empCode = str_(d.empCode).toUpperCase();
 
@@ -178,7 +187,7 @@ function saveReceipt_(dataUrl, fileName, slotId, empCode) {
 }
 
 function receiptFolder_() {
-  var ssFile = DriveApp.getFileById(SpreadsheetApp.getActive().getId());
+  var ssFile = DriveApp.getFileById(book_().getId());
   var parents = ssFile.getParents();
   var parent = parents.hasNext() ? parents.next() : DriveApp.getRootFolder();
   var it = parent.getFoldersByName(RECEIPT_FOLDER_NAME);
@@ -186,7 +195,7 @@ function receiptFolder_() {
 }
 
 function findSlot_(slotId) {
-  var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_SLOTS);
+  var sh = book_().getSheetByName(SHEET_SLOTS);
   var v = sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 1), 4).getValues();
   for (var i = 0; i < v.length; i++) {
     if (String(v[i][2]) === slotId) return { kho: String(v[i][0]), model: String(v[i][3]) };
@@ -200,14 +209,14 @@ function regRows_(reg) {
 }
 
 function config_(key) {
-  var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_CONFIG);
+  var sh = book_().getSheetByName(SHEET_CONFIG);
   var v = sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 1), 2).getValues();
   for (var i = 0; i < v.length; i++) if (String(v[i][0]) === key) return v[i][1];
   return '';
 }
 
 function log_(action, empCode, slotId, ua, details) {
-  var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_LOG);
+  var sh = book_().getSheetByName(SHEET_LOG);
   if (!sh) return;
   sh.appendRow([new Date(), action, safe_(empCode), slotId ? "'" + slotId : '', safe_(str_(ua).slice(0, 300)), safe_(details)]);
 }
