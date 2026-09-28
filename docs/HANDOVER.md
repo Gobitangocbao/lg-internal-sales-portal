@@ -774,6 +774,8 @@ Sau đó làm tiếp backlog mục 11, ưu tiên 1. Lưu bản mới, không ghi
 | 28/09/2026 | Claude | Thêm `data/LG_Internal_Sales_Database.xlsx` (file tổng hợp đăng ký) |
 | 28/09/2026 | Claude (v7) | Nối Google Sheet qua Apps Script (`apps-script/Code.gs`, hướng dẫn `docs/SETUP_APPS_SCRIPT.md`); sửa lỗi C-01 (đơn mới hiện "Chờ nộp tiền") và C-02 (bỏ mã GD ngẫu nhiên); Tab 3 nạp đủ 90 slot, điền sẵn thông tin sau khi đăng ký |
 | 28/09/2026 | Claude (v7.1) | Chặn trùng slot ở máy chủ (đơn Hủy/Từ chối thì mở lại slot); cột F–I sheet Slots chỉ tính đơn còn hiệu lực |
+| 28/09/2026 | Claude (v7.2) | Tab điều hướng đậm hơn (nút viền đen, tab đang chọn màu Heritage Red) |
+| 28/09/2026 | Claude (v7.3) | Chịu tải tốt hơn (khoá ngắn, bộ nhớ đệm, tự gửi lại khi bận); tra cứu đơn bằng Mã NV + 4 số cuối SĐT; thay dữ liệu mẫu cũ ở Tab 1, 3, 4 bằng 90 slot thật; khoá cột trên sheet; thêm sheet PM xử lý |
 
 ---
 

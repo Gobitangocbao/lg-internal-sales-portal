@@ -15,8 +15,17 @@ Vượt hạn mức 1 sản phẩm/NV vẫn được ghi kèm cảnh báo, sheet
 
 ## Trạng thái hiện tại (28/09/2026)
 - Đã cài: dự án Apps Script riêng tên **LG Internal Sales API** trong tài khoản chủ sheet (script.google.com). Script tự mở sheet theo `SPREADSHEET_ID`.
-- Đã triển khai Web App, phiên bản 1, chạy dưới tên chủ sheet, quyền truy cập "Bất kỳ ai". URL đã dán vào `SHEET_API_URL` trong bản `index.html` trên máy chủ dự án.
+- Đã triển khai Web App, chạy dưới tên chủ sheet, quyền truy cập "Bất kỳ ai". URL đã dán vào `SHEET_API_URL` trong bản `index.html` trên máy chủ dự án.
 - Đã thử: đăng ký, chặn trùng slot, khai nộp tiền đều ghi đúng vào sheet.
+- 28/09/2026 tối: nâng lên **v7.3.1** (phiên bản triển khai 3, URL giữ nguyên):
+  - Chỉ khoá đúng đoạn kiểm tra trùng + ghi dòng; Config và Slots đọc qua bộ nhớ đệm; chờ khoá tối đa 30 giây. Máy chủ trả `busy` thì trang tự gửi lại tối đa 4 lần.
+  - Gửi lại cùng Mã NV + cùng slot (do mạng chập chờn) được coi là thành công, không ghi thêm dòng (`REGISTER_REPEAT` trong ActivityLog).
+  - Thêm tra cứu đơn: Mã NV + 4 số cuối SĐT. Tra cứu sai được ghi `LOOKUP_NOT_FOUND`.
+  - Thử 20 đơn gửi cùng lúc vào 1 slot: 1 đơn được ghi, không đơn nào ghi trùng; mỗi đơn xử lý khoảng 1 giây.
+  - Giới hạn của Google (tài khoản cá nhân): tối đa 30 lượt chạy script cùng lúc cho mỗi người dùng; mỗi lượt tối đa 6 phút.
+- Sửa Config hoặc Slots: script thấy thay đổi sau tối đa 5–10 phút. Muốn áp dụng ngay, mở dự án Apps Script, chọn hàm `clearCache` rồi bấm Chạy.
+- Sheet đã khoá: chỉ chủ sheet sửa được. Người khác được chia sẻ sheet chỉ sửa được cột L (Trạng thái) và S:U (PM xác nhận, Ngày, Ghi chú) ở Registrations.
+- Sheet **PM xử lý**: bản xem gọn, đơn chờ đối soát lên đầu, có link "Sửa dòng" nhảy tới đúng dòng.
 
 ## Cài đặt (chủ sheet tự làm, khoảng 5 phút)
 1. Mở sheet, vào **Tiện ích mở rộng (Extensions) → Apps Script**.
