@@ -114,6 +114,7 @@
     .badge-ordinal { background: var(--lg-card-bg); color: var(--lg-ink); font-weight: 600; padding: 2px 10px; border-radius: 999px; font-size: 12px; border: 1px solid var(--lg-ink); }
     .badge-status-ok { background: #F6F3EB; color: var(--lg-ok); font-weight: 600; padding: 4px 10px; border-radius: 999px;
       display: inline-flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; }
+    .badge-status-pending { color: var(--lg-info); }
     .badge-status-ok::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
     .btn-view-slip { background: var(--lg-card-bg); color: var(--lg-ink); border: 1px solid var(--lg-ink); font-family: inherit;
       font-weight: 400; padding: 4px 10px; border-radius: 999px; font-size: 12px; cursor: pointer; }
@@ -211,7 +212,7 @@
         2. Đăng Ký Trực Tuyến Trên Hệ Thống <span class="tab-badge" style="background:var(--lg-panel-2); color:var(--lg-red);">Portal Live</span>
       </button>
       <button class="tab-btn" onclick="switchTab('tab3', this)">
-        3. Xác Nhận Mua & Nộp Tiền <span class="tab-badge" id="tab3-count-badge">5 Đã Xác Nhận</span>
+        3. Xác Nhận Mua & Nộp Tiền <span class="tab-badge" id="tab3-count-badge">5 Đơn</span>
       </button>
       <button class="tab-btn" onclick="switchTab('tab4', this)">
         4. File Danh Sách & Slot ID <span class="tab-badge">Excel List</span>
@@ -812,11 +813,7 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
               <label class="form-label" for="pay-slot-select">1. Chọn Mã Slot ID Đã Đăng Ký <span class="req">*</span></label>
               <select class="form-control" id="pay-slot-select" onchange="autoFillPaymentOrderInfo()" required>
                 <option value="">-- Chọn Mã Slot ID Của Bạn --</option>
-                <option value="#001">#001 - Nguyễn Thị Quỳnh Như (MS3032JAS)</option>
-                <option value="#002">#002 - Trần Văn Nam (MS3032JAS)</option>
-                <option value="#003">#003 - Lê Hoàng Anh (LDFB7623S)</option>
-                <option value="#004">#004 - Hoàng Minh Trí (S5GOC)</option>
-                <option value="#005">#005 - Đặng Thanh Hà (GR-X257MC)</option>
+                <!-- Danh sách 90 slot được nạp tự động từ ô Slot ở Tab 2 -->
               </select>
             </div>
 
@@ -1208,6 +1205,33 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
     let uploadedFileBase64 = null;
     let uploadedFileName = '';
 
+    // ===== Kết nối Google Sheet (Apps Script Web App) =====
+    // Dán URL Web App (dạng https://script.google.com/macros/s/.../exec) vào đây.
+    // Để trống = chế độ bản mẫu, dữ liệu KHÔNG được lưu.
+    const SHEET_API_URL = '';
+
+    async function postToSheet(payload) {
+      if (!SHEET_API_URL) return { ok: false, offline: true };
+      payload.userAgent = navigator.userAgent;
+      try {
+        const res = await fetch(SHEET_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // tránh preflight CORS
+          body: JSON.stringify(payload)
+        });
+        return await res.json();
+      } catch (err) {
+        return { ok: false, message: 'Không kết nối được máy chủ: ' + err.message };
+      }
+    }
+
+    function setBusy(form, busy) {
+      const btn = form.querySelector('button[type="submit"]');
+      if (!btn) return;
+      if (busy) { btn.dataset.label = btn.innerHTML; btn.innerHTML = 'Đang gửi…'; btn.disabled = true; }
+      else { btn.innerHTML = btn.dataset.label || btn.innerHTML; btn.disabled = false; }
+    }
+
     // Tab Switching Logic
     function switchTab(tabId, element) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -1315,7 +1339,7 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
       let n = 0, only = null;
       slotOpts.forEach(o => {
         const hit = (!kho || o.dataset.kho === kho) && (!model || o.dataset.model === model);
-        o.hidden = !hit; o.disabled = !hit; if (hit) { n++; only = o; }
+        o.hidden = !hit; o.disabled = !hit || o.dataset.taken === '1'; if (hit && o.dataset.taken !== '1') { n++; only = o; }
       });
       if (slotSel.selectedOptions[0] && slotSel.selectedOptions[0].disabled) slotSel.value = '';
       if (model && n === 1) slotSel.value = only.value;
@@ -1337,6 +1361,17 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
     document.getElementById('system-reg-form').addEventListener('reset', () => { setTimeout(filterRegSlots, 0); });
     filterRegSlots();
 
+    // Nạp 90 slot vào ô chọn slot ở Tab 3 (chỉ Slot + Kho + Model, không hiện tên người)
+    (function fillPaySlots() {
+      const pay = document.getElementById('pay-slot-select');
+      document.querySelectorAll('#reg-slot-id option[data-model]').forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o.value;
+        opt.textContent = `${o.value} · Kho ${o.dataset.kho} · ${o.dataset.model}`;
+        pay.appendChild(opt);
+      });
+    })();
+
     // File Selection Handler
     function handleFileSelected(event) {
       const file = event.target.files[0];
@@ -1345,7 +1380,18 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
       uploadedFileName = file.name;
       document.getElementById('file-name-display').innerText = `File đã chọn: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
 
-      if (file.type.startsWith('image/')) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File lớn hơn 5 MB. Vui lòng chụp lại hoặc nén file rồi chọn lại.');
+        event.target.value = ''; uploadedFileBase64 = null; uploadedFileName = '';
+        document.getElementById('file-name-display').innerText = '';
+        return;
+      }
+      if (file.type === 'application/pdf') {
+        const r = new FileReader();
+        r.onload = e => { uploadedFileBase64 = e.target.result; };
+        r.readAsDataURL(file);
+        document.getElementById('file-preview-img').style.display = 'none';
+      } else if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = function(e) {
           uploadedFileBase64 = e.target.result;
@@ -1362,6 +1408,7 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
 
     // Auto fill payment form from slot selection
     function autoFillPaymentOrderInfo() {
+      if (SHEET_API_URL) return; // Bản thật: không tự điền dữ liệu mẫu
       const slotVal = document.getElementById('pay-slot-select').value;
       if (slotVal === '#001') {
         document.getElementById('pay-emp-code').value = 'VH12345';
@@ -1383,8 +1430,9 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
     }
 
     // Handle Registration Form Submit (Tab 2)
-    function handleFormSubmit(event) {
+    async function handleFormSubmit(event) {
       event.preventDefault();
+      const form = event.target;
 
       const division = document.getElementById('reg-division').value;
       const empCode = document.getElementById('reg-emp-code').value.trim();
@@ -1395,9 +1443,29 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
       // Người nộp tiền được khai ở bước 3 (Xác nhận nộp tiền), không khai lúc đăng ký
       const payerName = empName, payerCode = empCode;
 
-      const now = new Date();
-      const timestampStr = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN');
+      const phone = document.getElementById('reg-phone').value.trim();
+      const address = document.getElementById('reg-address').value.trim();
+      const agree = document.getElementById('reg-agree').checked;
 
+      const now = new Date();
+      let timestampStr = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN');
+
+      setBusy(form, true);
+      const res = await postToSheet({ action: 'register', division, empCode, empName, kho, model, slotId, phone, address, agree });
+      setBusy(form, false);
+      if (res.slotTaken) {
+        // Đánh dấu slot đã có người, bắt chọn slot khác
+        const opt = document.querySelector(`#reg-slot-id option[value="${slotId}"]`);
+        if (opt) { opt.disabled = true; opt.dataset.taken = '1'; opt.textContent = opt.textContent.replace(/( — Đã có người đăng ký)?$/, ' — Đã có người đăng ký'); }
+        document.getElementById('reg-slot-id').value = '';
+        alert('SLOT ' + slotId + ' ĐÃ CÓ NGƯỜI ĐĂNG KÝ TRƯỚC.\n\nĐăng ký của bạn CHƯA được ghi nhận. Vui lòng chọn slot khác rồi bấm Gửi lại.');
+        return;
+      }
+      if (!res.ok && !res.offline) {
+        alert('CHƯA GỬI ĐƯỢC ĐĂNG KÝ.\n\n' + (res.message || 'Lỗi không xác định.') + '\n\nVui lòng thử lại hoặc báo PM phụ trách.');
+        return;
+      }
+      if (res.timestamp) timestampStr = res.timestamp;
 
       const tbody = document.getElementById('confirmation-tbody');
       const newRow = document.createElement('tr');
@@ -1410,30 +1478,36 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
         <td><span style="color:var(--lg-gray-muted); font-size:11.5px;">Chưa khai</span></td>
         <td>${division}</td>
         <td>${model}<br><span style="font-size:11px; color:var(--lg-gray-muted);">Kho: <strong>${kho}</strong></span></td>
-        <td>VCB - TXN${Math.floor(1000000 + Math.random() * 9000000)}</td>
-        <td>
-          <button class="btn-view-slip" onclick="openReceiptModal('Biên Lai Nộp Tiền Ngân Hàng ${slotId}', '${payerName} (${payerCode})', '', 'VCB-TXN${Math.floor(1000000 + Math.random() * 9000000)}')">
-            Xem Biên Lai (.PNG)
-          </button>
-        </td>
+        <td><span style="color:var(--lg-gray-muted); font-size:11.5px;">Chưa khai</span></td>
+        <td><span style="color:var(--lg-gray-muted); font-size:11.5px;">Chưa có</span></td>
         <td>${timestampStr}</td>
-        <td><span class="badge-status-ok">Đã Nộp & Xác Nhận</span></td>
+        <td><span class="badge-status-ok badge-status-pending">Chờ nộp tiền</span></td>
       `;
 
       tbody.insertBefore(newRow, tbody.firstChild);
 
       const totalCount = tbody.querySelectorAll('tr').length;
-      document.getElementById('tab3-count-badge').innerText = `${totalCount} Đã Xác Nhận`;
+      document.getElementById('tab3-count-badge').innerText = `${totalCount} Đơn`;
 
-      alert(`ĐĂNG KÝ THÀNH CÔNG VÀ ĐÃ GHI NHẬN LÊN HỆ THỐNG!\n\n• Mã Slot: ${slotId}\n• Kho: ${kho}\n• Model: ${model}\n• Nhân viên đăng ký: ${empName} (${empCode})\n• Thời gian Timestamp: ${timestampStr}\n\nVui lòng sang Tab 3 để điền mẫu biểu và Upload File Biên Lai Nộp Tiền!`);
+      const warn = (res.warnings && res.warnings.length) ? `\n\nLƯU Ý:\n• ${res.warnings.join('\n• ')}` : '';
+      const head = res.offline
+        ? 'BẢN MẪU: CHƯA KẾT NỐI GOOGLE SHEET, ĐĂNG KÝ NÀY KHÔNG ĐƯỢC LƯU.'
+        : 'ĐĂNG KÝ ĐÃ ĐƯỢC GHI NHẬN VÀO HỆ THỐNG.';
+      alert(`${head}${warn}\n\n• Mã Slot: ${slotId}\n• Kho: ${kho}\n• Model: ${model}\n• Nhân viên đăng ký: ${empName} (${empCode})\n• Thời gian Timestamp: ${timestampStr}\n• Trạng thái: Chờ nộp tiền\n\nVui lòng sang Tab 3 để điền mẫu biểu và Upload File Biên Lai Nộp Tiền!`);
+
+      // Điền sẵn thông tin sang Tab 3
+      document.getElementById('pay-slot-select').value = slotId;
+      document.getElementById('pay-emp-code').value = empCode;
+      document.getElementById('pay-emp-name').value = empName;
 
       const tab3Btn = document.querySelectorAll('.tab-btn')[2];
       switchTab('tab3', tab3Btn);
     }
 
     // Handle Payment Submission & Receipt Upload (Tab 3)
-    function handlePaymentSubmit(event) {
+    async function handlePaymentSubmit(event) {
       event.preventDefault();
+      const form = event.target;
 
       const slotId = document.getElementById('pay-slot-select').value;
       const empCode = document.getElementById('pay-emp-code').value.trim();
@@ -1444,9 +1518,20 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
       const txnId = document.getElementById('pay-txn-id').value.trim();
       const payDate = document.getElementById('pay-date').value.trim();
 
-      const fileName = uploadedFileName || `Bien_Lai_Chuyen_Khoan_${slotId.replace('#','')}.png`;
+      const fileName = uploadedFileName || 'Chưa đính kèm';
 
-      alert(`ĐÃ UPLOAD CHỨNG TỪ NỘP TIỀN THÀNH CÔNG!\n\n• Mã Slot: ${slotId}\n• Họ Tên NV Nộp Tiền: ${payerName}\n• Mã NV Người Nộp Tiền: ${payerCode}\n• Mã Giao Dịch: ${txnId}\n• File chứng từ: ${fileName}\n\nPM Support đã nhận được bằng chứng nộp tiền và tiến hành duyệt xuất kho!`);
+      setBusy(form, true);
+      const res = await postToSheet({ action: 'payment', slotId, empCode, empName, payerName, payerCode,
+        amount, bankTxn: txnId, payTime: payDate, fileName: uploadedFileName, fileBase64: uploadedFileBase64 });
+      setBusy(form, false);
+      if (!res.ok && !res.offline) {
+        alert('CHƯA GỬI ĐƯỢC KHAI NỘP TIỀN.\n\n' + (res.message || 'Lỗi không xác định.'));
+        return;
+      }
+      const head = res.offline
+        ? 'BẢN MẪU: CHƯA KẾT NỐI GOOGLE SHEET, KHAI NỘP NÀY KHÔNG ĐƯỢC LƯU.'
+        : 'ĐÃ GHI NHẬN KHAI NỘP TIỀN.';
+      alert(`${head}\n\n• Mã Slot: ${slotId}\n• Họ Tên NV Nộp Tiền: ${payerName}\n• Mã NV Người Nộp Tiền: ${payerCode}\n• Mã Giao Dịch: ${txnId}\n• File chứng từ: ${fileName}\n• Trạng thái: Đã khai nộp - chờ đối soát\n\nPM sẽ đối soát với sao kê ngân hàng trước khi xác nhận.`);
 
       const rows = document.querySelectorAll('#confirmation-tbody tr');
       let found = false;
@@ -1463,7 +1548,7 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
             </button>
           `;
           row.cells[9].innerText = payDate;
-          row.cells[10].innerHTML = `<span class="badge-status-ok">Đã Nộp & Xác Nhận</span>`;
+          row.cells[10].innerHTML = `<span class="badge-status-ok badge-status-pending">Chờ đối soát</span>`;
         }
       });
 
@@ -1486,7 +1571,7 @@ Ms. Nguyet - HS PM Support (nguyet.duong@lge.com)
             </button>
           </td>
           <td>${payDate}</td>
-          <td><span class="badge-status-ok">Đã Nộp & Xác Nhận</span></td>
+          <td><span class="badge-status-ok badge-status-pending">Chờ đối soát</span></td>
         `;
         tbody.insertBefore(newRow, tbody.firstChild);
       }

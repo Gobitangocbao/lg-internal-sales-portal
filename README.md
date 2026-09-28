@@ -10,14 +10,16 @@ Tải file `index.html` về rồi mở bằng trình duyệt (Chrome/Edge). Kh�
 
 ## Tình trạng hiện tại
 - **Frontend:** có, 1 file HTML + CSS + JavaScript thuần.
-- **Backend / Database / Domain:** **chưa có**. Dữ liệu chỉ nằm trên trình duyệt, tải lại trang là mất.
+- **Lưu dữ liệu:** qua Google Apps Script ghi vào Google Sheet (xem `docs/SETUP_APPS_SCRIPT.md`). Khi `SHEET_API_URL` trong `index.html` để trống, trang chạy chế độ bản mẫu và **không lưu**.
 - Link `internalsales.lge.com` trong trang chỉ là chữ minh hoạ.
 
 ## Cấu trúc
 ```
-index.html          Trang prototype v6, chuẩn nhận diện LG (5 tab: Thư thông báo, Đăng ký, Nộp tiền, Danh sách Slot, SOP)
+index.html          Trang prototype v7, chuẩn nhận diện LG (5 tab: Thư thông báo, Đăng ký, Nộp tiền, Danh sách Slot, SOP)
 docs/HANDOVER.md    Hồ sơ bàn giao chi tiết (đọc mục 0.1 trước): tính năng, lỗi đã biết, backlog, kịch bản kiểm thử
 data/LG_Internal_Sales_Database.xlsx   File tổng hợp đăng ký (Dashboard, Registrations, Slots, Config...)
+apps-script/Code.gs      Script nhận đơn từ trang, ghi vào Google Sheet (chỉ thêm, không xoá)
+docs/SETUP_APPS_SCRIPT.md  Hướng dẫn cài script, triển khai Web App
 ```
 
 ## Cách cùng làm
