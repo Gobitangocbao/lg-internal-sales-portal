@@ -13,6 +13,11 @@ Script **chỉ thêm, không xoá**. Đơn đã khai nộp thì không bị ghi 
 
 Vượt hạn mức 1 sản phẩm/NV vẫn được ghi kèm cảnh báo, sheet tô đỏ để PM xử lý.
 
+## Trạng thái hiện tại (28/09/2026)
+- Đã cài: dự án Apps Script riêng tên **LG Internal Sales API** trong tài khoản chủ sheet (script.google.com). Script tự mở sheet theo `SPREADSHEET_ID`.
+- Đã triển khai Web App, phiên bản 1, chạy dưới tên chủ sheet, quyền truy cập "Bất kỳ ai". URL đã dán vào `SHEET_API_URL` trong bản `index.html` trên máy chủ dự án.
+- Đã thử: đăng ký, chặn trùng slot, khai nộp tiền đều ghi đúng vào sheet.
+
 ## Cài đặt (chủ sheet tự làm, khoảng 5 phút)
 1. Mở sheet, vào **Tiện ích mở rộng (Extensions) → Apps Script**.
 2. Xoá đoạn mẫu trong `Code.gs` (chỉ có dòng `function myFunction() {}`), rồi dán toàn bộ file `apps-script/Code.gs`. Bấm **Lưu**.
