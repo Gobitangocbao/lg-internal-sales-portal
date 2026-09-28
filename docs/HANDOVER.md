@@ -772,6 +772,8 @@ Sau đó làm tiếp backlog mục 11, ưu tiên 1. Lưu bản mới, không ghi
 | 28/09/2026 | Claude (v5) | Bỏ trường 9, 10 (người nộp tiền) khỏi form đăng ký |
 | 28/09/2026 | Claude (v6) | Áp nhận diện LG: logo gốc, font LG EI, bảng màu LG.com web; bỏ gradient và emoji |
 | 28/09/2026 | Claude | Thêm `data/LG_Internal_Sales_Database.xlsx` (file tổng hợp đăng ký) |
+| 28/09/2026 | Claude (v7) | Nối Google Sheet qua Apps Script (`apps-script/Code.gs`, hướng dẫn `docs/SETUP_APPS_SCRIPT.md`); sửa lỗi C-01 (đơn mới hiện "Chờ nộp tiền") và C-02 (bỏ mã GD ngẫu nhiên); Tab 3 nạp đủ 90 slot, điền sẵn thông tin sau khi đăng ký |
+| 28/09/2026 | Claude (v7.1) | Chặn trùng slot ở máy chủ (đơn Hủy/Từ chối thì mở lại slot); cột F–I sheet Slots chỉ tính đơn còn hiệu lực |
 
 ---
 
