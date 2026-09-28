@@ -15,8 +15,9 @@ Tải file `index.html` về rồi mở bằng trình duyệt (Chrome/Edge). Kh�
 
 ## Cấu trúc
 ```
-index.html          Trang prototype (5 tab: Thư thông báo, Đăng ký, Nộp tiền, Danh sách Slot, SOP)
-docs/HANDOVER.md    Hồ sơ bàn giao chi tiết: tính năng, lỗi đã biết, backlog, đề xuất kiến trúc, kịch bản kiểm thử
+index.html          Trang prototype v6, chuẩn nhận diện LG (5 tab: Thư thông báo, Đăng ký, Nộp tiền, Danh sách Slot, SOP)
+docs/HANDOVER.md    Hồ sơ bàn giao chi tiết (đọc mục 0.1 trước): tính năng, lỗi đã biết, backlog, kịch bản kiểm thử
+data/LG_Internal_Sales_Database.xlsx   File tổng hợp đăng ký (Dashboard, Registrations, Slots, Config...)
 ```
 
 ## Cách cùng làm

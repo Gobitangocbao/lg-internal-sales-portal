@@ -23,6 +23,22 @@
 
 ---
 
+## 0.1. CẬP NHẬT 28/09/2026 — ĐỌC TRƯỚC CÁC MỤC CŨ BÊN DƯỚI
+
+`index.html` trong repo hiện là **bản v6**. Một số mô tả ở các mục 4–8 và 10 (viết cho bản 24/09) đã cũ. Trạng thái hiện tại:
+
+- **Form đăng ký (Tab 2) còn 8 trường:** 1 Bộ phận · 2 Mã NV · 3 Họ tên · 4 Kho · 5 Model · 6 Slot ID · 7 SĐT · 8 Địa chỉ. Hai trường người nộp tiền đã bỏ khỏi form đăng ký; người nộp tiền khai ở form nộp tiền (Tab 3).
+- **Bộ phận:** 173 phòng ban do chị Hiền cung cấp, chia nhóm HCM / HN / NORTH / MIDDLE / SOUTH / PM-PD / khác, có ô tìm nhanh; OTHER luôn hiện.
+- **Kho:** AYA (44 slot), AYB (1 slot, #040), AYC (45 slot).
+- **Model / Slot:** 43 model, 90 slot #001–#090 theo danh sách WH / No / Model do chị Hiền cung cấp. Kho → Model → Slot lọc lẫn nhau; chọn Slot thì Kho và Model tự điền; không chọn lệch được.
+- **Giá bán đã bỏ khỏi mọi chỗ hiển thị** vì bảo mật (bảng Tab 3, Tab 4, modal, thông báo). Ô "Số tiền đã chuyển khoản" ở form nộp tiền vẫn giữ để Kế toán đối soát.
+- **Nhận diện LG (v6):** logo gốc LG (symbol + "LG", Heritage Red / Grey; bản chữ trắng khi chế độ tối), font LG EI Headline / LG EI Text nhúng dạng subset Latin + tiếng Việt, bảng màu LG.com web (Active Red #EA1917, dải xám ấm), bỏ gradient, emoji và font Google.
+- **Vẫn chưa có backend / database.** Dữ liệu chỉ ở trình duyệt. File tổng hợp thiết kế sẵn: `data/LG_Internal_Sales_Database.xlsx` (Dashboard, Registrations, Slots, Divisions, Config, ActivityLog, AutoEmail), theo cấu trúc file "LG JeongDo RSVP Database". Bước tiếp theo đề xuất: Google Apps Script `doPost` ghi vào sheet Registrations và sửa `index.html` gửi dữ liệu về.
+- **Lỗi cũ còn tồn tại:** C-01, C-02 (đăng ký xong hiện "Đã nộp & xác nhận", mã GD ngẫu nhiên), C-06, C-08, C-09, L-11, L-13; Tab 4 và ô chọn slot ở form nộp tiền Tab 3 vẫn là 5 sản phẩm mẫu cũ; thư Tab 1 vẫn ghi dòng sản phẩm DW/MWO/Styler.
+- **Bảo mật:** font LG EI và tài liệu nhận diện là tài sản nội bộ LG ("Internal Use only"). Chỉ chia sẻ repo cho người được phép.
+
+---
+
 ## 1. TỔNG QUAN DỰ ÁN
 
 ### 1.1. Dự án là gì
@@ -750,6 +766,12 @@ Sau đó làm tiếp backlog mục 11, ưu tiên 1. Lưu bản mới, không ghi
 |---|---|---|
 | 17/09/2026 | (chưa rõ) | Bản HTML hiện tại được lưu lần cuối trên máy |
 | 24/09/2026 | Claude | Lập file bàn giao này từ việc đọc toàn bộ mã nguồn. Chưa sửa code |
+| 28/09/2026 | Claude (v2) | Bộ phận: 173 phòng ban kèm ô tìm nhanh; sửa 2 tên có dấu cách thừa |
+| 28/09/2026 | Claude (v3) | Thêm trường 4 Kho; nạp 43 model và 90 slot; liên kết Model ↔ Slot |
+| 28/09/2026 | Claude (v4) | Gắn slot với kho (WH); bỏ hiển thị giá bán ở mọi nơi |
+| 28/09/2026 | Claude (v5) | Bỏ trường 9, 10 (người nộp tiền) khỏi form đăng ký |
+| 28/09/2026 | Claude (v6) | Áp nhận diện LG: logo gốc, font LG EI, bảng màu LG.com web; bỏ gradient và emoji |
+| 28/09/2026 | Claude | Thêm `data/LG_Internal_Sales_Database.xlsx` (file tổng hợp đăng ký) |
 
 ---
 
