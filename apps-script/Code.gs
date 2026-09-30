@@ -27,6 +27,10 @@
  * -> mật khẩu trở về 123456. Sai 5 lần liên tiếp -> khoá 15 phút. Đăng nhập đúng -> cấp mã phiên (token) 12 giờ.
  * Config REQUIRE_LOGIN_TOKEN = TRUE: đăng ký / nộp tiền / tra cứu bắt buộc có token đúng Mã NV (bật khi mọi người
  * đã dùng trang mới). Chưa bật: token có gửi thì vẫn kiểm tra, không gửi thì cho qua như cũ.
+ * v7.10 (30/09/2026): DANH SÁCH NV Ở MÁY CHỦ. Sheet "Employees" [Mã NV, Họ tên, Trạng thái, Ghi chú].
+ * Đăng nhập / đổi mật khẩu / đăng ký / nộp tiền / tra cứu chỉ nhận Mã NV có trong sheet và Trạng thái khác "Ngừng".
+ * Họ tên ghi vào đơn lấy theo sheet Employees (không lấy chữ trang gửi lên). Thêm người: thêm dòng; bỏ người: đổi
+ * Trạng thái sang "Ngừng" (không xoá dòng). Sheet trống hoặc chưa có thì không chặn (như bản cũ).
  * Chế độ thử tải: gửi test:true (POST) hoặc ?test=1 (GET) thì script dùng BẢN SAO sheet.
  *
  * Cách cài: xem docs/SETUP_APPS_SCRIPT.md
@@ -76,7 +80,7 @@ function doGet(e) {
   _useTest = !!(e && e.parameter && e.parameter.test === '1');
   _testRun = _useTest ? str_(e.parameter.run).replace(/[^A-Za-z0-9]/g, '').slice(0, 12) : '';
   if (e && e.parameter && e.parameter.action === 'taken') return json_(taken_());
-  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.9', test: _useTest, time: new Date().toISOString() });
+  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.10', test: _useTest, time: new Date().toISOString() });
 }
 
 /* ---------- Danh sách slot đã có người (chỉ mã slot, không kèm tên / Mã NV) ---------- */
@@ -111,6 +115,10 @@ function doPost(e) {
     var data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     _useTest = data.test === true;
     _testRun = _useTest ? str_(data.testRun).replace(/[^A-Za-z0-9]/g, '').slice(0, 12) : '';
+    if (/^(login|changePassword|register|payment|lookup)$/.test(String(data.action))) {
+      var notEmp = empCheck_(data);
+      if (notEmp) return json_(notEmp);
+    }
     if (data.action === 'login') return json_(login_(data));
     if (data.action === 'changePassword') return json_(changePassword_(data));
     if (data.action === 'register' || data.action === 'payment' || data.action === 'lookup') {
@@ -234,7 +242,9 @@ function register_(d) {
   row[C.CAMPAIGN - 1] = campaign;
   row[C.DIVISION - 1] = safe_(d.division);
   row[C.EMP_CODE - 1] = safe_(empCode);
-  row[C.EMP_NAME - 1] = safe_(d.empName);
+  var master = employees_();
+  var mName = master && master[str_(d.empCode).toUpperCase().replace(/\s+/g, '')];
+  row[C.EMP_NAME - 1] = safe_(mName && mName.name ? mName.name : d.empName); // họ tên theo sheet Employees
   row[C.KHO - 1] = safe_(d.kho);
   row[C.MODEL - 1] = safe_(d.model);
   row[C.SLOT - 1] = "'" + slotId.replace(/^'+/, '');
@@ -421,6 +431,40 @@ function lookup_(d) {
   return { ok: true, orders: out };
 }
 
+/* ---------- Danh sách nhân viên được mua (v7.10) ---------- */
+var SHEET_EMP = 'Employees';
+var CACHE_EMP_SEC = 300; // sửa sheet Employees thì sau tối đa 5 phút script mới thấy (hoặc chạy clearCache)
+// null = chưa có danh sách (không chặn); ngược lại { MÃ_NV: { name, active } }
+function employees_() {
+  var cache = CacheService.getScriptCache();
+  var hit = cache.get(ck_('emps'));
+  if (hit) return JSON.parse(hit);
+  var sh = book_().getSheetByName(SHEET_EMP), o = null;
+  if (sh && sh.getLastRow() > 1) {
+    var v = sh.getRange(2, 1, sh.getLastRow() - 1, 3).getValues();
+    for (var i = 0; i < v.length; i++) {
+      var code = str_(v[i][0]).toUpperCase().replace(/\s+/g, '');
+      if (!code) continue;
+      o = o || {};
+      o[code] = { name: str_(v[i][1]), active: !/ng[ừu]ng|stop|kh[oó]a|khoá/i.test(str_(v[i][2])) };
+    }
+  }
+  try { cache.put(ck_('emps'), JSON.stringify(o), CACHE_EMP_SEC); } catch (e) {}
+  return o;
+}
+function empCheck_(d) {
+  if (_useTest) return null;
+  var list = employees_();
+  if (!list) return null;
+  var emp = str_(d.empCode).toUpperCase().replace(/\s+/g, '');
+  var e = list[emp];
+  if (e && e.active) return null;
+  log_('EMP_REJECTED', emp, str_(d.slotId), d.userAgent, (e ? 'Mã NV đang ở trạng thái Ngừng' : 'Mã NV không có trong sheet Employees') + ' | ' + str_(d.action));
+  return { ok: false, notEmployee: true,
+    message: e ? 'Mã NV ' + emp + ' hiện không được mua trong đợt này. Vui lòng liên hệ PM Support.'
+               : 'Mã NV "' + emp + '" không có trong danh sách được mua đợt này. Kiểm tra lại hoặc liên hệ PM Support.' };
+}
+
 /* ---------- Tài khoản: đăng nhập, đổi mật khẩu (v7.9) ---------- */
 var SHEET_ACC = 'Accounts';
 var DEFAULT_PW = '123456';
@@ -519,7 +563,8 @@ function login_(d) {
   }
   CacheService.getScriptCache().remove(failKey_(emp));
   log_('LOGIN', emp, '', d.userAgent, acc.custom ? 'Mật khẩu riêng' : 'Mật khẩu mặc định');
-  return { ok: true, token: token_(emp), defaultPassword: !acc.custom };
+  var el = employees_(), nm = el && el[emp] ? el[emp].name : '';
+  return { ok: true, token: token_(emp), defaultPassword: !acc.custom, empName: nm };
 }
 
 function changePassword_(d) {
@@ -580,8 +625,8 @@ function slots_() {
 
 /** Chạy tay khi vừa sửa Config hoặc Slots để script thấy ngay. */
 function clearCache() {
-  CacheService.getScriptCache().removeAll(['cfg', 'slots', 'taken', 't_cfg', 't_slots', 't_taken']);
-  Logger.log('Đã xoá bộ nhớ đệm Config và Slots.');
+  CacheService.getScriptCache().removeAll(['cfg', 'slots', 'taken', 'emps', 't_cfg', 't_slots', 't_taken']);
+  Logger.log('Đã xoá bộ nhớ đệm Config, Slots, Employees.');
 }
 
 /* ---------- Tiện ích ---------- */
