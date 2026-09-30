@@ -379,7 +379,7 @@
     /* ===== P0: Login Overlay ===== */
     #login-overlay {
       position: fixed; inset: 0; z-index: 99999;
-      background: linear-gradient(135deg, #A50034 0%, #60001D 60%, #1E293B 100%);
+      background: linear-gradient(135deg, #A50034 0%, #60001D 60%, #262626 100%);  /* WG01 replaces Tailwind slate */
       display: flex; align-items: center; justify-content: center;
       transition: opacity .4s ease;
     }
@@ -394,15 +394,15 @@
     }
     .login-card h2 {
       font-family: 'LG EI Headline', 'LG EI Text', sans-serif;
-      font-size: 20px; color: #1E293B; margin: 0 0 6px;
+      font-size: 20px; color: #262626; margin: 0 0 6px;  /* WG01 */
     }
     .login-card .login-sub {
-      font-size: 13px; color: #64748B; margin: 0 0 24px;
+      font-size: 13px; color: #716F6A; margin: 0 0 24px;  /* WG03 */
     }
     .login-card .form-group { margin-bottom: 16px; text-align: left; }
-    .login-card .form-label { font-size: 12.5px; font-weight: 600; color: #1E293B; margin-bottom: 5px; display: block; }
+    .login-card .form-label { font-size: 12.5px; font-weight: 600; color: #262626; margin-bottom: 5px; display: block; }  /* WG01 */
     .login-card .form-control {
-      width: 100%; padding: 10px 14px; border: 1.5px solid #CBD5E1;
+      width: 100%; padding: 10px 14px; border: 1.5px solid #CBC8C2;  /* WG04 */
       border-radius: 10px; font-size: 14px; outline: none; transition: border-color .2s;
       box-sizing: border-box;
     }
@@ -417,13 +417,13 @@
     .login-card .btn-login:active { transform: scale(.98); }
     .login-card .btn-login:disabled { opacity: .5; cursor: not-allowed; }
     .login-card .login-error {
-      background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA;
+      background: rgba(165,0,52,.06); color: #A50034; border: 1px solid rgba(165,0,52,.2);  /* Heritage Red tint */
       border-radius: 8px; padding: 10px 14px; font-size: 13px;
       margin-bottom: 16px; display: none;
     }
     .login-card .login-error.show { display: block; }
     .login-card .login-info {
-      margin-top: 16px; font-size: 12px; color: #94A3B8;
+      margin-top: 16px; font-size: 12px; color: #716F6A;  /* WG03 */
     }
     /* user-bar shown after login */
     .user-bar {
