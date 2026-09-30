@@ -31,6 +31,14 @@
  * Đăng nhập / đổi mật khẩu / đăng ký / nộp tiền / tra cứu chỉ nhận Mã NV có trong sheet và Trạng thái khác "Ngừng".
  * Họ tên ghi vào đơn lấy theo sheet Employees (không lấy chữ trang gửi lên). Thêm người: thêm dòng; bỏ người: đổi
  * Trạng thái sang "Ngừng" (không xoá dòng). Sheet trống hoặc chưa có thì không chặn (như bản cũ).
+ * v7.11 (30/09/2026) — GĐ 0 trước đợt 14/10:
+ *  - Config OPEN_TIME / CLOSE_TIME (dd/mm/yyyy hh:mm, giờ VN): máy chủ từ chối đăng ký ngoài khung giờ. Để trống = không chặn.
+ *  - Config PORTAL_PAUSED = TRUE: tạm dừng nhận đăng ký và khai nộp tiền (có hiệu lực sau tối đa 30 giây).
+ *  - Máy chủ chặn khai nộp tiền trước PAY_OPEN_DELAY_HOURS giờ (mặc định 2) kể từ lúc đăng ký.
+ *  - GET ?action=taken / ?action=status trả kèm giờ máy chủ, giờ mở/đóng, trạng thái tạm dừng cho trang.
+ *  - Dọn các ô giữ chỗ slot đã hết hạn (Script Property 'claims' giới hạn 9 KB).
+ *  - Config PAGE_FILE_ID = ID file HTML trên Drive: link web app mở thẳng trang đăng ký (1 link cho mọi NV).
+ *  - Chế độ thử nhận testSheet = file "LoadTest ..." do công cụ thử tải (project Apps Script riêng) tạo.
  * Chế độ thử tải: gửi test:true (POST) hoặc ?test=1 (GET) thì script dùng BẢN SAO sheet.
  *
  * Cách cài: xem docs/SETUP_APPS_SCRIPT.md
@@ -40,7 +48,7 @@
 var SPREADSHEET_ID = '10aN5O3HL79asPGfug75IPv1w_ssGPo8edsASMuG3_aM';
 // Bản sao dùng để thử tải (không phải dữ liệu thật)
 var TEST_SPREADSHEET_ID = '1R4u0BEp2BjQBIEv3eCNm1WML4PedjgIsqjyhFWn4YY4';
-var _useTest = false, _testRun = '';
+var _useTest = false, _testRun = '', _testSheet = '';
 // Khoá bộ nhớ đệm / Properties: bản sao dùng tiền tố riêng theo từng lượt thử, không lẫn với dữ liệu thật
 function ck_(k) { return (_useTest ? 't' + _testRun + '_' : '') + k; }
 var CLAIM_GRACE_MS = 120000; // slot vừa giữ chỗ nhưng chưa thấy trên sheet: coi là còn giữ trong 2 phút
@@ -71,7 +79,13 @@ var C = {
 var _book = null;
 function book_() {
   if (_book) return _book;
-  if (_useTest) return (_book = SpreadsheetApp.openById(TEST_SPREADSHEET_ID));
+  if (_useTest) {
+    // File thử do công cụ thử tải tạo: tên phải bắt đầu "LoadTest " và không phải file dữ liệu thật
+    if (_testSheet && _testSheet !== SPREADSHEET_ID) {
+      try { var t = SpreadsheetApp.openById(_testSheet); if (/^LoadTest /.test(t.getName())) return (_book = t); } catch (e) {}
+    }
+    return (_book = SpreadsheetApp.openById(TEST_SPREADSHEET_ID));
+  }
   try { var a = SpreadsheetApp.getActiveSpreadsheet(); if (a) return (_book = a); } catch (e) {}
   return (_book = SpreadsheetApp.openById(SPREADSHEET_ID));
 }
@@ -79,8 +93,12 @@ function book_() {
 function doGet(e) {
   _useTest = !!(e && e.parameter && e.parameter.test === '1');
   _testRun = _useTest ? str_(e.parameter.run).replace(/[^A-Za-z0-9]/g, '').slice(0, 12) : '';
-  if (e && e.parameter && e.parameter.action === 'taken') return json_(taken_());
-  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.10', test: _useTest, time: new Date().toISOString() });
+  _testSheet = _useTest ? str_(e.parameter.sheet).replace(/[^A-Za-z0-9_-]/g, '') : '';
+  var act = e && e.parameter ? str_(e.parameter.action) : '';
+  if (act === 'taken') return json_(withSchedule_(taken_()));
+  if (act === 'status') return json_(withSchedule_({ ok: true }));
+  if (!act && !_useTest) { var pg = page_(); if (pg) return pg; }
+  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.11', test: _useTest, time: new Date().toISOString() });
 }
 
 /* ---------- Danh sách slot đã có người (chỉ mã slot, không kèm tên / Mã NV) ---------- */
@@ -115,6 +133,7 @@ function doPost(e) {
     var data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     _useTest = data.test === true;
     _testRun = _useTest ? str_(data.testRun).replace(/[^A-Za-z0-9]/g, '').slice(0, 12) : '';
+    _testSheet = _useTest ? str_(data.testSheet).replace(/[^A-Za-z0-9_-]/g, '') : '';
     if (/^(login|changePassword|register|payment|lookup)$/.test(String(data.action))) {
       var notEmp = empCheck_(data);
       if (notEmp) return json_(notEmp);
@@ -146,6 +165,8 @@ function register_(d) {
   if (d.agree !== true) return { ok: false, message: 'Chưa xác nhận cam kết Jeong-Do.' };
 
   var slotId = str_(d.slotId), empCode = str_(d.empCode).toUpperCase();
+  var closed = windowCheck_(empCode, slotId, d.userAgent);
+  if (closed) return closed;
   var cfg = config_();
   var warnings = [], notes = [];
 
@@ -216,6 +237,7 @@ function register_(d) {
     if (!heldBy && !overLimit) {
       rowNo = Math.max(Number(props.getProperty(ck_('nextRow'))) || 0, n + 2);
       claims[slotId] = { emp: empCode, row: rowNo, t: Date.now() };
+      pruneClaims_(claims);
       var upd = {};
       upd[ck_('claims')] = JSON.stringify(claims);
       upd[ck_('nextRow')] = String(rowNo + 1);
@@ -275,7 +297,7 @@ function releaseClaim_(slotId, rowNo) {
     var props = PropertiesService.getScriptProperties();
     var claims = JSON.parse(props.getProperty(ck_('claims')) || '{}');
     // Đánh dấu hết hạn (không xoá): dòng chưa ghi nên lần gửi sau được giữ chỗ lại
-    if (claims[slotId] && claims[slotId].row === rowNo) { claims[slotId].t = 0; props.setProperty(ck_('claims'), JSON.stringify(claims)); }
+    if (claims[slotId] && claims[slotId].row === rowNo) { claims[slotId].t = 0; pruneClaims_(claims); props.setProperty(ck_('claims'), JSON.stringify(claims)); }
   } finally { lock.releaseLock(); }
 }
 
@@ -325,6 +347,7 @@ function payment_(d) {
   }
   var slotId = str_(d.slotId), empCode = str_(d.empCode).toUpperCase();
   var reg = book_().getSheetByName(SHEET_REG);
+  if (schedule_().paused) return pausedMsg_(empCode, slotId, d.userAgent, 'PAYMENT');
 
   // Kiểm tra trước (không khoá) để không lưu biên lai thừa
   var pre = findOrder_(reg, slotId, empCode);
@@ -335,10 +358,16 @@ function payment_(d) {
   if (pre.paid && pre.txn === str_(d.bankTxn)) return { ok: true, row: pre.rowNo, status: STATUS_PAID, repeat: true };
   if (pre.paid) return paidAlready_(d, empCode, slotId, pre.rowNo);
   if (!pre.valid) return invalid_msg_(d, empCode, slotId, pre);
+  var early = payDelayCheck_(reg, pre.rowNo, empCode, slotId, d.userAgent);
+  if (early) return early;
 
   // Lưu biên lai (việc chậm) trước khi khoá
   var link = '';
-  if (d.fileBase64) {
+  if (d.fileBase64 && _useTest) {
+    // Thử tải: kiểm tra và giải mã file như thật nhưng KHÔNG lưu vào Drive
+    var tm = /^data:([^;]+);base64,(.+)$/.exec(d.fileBase64);
+    if (!tm || Utilities.base64Decode(tm[2]).length > MAX_FILE_BYTES) return { ok: false, message: 'File thử không hợp lệ' };
+  } else if (d.fileBase64) {
     try { link = saveReceipt_(d.fileBase64, d.fileName, slotId, empCode); }
     catch (err) { log_('RECEIPT_ERROR', empCode, slotId, d.userAgent, String(err)); return { ok: false, message: 'Không lưu được file biên lai: ' + err }; }
   }
@@ -429,6 +458,103 @@ function lookup_(d) {
     return { ok: false, message: 'Không tìm thấy đơn khớp Mã NV và 4 số cuối điện thoại này.' };
   }
   return { ok: true, orders: out };
+}
+
+/* ---------- Khung giờ, tạm dừng, giờ máy chủ (v7.11) ---------- */
+var CACHE_SCHED_SEC = 30; // đổi OPEN_TIME / CLOSE_TIME / PORTAL_PAUSED thì sau tối đa 30 giây có hiệu lực
+// "14/10/2026 10:00" hoặc "14/10/2026 10:00:00" (giờ Việt Nam) -> mốc thời gian (ms); sai định dạng -> null
+function vnTime_(v) {
+  var m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(str_(v));
+  if (!m) return null;
+  return Date.UTC(+m[3], +m[2] - 1, +m[1], +m[4] - 7, +m[5], +(m[6] || 0));
+}
+function schedule_() {
+  var cache = CacheService.getScriptCache();
+  var hit = cache.get(ck_('sched'));
+  if (hit) return JSON.parse(hit);
+  var sh = book_().getSheetByName(SHEET_CONFIG), o = { openAt: null, closeAt: null, paused: false };
+  if (sh && sh.getLastRow() > 1) {
+    var v = sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues();
+    for (var i = 0; i < v.length; i++) {
+      var k = str_(v[i][0]), val = v[i][1] instanceof Date ? fmt_(v[i][1]) : str_(v[i][1]);
+      if (k === 'OPEN_TIME') { o.openAt = vnTime_(val); if (val && !o.openAt) o.badTime = true; }
+      else if (k === 'CLOSE_TIME') { o.closeAt = vnTime_(val); if (val && !o.closeAt) o.badTime = true; }
+      else if (k === 'PORTAL_PAUSED') o.paused = /^(true|1|yes|có|co)$/i.test(val);
+    }
+  }
+  try { cache.put(ck_('sched'), JSON.stringify(o), CACHE_SCHED_SEC); } catch (e) {}
+  return o;
+}
+function withSchedule_(out) {
+  var s = schedule_();
+  out.serverNow = Date.now(); out.openAt = s.openAt; out.closeAt = s.closeAt; out.paused = s.paused;
+  if (s.badTime) out.badTime = true; // OPEN_TIME / CLOSE_TIME sai định dạng: không chặn, PM cần sửa
+  return out;
+}
+function pausedMsg_(empCode, slotId, ua, what) {
+  log_(what + '_REJECTED_PAUSED', empCode, slotId, ua, 'Cổng đang tạm dừng (PORTAL_PAUSED)');
+  return { ok: false, paused: true, message: 'Cổng đăng ký đang tạm dừng để kiểm tra. Vui lòng thử lại sau ít phút.' };
+}
+// null = cho đăng ký; ngược lại trả lỗi (ngoài giờ mở/đóng hoặc đang tạm dừng)
+function windowCheck_(empCode, slotId, ua) {
+  var s = schedule_(), now = Date.now();
+  if (s.paused) return pausedMsg_(empCode, slotId, ua, 'REGISTER');
+  if (s.openAt && now < s.openAt) {
+    log_('REGISTER_REJECTED_TIME', empCode, slotId, ua, 'Trước giờ mở cổng');
+    return { ok: false, notOpen: true, openAt: s.openAt, message: 'Cổng đăng ký chưa mở. Giờ mở: ' + fmt_(new Date(s.openAt)) + '.' };
+  }
+  if (s.closeAt && now > s.closeAt) {
+    log_('REGISTER_REJECTED_TIME', empCode, slotId, ua, 'Sau giờ đóng cổng');
+    return { ok: false, closed: true, message: 'Cổng đăng ký đã đóng lúc ' + fmt_(new Date(s.closeAt)) + '.' };
+  }
+  return null;
+}
+// Chỉ cho khai nộp tiền sau PAY_OPEN_DELAY_HOURS giờ kể từ lúc đăng ký (cột A của dòng đơn)
+function payDelayCheck_(reg, rowNo, empCode, slotId, ua) {
+  if (_useTest) return null;
+  var h = Number(config_().PAY_OPEN_DELAY_HOURS);
+  if (!(h >= 0)) h = 2;
+  if (!h) return null;
+  var ts = reg.getRange(rowNo, C.TS).getValue();
+  var t = ts instanceof Date ? ts.getTime() : vnTime_(ts);
+  if (!t) return null; // không đọc được giờ đăng ký: không chặn, PM đối soát
+  var openAt = t + h * 3600000;
+  if (Date.now() >= openAt) return null;
+  log_('PAYMENT_REJECTED_EARLY', empCode, slotId, ua, 'Dòng ' + rowNo + ' | mở nộp tiền lúc ' + fmt_(new Date(openAt)));
+  return { ok: false, tooEarly: true, payOpenAt: openAt, message: 'Chưa đến giờ khai nộp tiền cho Slot ' + slotId + '. Mở lúc ' + fmt_(new Date(openAt)) + '.' };
+}
+// Bỏ các ô giữ chỗ đã hết hạn (quá CLAIM_GRACE_MS): khi đó sheet đã là nguồn đúng
+function pruneClaims_(claims) {
+  var now = Date.now();
+  for (var k in claims) if (!(now - claims[k].t < CLAIM_GRACE_MS)) delete claims[k];
+}
+
+/* ---------- Phục vụ trang đăng ký từ Drive (1 link cho mọi NV) ---------- */
+var PAGE_CHUNK = 90000, CACHE_PAGE_SEC = 600;
+function page_() {
+  var id = str_(config_().PAGE_FILE_ID);
+  if (!id) return null;
+  var cache = CacheService.getScriptCache(), html = null;
+  var meta = cache.get('pg_' + id);
+  if (meta) {
+    var keys = [];
+    for (var i = 0; i < Number(meta); i++) keys.push('pg_' + id + '_' + i);
+    var got = cache.getAll(keys), parts = [];
+    for (var j = 0; j < keys.length; j++) { if (got[keys[j]] == null) { parts = null; break; } parts.push(got[keys[j]]); }
+    if (parts) html = parts.join('');
+  }
+  if (html == null) {
+    html = DriveApp.getFileById(id).getBlob().getDataAsString('UTF-8');
+    try {
+      var put = {}, n = Math.ceil(html.length / PAGE_CHUNK);
+      for (var c = 0; c < n; c++) put['pg_' + id + '_' + c] = html.slice(c * PAGE_CHUNK, (c + 1) * PAGE_CHUNK);
+      cache.putAll(put, CACHE_PAGE_SEC);
+      cache.put('pg_' + id, String(n), CACHE_PAGE_SEC);
+    } catch (e) {}
+  }
+  return HtmlService.createHtmlOutput(html)
+    .setTitle('LG Internal Sales Portal')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
 /* ---------- Danh sách nhân viên được mua (v7.10) ---------- */
@@ -625,8 +751,10 @@ function slots_() {
 
 /** Chạy tay khi vừa sửa Config hoặc Slots để script thấy ngay. */
 function clearCache() {
-  CacheService.getScriptCache().removeAll(['cfg', 'slots', 'taken', 'emps', 't_cfg', 't_slots', 't_taken']);
-  Logger.log('Đã xoá bộ nhớ đệm Config, Slots, Employees.');
+  CacheService.getScriptCache().removeAll(['cfg', 'slots', 'taken', 'emps', 'sched', 't_cfg', 't_slots', 't_taken', 't_sched']);
+  var pid = str_(config_().PAGE_FILE_ID);
+  if (pid) CacheService.getScriptCache().remove('pg_' + pid);
+  Logger.log('Đã xoá bộ nhớ đệm Config, Slots, Employees, giờ mở/đóng, trang.');
 }
 
 /* ---------- Tiện ích ---------- */
@@ -691,3 +819,4 @@ function testSetup() {
   Logger.log('MAX_PER_EMPLOYEE: ' + config_().MAX_PER_EMPLOYEE);
   Logger.log('Thư mục biên lai: ' + receiptFolder_().getName());
 }
+
