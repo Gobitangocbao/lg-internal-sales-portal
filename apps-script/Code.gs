@@ -21,6 +21,12 @@
  * SỚM NHẤT (theo thứ tự dòng). Đơn còn lại
  * (ví dụ đơn thừa tạo trước v7.7) = "Vượt hạn mức – không hợp lệ": không giữ slot, không được nộp tiền.
  * Script KHÔNG sửa/xoá các dòng đó; PM đổi trạng thái sang "Hủy" khi rà soát.
+ * v7.9 (30/09/2026): MẬT KHẨU RIÊNG TỪNG NV. Đăng nhập kiểm tra ở máy chủ. Mật khẩu mặc định 123456 cho tới khi
+ * NV tự đổi. Sheet "Accounts" (script tự tạo) chỉ THÊM dòng: mỗi lần đổi = 1 dòng CHANGE, lưu Salt + Mã băm
+ * SHA-256, KHÔNG lưu mật khẩu gốc (PM cũng không xem được). Quên mật khẩu: PM thêm 1 dòng [thời gian, Mã NV, RESET]
+ * -> mật khẩu trở về 123456. Sai 5 lần liên tiếp -> khoá 15 phút. Đăng nhập đúng -> cấp mã phiên (token) 12 giờ.
+ * Config REQUIRE_LOGIN_TOKEN = TRUE: đăng ký / nộp tiền / tra cứu bắt buộc có token đúng Mã NV (bật khi mọi người
+ * đã dùng trang mới). Chưa bật: token có gửi thì vẫn kiểm tra, không gửi thì cho qua như cũ.
  * Chế độ thử tải: gửi test:true (POST) hoặc ?test=1 (GET) thì script dùng BẢN SAO sheet.
  *
  * Cách cài: xem docs/SETUP_APPS_SCRIPT.md
@@ -70,7 +76,7 @@ function doGet(e) {
   _useTest = !!(e && e.parameter && e.parameter.test === '1');
   _testRun = _useTest ? str_(e.parameter.run).replace(/[^A-Za-z0-9]/g, '').slice(0, 12) : '';
   if (e && e.parameter && e.parameter.action === 'taken') return json_(taken_());
-  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.8', test: _useTest, time: new Date().toISOString() });
+  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.9', test: _useTest, time: new Date().toISOString() });
 }
 
 /* ---------- Danh sách slot đã có người (chỉ mã slot, không kèm tên / Mã NV) ---------- */
@@ -105,6 +111,12 @@ function doPost(e) {
     var data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     _useTest = data.test === true;
     _testRun = _useTest ? str_(data.testRun).replace(/[^A-Za-z0-9]/g, '').slice(0, 12) : '';
+    if (data.action === 'login') return json_(login_(data));
+    if (data.action === 'changePassword') return json_(changePassword_(data));
+    if (data.action === 'register' || data.action === 'payment' || data.action === 'lookup') {
+      var denied = authCheck_(data);
+      if (denied) return json_(denied);
+    }
     if (data.action === 'register') return json_(register_(data));
     if (data.action === 'payment') return json_(payment_(data));
     if (data.action === 'lookup') return json_(lookup_(data));
@@ -407,6 +419,138 @@ function lookup_(d) {
     return { ok: false, message: 'Không tìm thấy đơn khớp Mã NV và 4 số cuối điện thoại này.' };
   }
   return { ok: true, orders: out };
+}
+
+/* ---------- Tài khoản: đăng nhập, đổi mật khẩu (v7.9) ---------- */
+var SHEET_ACC = 'Accounts';
+var DEFAULT_PW = '123456';
+var TOKEN_TTL_MS = 12 * 3600 * 1000;   // phiên đăng nhập 12 giờ
+var LOGIN_MAX_FAIL = 5;                // sai 5 lần liên tiếp
+var LOGIN_LOCK_SEC = 900;              // thì khoá 15 phút
+var PW_ITER = 300;                     // số vòng băm
+var PW_MIN = 6, PW_MAX = 32;
+
+function accSheet_() {
+  var b = book_(), sh = b.getSheetByName(SHEET_ACC);
+  if (sh) return sh;
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) throw 'busy';
+  try {
+    sh = b.getSheetByName(SHEET_ACC);
+    if (!sh) {
+      sh = b.insertSheet(SHEET_ACC);
+      sh.getRange(1, 1, 1, 6).setValues([['Thời gian', 'Mã NV', 'Thao tác (CHANGE / RESET)', 'Salt', 'Mã băm SHA-256 (không phải mật khẩu)', 'Ghi chú']]);
+      sh.setFrozenRows(1);
+    }
+  } finally { lock.releaseLock(); }
+  return sh;
+}
+// Dòng mới nhất của Mã NV quyết định: CHANGE = mật khẩu riêng; RESET hoặc chưa có dòng = mật khẩu mặc định
+function account_(empCode) {
+  var sh = accSheet_(), n = sh.getLastRow() - 1;
+  var v = n > 0 ? sh.getRange(2, 2, n, 4).getValues() : [];
+  for (var r = v.length - 1; r >= 0; r--) {
+    if (str_(v[r][0]).toUpperCase() !== empCode) continue;
+    var act = str_(v[r][1]).toUpperCase();
+    if (act === 'CHANGE' && str_(v[r][2]) && str_(v[r][3])) return { custom: true, salt: str_(v[r][2]), hash: str_(v[r][3]) };
+    if (act === 'RESET') return { custom: false };
+  }
+  return { custom: false };
+}
+function hex_(bytes) {
+  var o = '';
+  for (var i = 0; i < bytes.length; i++) { var b = (bytes[i] + 256) % 256; o += (b < 16 ? '0' : '') + b.toString(16); }
+  return o;
+}
+function hashPw_(salt, pw) {
+  var h = salt + '|' + pw;
+  for (var i = 0; i < PW_ITER; i++) h = hex_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, h + '|' + salt, Utilities.Charset.UTF_8));
+  return h;
+}
+function pwOk_(acc, pw) { return acc.custom ? hashPw_(acc.salt, pw) === acc.hash : pw === DEFAULT_PW; }
+
+function secret_() {
+  var p = PropertiesService.getScriptProperties(), k = ck_('authSecret');
+  var s = p.getProperty(k);
+  if (!s) { s = Utilities.getUuid() + Utilities.getUuid(); p.setProperty(k, s); }
+  return s;
+}
+function sign_(payload) {
+  return Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(payload, secret_())).replace(/=+$/, '');
+}
+function token_(empCode) { var pl = empCode + '.' + (Date.now() + TOKEN_TTL_MS); return pl + '.' + sign_(pl); }
+function tokenEmp_(tok) {
+  var m = /^(.+)\.(\d+)\.([A-Za-z0-9_-]+)$/.exec(str_(tok));
+  if (!m || Number(m[2]) < Date.now() || sign_(m[1] + '.' + m[2]) !== m[3]) return '';
+  return m[1];
+}
+// null = cho qua; ngược lại trả lỗi yêu cầu đăng nhập lại
+function authCheck_(d) {
+  if (_useTest) return null;
+  var emp = str_(d.empCode).toUpperCase(), tok = str_(d.token);
+  var need = /^(true|1|yes|có|co)$/i.test(str_(config_().REQUIRE_LOGIN_TOKEN));
+  if (!tok && !need) return null;
+  if (tok && tokenEmp_(tok) === emp && emp) return null;
+  log_('AUTH_REJECTED', emp, str_(d.slotId), d.userAgent, tok ? 'Mã phiên sai / hết hạn / khác Mã NV' : 'Không có mã phiên');
+  return { ok: false, authRequired: true, message: 'Phiên đăng nhập đã hết hạn hoặc không đúng Mã NV. Vui lòng đăng nhập lại.' };
+}
+
+function failKey_(emp) { return ck_('lf_' + emp); }
+function lockedMsg_() { return { ok: false, locked: true, message: 'Nhập sai mật khẩu ' + LOGIN_MAX_FAIL + ' lần. Tài khoản tạm khoá ' + (LOGIN_LOCK_SEC / 60) + ' phút. Quên mật khẩu: liên hệ PM để đặt lại.' }; }
+function isLocked_(emp) { return Number(CacheService.getScriptCache().get(failKey_(emp)) || 0) >= LOGIN_MAX_FAIL; }
+function addFail_(emp) {
+  var c = CacheService.getScriptCache(), k = failKey_(emp);
+  var n = Number(c.get(k) || 0) + 1;
+  c.put(k, String(n), LOGIN_LOCK_SEC);
+  return n;
+}
+function empOk_(emp) { return /^[A-Z0-9.]{3,15}$/.test(emp); }
+
+function login_(d) {
+  var emp = str_(d.empCode).toUpperCase().replace(/\s+/g, ''), pw = String(d.password || '');
+  if (!empOk_(emp) || !pw) return { ok: false, message: 'Vui lòng nhập Mã NV và mật khẩu.' };
+  if (isLocked_(emp)) return lockedMsg_();
+  var acc = account_(emp);
+  if (!pwOk_(acc, pw)) {
+    var n = addFail_(emp);
+    log_('LOGIN_FAIL', emp, '', d.userAgent, 'Sai mật khẩu lần ' + n);
+    if (n >= LOGIN_MAX_FAIL) return lockedMsg_();
+    return { ok: false, message: 'Mật khẩu không đúng. Còn ' + (LOGIN_MAX_FAIL - n) + ' lần thử trước khi bị khoá ' + (LOGIN_LOCK_SEC / 60) + ' phút.' };
+  }
+  CacheService.getScriptCache().remove(failKey_(emp));
+  log_('LOGIN', emp, '', d.userAgent, acc.custom ? 'Mật khẩu riêng' : 'Mật khẩu mặc định');
+  return { ok: true, token: token_(emp), defaultPassword: !acc.custom };
+}
+
+function changePassword_(d) {
+  var emp = str_(d.empCode).toUpperCase().replace(/\s+/g, '');
+  var oldPw = String(d.oldPassword || ''), newPw = String(d.newPassword || '');
+  if (!empOk_(emp) || !oldPw || !newPw) return { ok: false, message: 'Vui lòng nhập đủ mật khẩu hiện tại và mật khẩu mới.' };
+  if (isLocked_(emp)) return lockedMsg_();
+  var bad = pwRule_(emp, oldPw, newPw);
+  if (bad) return { ok: false, message: bad };
+  var acc = account_(emp);
+  if (!pwOk_(acc, oldPw)) {
+    var n = addFail_(emp);
+    log_('PASSWORD_CHANGE_FAIL', emp, '', d.userAgent, 'Sai mật khẩu hiện tại lần ' + n);
+    if (n >= LOGIN_MAX_FAIL) return lockedMsg_();
+    return { ok: false, message: 'Mật khẩu hiện tại không đúng. Còn ' + (LOGIN_MAX_FAIL - n) + ' lần thử.' };
+  }
+  var salt = Utilities.getUuid().replace(/-/g, '');
+  accSheet_().appendRow([new Date(), emp, 'CHANGE', salt, hashPw_(salt, newPw), 'NV tự đổi trên cổng đăng ký']);
+  CacheService.getScriptCache().remove(failKey_(emp));
+  log_('PASSWORD_CHANGE', emp, '', d.userAgent, acc.custom ? 'Đổi mật khẩu riêng' : 'Đổi từ mật khẩu mặc định');
+  return { ok: true, token: token_(emp), message: 'Đã đổi mật khẩu. Lần sau đăng nhập bằng mật khẩu mới.' };
+}
+// Quy tắc mật khẩu mới (trang cũng kiểm tra y hệt)
+function pwRule_(emp, oldPw, newPw) {
+  if (newPw.length < PW_MIN || newPw.length > PW_MAX) return 'Mật khẩu mới phải dài ' + PW_MIN + '–' + PW_MAX + ' ký tự.';
+  if (/\s/.test(newPw)) return 'Mật khẩu mới không được có khoảng trắng.';
+  if (newPw === DEFAULT_PW) return 'Không được dùng lại mật khẩu mặc định 123456.';
+  if (newPw === oldPw) return 'Mật khẩu mới phải khác mật khẩu hiện tại.';
+  if (newPw.toUpperCase().indexOf(emp) >= 0) return 'Mật khẩu mới không được chứa Mã NV.';
+  if (/^(.)\1+$/.test(newPw) || '0123456789012345678909876543210'.indexOf(newPw) >= 0) return 'Mật khẩu quá dễ đoán (dãy số liên tiếp hoặc lặp một ký tự).';
+  return '';
 }
 
 /* ---------- Bộ nhớ đệm Config / Slots ---------- */

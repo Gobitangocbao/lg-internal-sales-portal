@@ -15,7 +15,7 @@ Tải file `index.html` về rồi mở bằng trình duyệt (Chrome/Edge). Kh�
 
 ## Cấu trúc
 ```
-index.html          BẢN CHÍNH THỨC = v9 (chốt 30/09/2026): trang bìa + đăng nhập bằng Mã NV, mỗi NV chỉ 1 đơn hợp lệ. Nội dung giống hệt Mau_Dang_Ky_Internal_Sales_v9_TrangBia.html
+index.html          BẢN CHÍNH THỨC = v9 (chốt 30/09/2026): trang bìa + đăng nhập bằng Mã NV, mỗi NV chỉ 1 đơn hợp lệ, mỗi NV tự đổi mật khẩu riêng (Apps Script v7.9). Nội dung giống hệt Mau_Dang_Ky_Internal_Sales_v9_TrangBia.html
 index_v7_cu.html    Bản v7 cũ (trước đây là index.html), giữ lại để đối chiếu
 Mau_Dang_Ky_Internal_Sales_3009.html   Bản v8 (30/09/2026) đang chờ nhóm kiểm tra: khoá nộp tiền 2 giờ, chọn sản phẩm dạng thẻ, lọc kho. Xem mục 18 trong docs/HANDOVER.md
 Mau_Dang_Ky_Internal_Sales_v9_TrangBia.html   Bản v9 (đã chốt, chép sang index.html). Sửa trang thì sửa cả 2 file cho khớp. Xem mục 18 trong docs/HANDOVER.md
