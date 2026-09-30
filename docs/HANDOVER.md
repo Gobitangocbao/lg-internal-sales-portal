@@ -776,6 +776,7 @@ Sau đó làm tiếp backlog mục 11, ưu tiên 1. Lưu bản mới, không ghi
 | 28/09/2026 | Claude (v7.1) | Chặn trùng slot ở máy chủ (đơn Hủy/Từ chối thì mở lại slot); cột F–I sheet Slots chỉ tính đơn còn hiệu lực |
 | 28/09/2026 | Claude (v7.2) | Tab điều hướng đậm hơn (nút viền đen, tab đang chọn màu Heritage Red) |
 | 28/09/2026 | Claude (v7.3) | Chịu tải tốt hơn (khoá ngắn, bộ nhớ đệm, tự gửi lại khi bận); tra cứu đơn bằng Mã NV + 4 số cuối SĐT; thay dữ liệu mẫu cũ ở Tab 1, 3, 4 bằng 90 slot thật; khoá cột trên sheet; thêm sheet PM xử lý |
+| 30/09/2026 | Claude (v8) | Thêm file `Mau_Dang_Ky_Internal_Sales_3009.html` (chưa thay `index.html`). Tab 3: nộp tiền chỉ mở sau 2 giờ kể từ lúc đăng ký, qua nút Nộp tiền ở Tra cứu đơn (hằng `PAY_OPEN_DELAY_HOURS`); kéo thả biên lai; ô tick "người nộp tiền giống người đăng ký"; hiện số tiền cần nộp và cảnh báo khi khai lệch. Tab 2: chọn sản phẩm bằng thẻ (lọc kho, loại hàng, tìm model, sắp xếp giá), đưa bước chọn sản phẩm lên đầu. Tab 4: lọc kho, cột "Đăng ký nhanh" với link Đặt hàng sang Tab 2 điền sẵn. **Chưa làm:** Apps Script chưa tự chặn khai nộp trước 2 giờ (trang đã gửi kèm `regTime`, `amountDue`) |
 
 ---
 

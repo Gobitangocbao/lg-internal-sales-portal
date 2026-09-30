@@ -16,6 +16,7 @@ Tải file `index.html` về rồi mở bằng trình duyệt (Chrome/Edge). Kh�
 ## Cấu trúc
 ```
 index.html          Trang prototype v7, chuẩn nhận diện LG (5 tab: Thư thông báo, Đăng ký, Nộp tiền, Danh sách Slot, SOP)
+Mau_Dang_Ky_Internal_Sales_3009.html   Bản v8 (30/09/2026) đang chờ nhóm kiểm tra: khoá nộp tiền 2 giờ, chọn sản phẩm dạng thẻ, lọc kho. Xem mục 18 trong docs/HANDOVER.md
 docs/HANDOVER.md    Hồ sơ bàn giao chi tiết (đọc mục 0.1 trước): tính năng, lỗi đã biết, backlog, kịch bản kiểm thử
 data/LG_Internal_Sales_Database.xlsx   File tổng hợp đăng ký (Dashboard, Registrations, Slots, Config...)
 apps-script/Code.gs      Script nhận đơn từ trang, ghi vào Google Sheet (chỉ thêm, không xoá)
