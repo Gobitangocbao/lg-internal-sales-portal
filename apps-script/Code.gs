@@ -8,14 +8,32 @@
  *  - Mọi thao tác ghi đều ghi thêm 1 dòng vào sheet ActivityLog.
  *  - Trạng thái do máy chủ đặt, không tin trạng thái trình duyệt gửi lên.
  *
- * v7.3 (chịu tải): chỉ khoá (lock) đúng đoạn kiểm tra trùng + ghi dòng; đọc Config/Slots
- * qua bộ nhớ đệm; chờ khoá tối đa 30 giây; trả busy:true để trang tự gửi lại.
+ * v7.3 (chịu tải): đọc Config/Slots qua bộ nhớ đệm; trả busy:true để trang tự gửi lại.
+ * v7.6 (200 người): khoá chỉ giữ vài chục mili-giây để "giữ chỗ slot + cấp số dòng" (lưu trong
+ * Script Properties). Việc đọc/ghi sheet nằm ngoài khoá, mỗi đơn ghi vào đúng dòng đã cấp nên
+ * 2 người không ghi đè nhau. (v7.5 dùng appendRow không khoá: thử 200 người thấy mất dòng, đã bỏ.)
+ * Cột W lưu mã yêu cầu để đối chiếu.
+ * v7.7 (30/09/2026): CHẶN VƯỢT HẠN MỨC. Mã NV đã có đơn còn hiệu lực (không phải Hủy/Từ chối) thì
+ * đăng ký mới bị TỪ CHỐI: không ghi dòng, không giữ slot, trả limitReached:true. Kiểm tra cả khi
+ * 1 người gửi 2 slot khác nhau cùng lúc (so trong khoá với các slot người đó vừa giữ chỗ).
+ * v7.8 (30/09/2026): QUY TẮC ĐƠN HỢP LỆ dùng chung cho đăng ký / slot đã hết / tra cứu / nộp tiền:
+ * mỗi Mã NV chỉ tính MAX_PER_EMPLOYEE đơn còn hiệu lực: ưu tiên đơn đã khai nộp/đã xử lý, rồi đến đơn đăng ký
+ * SỚM NHẤT (theo thứ tự dòng). Đơn còn lại
+ * (ví dụ đơn thừa tạo trước v7.7) = "Vượt hạn mức – không hợp lệ": không giữ slot, không được nộp tiền.
+ * Script KHÔNG sửa/xoá các dòng đó; PM đổi trạng thái sang "Hủy" khi rà soát.
+ * Chế độ thử tải: gửi test:true (POST) hoặc ?test=1 (GET) thì script dùng BẢN SAO sheet.
  *
  * Cách cài: xem docs/SETUP_APPS_SCRIPT.md
  */
 
 // ID của Google Sheet "LG Internal Sales Database"
 var SPREADSHEET_ID = '10aN5O3HL79asPGfug75IPv1w_ssGPo8edsASMuG3_aM';
+// Bản sao dùng để thử tải (không phải dữ liệu thật)
+var TEST_SPREADSHEET_ID = '1R4u0BEp2BjQBIEv3eCNm1WML4PedjgIsqjyhFWn4YY4';
+var _useTest = false, _testRun = '';
+// Khoá bộ nhớ đệm / Properties: bản sao dùng tiền tố riêng theo từng lượt thử, không lẫn với dữ liệu thật
+function ck_(k) { return (_useTest ? 't' + _testRun + '_' : '') + k; }
+var CLAIM_GRACE_MS = 120000; // slot vừa giữ chỗ nhưng chưa thấy trên sheet: coi là còn giữ trong 2 phút
 
 var SHEET_REG = 'Registrations';
 var SHEET_SLOTS = 'Slots';
@@ -35,31 +53,67 @@ var STATUS_FREE = ['Hủy', 'Từ chối']; // đơn ở trạng thái này khô
 var C = {
   TS: 1, CAMPAIGN: 2, DIVISION: 3, EMP_CODE: 4, EMP_NAME: 5, KHO: 6, MODEL: 7, SLOT: 8,
   PHONE: 9, ADDRESS: 10, AGREE: 11, STATUS: 12, PAYER_NAME: 13, PAYER_CODE: 14,
-  AMOUNT: 15, BANK_TXN: 16, PAY_TIME: 17, RECEIPT: 18, PM_BY: 19, PM_DATE: 20, NOTE: 21, UA: 22
+  AMOUNT: 15, BANK_TXN: 16, PAY_TIME: 17, RECEIPT: 18, PM_BY: 19, PM_DATE: 20, NOTE: 21, UA: 22,
+  REQ: 23 // Mã yêu cầu (hệ thống)
 };
 
 /* ---------- Mở sheet (1 lần mỗi lượt chạy) ---------- */
 var _book = null;
 function book_() {
   if (_book) return _book;
+  if (_useTest) return (_book = SpreadsheetApp.openById(TEST_SPREADSHEET_ID));
   try { var a = SpreadsheetApp.getActiveSpreadsheet(); if (a) return (_book = a); } catch (e) {}
   return (_book = SpreadsheetApp.openById(SPREADSHEET_ID));
 }
 
-function doGet() {
-  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.3.1', time: new Date().toISOString() });
+function doGet(e) {
+  _useTest = !!(e && e.parameter && e.parameter.test === '1');
+  _testRun = _useTest ? str_(e.parameter.run).replace(/[^A-Za-z0-9]/g, '').slice(0, 12) : '';
+  if (e && e.parameter && e.parameter.action === 'taken') return json_(taken_());
+  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.8', test: _useTest, time: new Date().toISOString() });
+}
+
+/* ---------- Danh sách slot đã có người (chỉ mã slot, không kèm tên / Mã NV) ---------- */
+var CACHE_TAKEN_SEC = 10;
+function taken_() {
+  var cache = CacheService.getScriptCache();
+  var hit = cache.get(ck_('taken'));
+  if (hit) return JSON.parse(hit);
+  var reg = book_().getSheetByName(SHEET_REG);
+  var n = reg.getLastRow() - 1;
+  var v = n > 0 ? reg.getRange(2, C.EMP_CODE, n, C.STATUS - C.EMP_CODE + 1).getValues() : [];
+  var eff = effective_(v.map(function (x) { return x[0]; }), v.map(function (x) { return x[C.STATUS - C.EMP_CODE]; }), maxPer_());
+  var seen = {}, list = [];
+  for (var r = 0; r < v.length; r++) {
+    var slot = str_(v[r][C.SLOT - C.EMP_CODE]).replace(/^'+/, '');
+    if (!slot || seen[slot]) continue;
+    if (!eff[r]) continue; // đơn Hủy/Từ chối hoặc đơn thừa vượt hạn mức không giữ slot
+    seen[slot] = true; list.push(slot);
+  }
+  // Cộng thêm slot vừa được giữ chỗ (chưa kịp hiện trên sheet)
+  try {
+    var claims = JSON.parse(PropertiesService.getScriptProperties().getProperty(ck_('claims')) || '{}');
+    for (var k in claims) if (!seen[k] && Date.now() - claims[k].t < CLAIM_GRACE_MS) { seen[k] = true; list.push(k); }
+  } catch (e) {}
+  var out = { ok: true, taken: list, time: fmt_(new Date()) };
+  cache.put(ck_('taken'), JSON.stringify(out), CACHE_TAKEN_SEC);
+  return out;
 }
 
 function doPost(e) {
   try {
     var data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    _useTest = data.test === true;
+    _testRun = _useTest ? str_(data.testRun).replace(/[^A-Za-z0-9]/g, '').slice(0, 12) : '';
     if (data.action === 'register') return json_(register_(data));
     if (data.action === 'payment') return json_(payment_(data));
     if (data.action === 'lookup') return json_(lookup_(data));
     return json_({ ok: false, message: 'Yêu cầu không hợp lệ.' });
   } catch (err) {
     try { log_('ERROR', '', '', '', String(err)); } catch (e2) {}
-    return json_({ ok: false, message: 'Lỗi máy chủ: ' + err });
+    // Lỗi tạm của Google (quá tải, hết giờ): báo busy để trang tự gửi lại.
+    // Gửi lại an toàn vì cùng Mã NV + cùng slot được coi là 1 đơn.
+    return json_({ ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' });
   }
 }
 
@@ -84,65 +138,161 @@ function register_(d) {
   if (!campaign) notes.push('Config chưa có CAMPAIGN_CODE');
   var maxPer = Number(cfg.MAX_PER_EMPLOYEE) || 1;
 
-  // ---- Đoạn cần khoá: kiểm tra trùng + ghi dòng ----
+  var reg = book_().getSheetByName(SHEET_REG);
+  var iEmp = 0, iSlot = C.SLOT - C.EMP_CODE, iSt = C.STATUS - C.EMP_CODE;
+
+  // ---- Bước 1: đọc sheet (không khoá). Quét HẾT các dòng còn hiệu lực ----
+  var n = reg.getLastRow() - 1;
+  var rows = n > 0 ? reg.getRange(2, C.EMP_CODE, n, C.STATUS - C.EMP_CODE + 1).getValues() : [];
+  var empSlots = {}, slotOther = false;
+  var eff = effective_(rows.map(function (x) { return x[iEmp]; }), rows.map(function (x) { return x[iSt]; }), maxPer);
+  for (var r = 0; r < rows.length; r++) {
+    if (!eff[r]) continue; // đơn đã Hủy/Từ chối hoặc đơn thừa vượt hạn mức: không tính, không giữ slot
+    var em = String(rows[r][iEmp]).toUpperCase();
+    var sl = String(rows[r][iSlot]).replace(/^'+/, '');
+    if (sl === slotId && em === empCode) {
+      // Chính người này đã giữ slot (gửi lại do mạng chập chờn): coi như thành công, không ghi thêm
+      log_('REGISTER_REPEAT', empCode, slotId, d.userAgent, 'Gửi lại, đơn đã có ở dòng ' + (r + 2) + ', không ghi thêm');
+      return { ok: true, row: r + 2, status: STATUS_NEW, repeat: true, warnings: [] };
+    }
+    if (sl === slotId) slotOther = true;
+    else if (em === empCode) empSlots[sl] = r + 2;
+  }
+  // Đã đủ hạn mức: từ chối, không ghi dòng, không giữ slot
+  if (Object.keys(empSlots).length >= maxPer) return limit_msg_(empCode, empSlots, maxPer, slotId, d.userAgent);
+  if (slotOther) {
+    log_('REGISTER_REJECTED_DUP_SLOT', empCode, slotId, d.userAgent, 'Slot đã có người đăng ký, không ghi đơn');
+    return taken_msg_(slotId);
+  }
+
+  // ---- Bước 2: khoá rất ngắn, chỉ giữ chỗ slot + cấp số dòng (không đụng sheet trong khoá) ----
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(LOCK_WAIT_MS)) {
     return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
   }
-  var rowNo, ts, rejected = false, byEmp = 0, sameRow = 0;
+  var props = PropertiesService.getScriptProperties();
+  var rowNo = 0, heldBy = null, overLimit = null;
   try {
-    var reg = book_().getSheetByName(SHEET_REG);
-    var n = reg.getLastRow() - 1;
-    // Chỉ đọc 9 cột D..L (Mã NV .. Trạng thái)
-    var rows = n > 0 ? reg.getRange(2, C.EMP_CODE, n, C.STATUS - C.EMP_CODE + 1).getValues() : [];
-    var iEmp = 0, iSlot = C.SLOT - C.EMP_CODE, iSt = C.STATUS - C.EMP_CODE;
-    for (var r = 0; r < rows.length; r++) {
-      if (STATUS_FREE.indexOf(String(rows[r][iSt])) >= 0) continue;
-      if (String(rows[r][iSlot]) === slotId) {
-        // Chính người này đã giữ slot (trang gửi lại do mạng chập chờn): coi như thành công, không ghi thêm
-        if (String(rows[r][iEmp]).toUpperCase() === empCode) sameRow = r + 2; else rejected = true;
-        break;
-      }
-      if (String(rows[r][iEmp]).toUpperCase() === empCode) byEmp++;
+    var claims = JSON.parse(props.getProperty(ck_('claims')) || '{}');
+    // Cùng 1 Mã NV vừa giữ chỗ slot khác (chưa kịp hiện trên sheet): tính vào hạn mức
+    var mine = {};
+    for (var k0 in empSlots) mine[k0] = empSlots[k0];
+    for (var k in claims) {
+      if (k === slotId || claims[k].emp !== empCode || Date.now() - claims[k].t >= CLAIM_GRACE_MS) continue;
+      var j = claims[k].row - 2;
+      // Dòng đã hiện trên sheet thì đã được xét ở Bước 1 (kể cả khi PM đổi sang Hủy/Từ chối): bỏ qua
+      if (j >= 0 && j < rows.length && String(rows[j][iSlot]).replace(/^'+/, '') === k) continue;
+      mine[k] = claims[k].row;
     }
-    if (!rejected && !sameRow) {
-      if (byEmp >= maxPer) warnings.push('Mã NV ' + empCode + ' đã đăng ký ' + byEmp + ' lần, vượt hạn mức ' + maxPer + ' sản phẩm/NV.');
-      if (warnings.length) notes = notes.concat(warnings);
-      ts = new Date();
-      var row = new Array(22).fill('');
-      row[C.TS - 1] = ts;
-      row[C.CAMPAIGN - 1] = campaign;
-      row[C.DIVISION - 1] = safe_(d.division);
-      row[C.EMP_CODE - 1] = safe_(empCode);
-      row[C.EMP_NAME - 1] = safe_(d.empName);
-      row[C.KHO - 1] = safe_(d.kho);
-      row[C.MODEL - 1] = safe_(d.model);
-      row[C.SLOT - 1] = "'" + slotId.replace(/^'+/, '');
-      row[C.PHONE - 1] = "'" + str_(d.phone);
-      row[C.ADDRESS - 1] = safe_(d.address);
-      row[C.AGREE - 1] = 'Đồng ý';
-      row[C.STATUS - 1] = STATUS_NEW;
-      row[C.NOTE - 1] = safe_(notes.join(' | '));
-      row[C.UA - 1] = safe_(str_(d.userAgent).slice(0, 300));
-      rowNo = n + 2;
-      reg.getRange(rowNo, 1, 1, 22).setValues([row]);
-      SpreadsheetApp.flush();
+    if (Object.keys(mine).length >= maxPer) overLimit = mine;
+    var c = overLimit ? null : claims[slotId];
+    if (c) {
+      var i2 = c.row - 2, inRead = i2 >= 0 && i2 < rows.length;
+      // Dòng đã giữ bị PM đổi sang Hủy/Từ chối, hoặc giữ chỗ quá 2 phút mà không có dòng: slot được mở lại
+      var freed = inRead && String(rows[i2][iSlot]).replace(/^'+/, '') === slotId && !eff[i2];
+      var stale = Date.now() - c.t > CLAIM_GRACE_MS && (!inRead || String(rows[i2][iSlot]) !== slotId);
+      if (!freed && !stale) heldBy = c;
+    }
+    if (!heldBy && !overLimit) {
+      rowNo = Math.max(Number(props.getProperty(ck_('nextRow'))) || 0, n + 2);
+      claims[slotId] = { emp: empCode, row: rowNo, t: Date.now() };
+      var upd = {};
+      upd[ck_('claims')] = JSON.stringify(claims);
+      upd[ck_('nextRow')] = String(rowNo + 1);
+      props.setProperties(upd);
     }
   } finally {
     lock.releaseLock();
   }
-  // ---- Hết đoạn khoá ----
+  if (overLimit) return limit_msg_(empCode, overLimit, maxPer, slotId, d.userAgent);
+  if (heldBy) {
+    if (heldBy.emp === empCode) {
+      log_('REGISTER_REPEAT', empCode, slotId, d.userAgent, 'Gửi lặp, đơn đang ghi ở dòng ' + heldBy.row + ', không ghi thêm');
+      return { ok: true, row: heldBy.row, status: STATUS_NEW, repeat: true, warnings: [] };
+    }
+    log_('REGISTER_REJECTED_DUP_SLOT', empCode, slotId, d.userAgent, 'Slot vừa được người khác giữ chỗ (dòng ' + heldBy.row + '), không ghi đơn');
+    return taken_msg_(slotId);
+  }
 
-  if (sameRow) {
-    log_('REGISTER_REPEAT', empCode, slotId, d.userAgent, 'Gửi lại, đơn đã có ở dòng ' + sameRow + ', không ghi thêm');
-    return { ok: true, row: sameRow, status: STATUS_NEW, repeat: true, warnings: [] };
+  // ---- Bước 3: ghi vào đúng dòng đã cấp (ngoài khoá) ----
+  if (warnings.length) notes = notes.concat(warnings);
+  var ts = new Date();
+  var row = new Array(C.REQ).fill('');
+  row[C.TS - 1] = ts;
+  row[C.CAMPAIGN - 1] = campaign;
+  row[C.DIVISION - 1] = safe_(d.division);
+  row[C.EMP_CODE - 1] = safe_(empCode);
+  row[C.EMP_NAME - 1] = safe_(d.empName);
+  row[C.KHO - 1] = safe_(d.kho);
+  row[C.MODEL - 1] = safe_(d.model);
+  row[C.SLOT - 1] = "'" + slotId.replace(/^'+/, '');
+  row[C.PHONE - 1] = "'" + str_(d.phone);
+  row[C.ADDRESS - 1] = safe_(d.address);
+  row[C.AGREE - 1] = 'Đồng ý';
+  row[C.STATUS - 1] = STATUS_NEW;
+  row[C.NOTE - 1] = safe_(notes.join(' | '));
+  row[C.UA - 1] = safe_(str_(d.userAgent).slice(0, 300));
+  row[C.REQ - 1] = Utilities.getUuid();
+  try {
+    if (reg.getMaxRows() < rowNo) reg.insertRowsAfter(reg.getMaxRows(), Math.max(50, rowNo - reg.getMaxRows()));
+    reg.getRange(rowNo, 1, 1, C.REQ).setValues([row]);
+  } catch (err) {
+    releaseClaim_(slotId, rowNo); // ghi lỗi: trả slot lại để lần gửi lại (tự động) giữ chỗ lại
+    throw err;
   }
-  if (rejected) {
-    log_('REGISTER_REJECTED_DUP_SLOT', empCode, slotId, d.userAgent, 'Slot đã có người đăng ký, không ghi đơn');
-    return { ok: false, slotTaken: true, message: 'Slot ' + slotId + ' đã có người đăng ký trước. Vui lòng chọn slot khác.' };
-  }
+
+  try { CacheService.getScriptCache().remove(ck_('taken')); } catch (e) {}
   log_('REGISTER', empCode, slotId, d.userAgent, 'Dòng ' + rowNo + (warnings.length ? ' | ' + warnings.join(' | ') : ''));
   return { ok: true, row: rowNo, status: STATUS_NEW, timestamp: fmt_(ts), warnings: warnings };
+}
+
+function releaseClaim_(slotId, rowNo) {
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) return;
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var claims = JSON.parse(props.getProperty(ck_('claims')) || '{}');
+    // Đánh dấu hết hạn (không xoá): dòng chưa ghi nên lần gửi sau được giữ chỗ lại
+    if (claims[slotId] && claims[slotId].row === rowNo) { claims[slotId].t = 0; props.setProperty(ck_('claims'), JSON.stringify(claims)); }
+  } finally { lock.releaseLock(); }
+}
+
+// eff[i] = true nếu dòng i là đơn hợp lệ. Mỗi Mã NV chỉ có tối đa maxPer đơn hợp lệ:
+// ưu tiên đơn đã khai nộp / đã xử lý (khác "Chờ nộp tiền"), sau đó đến đơn đăng ký sớm nhất.
+// Đơn Hủy/Từ chối không bao giờ hợp lệ.
+function effective_(emps, stats, maxPer) {
+  var cnt = {}, eff = [], i, e, st;
+  for (i = 0; i < emps.length; i++) eff.push(false);
+  for (var pass = 0; pass < 2; pass++) {
+    for (i = 0; i < emps.length; i++) {
+      st = String(stats[i]);
+      if (STATUS_FREE.indexOf(st) >= 0) continue;
+      var progressed = !!st && st !== STATUS_NEW;
+      if ((pass === 0) !== progressed) continue;
+      e = String(emps[i]).toUpperCase();
+      cnt[e] = (cnt[e] || 0) + 1;
+      eff[i] = cnt[e] <= maxPer;
+    }
+  }
+  return eff;
+}
+function maxPer_() { return Number(config_().MAX_PER_EMPLOYEE) || 1; }
+var STATUS_OVER = 'Vượt hạn mức – không hợp lệ';
+
+function limit_msg_(empCode, slots, maxPer, slotId, ua) {
+  var list = Object.keys(slots);
+  log_('REGISTER_REJECTED_LIMIT', empCode, slotId, ua, 'Đã có đơn: ' + list.join(', ') + ' | hạn mức ' + maxPer + ' SP/NV, không ghi đơn');
+  return {
+    ok: false, limitReached: true, existing: list,
+    message: 'Mã NV ' + empCode + ' đã có đơn đăng ký hợp lệ (Slot ' + list.join(', ') + '). ' +
+             'Theo quy định, mỗi nhân viên chỉ được mua tối đa ' + (maxPer < 10 ? '0' + maxPer : maxPer) + ' sản phẩm. ' +
+             'Đăng ký này KHÔNG hợp lệ và KHÔNG được ghi nhận.'
+  };
+}
+
+function taken_msg_(slotId) {
+  try { CacheService.getScriptCache().remove(ck_('taken')); } catch (e) {}
+  return { ok: false, slotTaken: true, message: 'Slot ' + slotId + ' đã có người đăng ký trước. Vui lòng chọn slot khác.' };
 }
 
 /* ---------- Khai nộp tiền (Tab 3) ---------- */
@@ -162,6 +312,7 @@ function payment_(d) {
   }
   if (pre.paid && pre.txn === str_(d.bankTxn)) return { ok: true, row: pre.rowNo, status: STATUS_PAID, repeat: true };
   if (pre.paid) return paidAlready_(d, empCode, slotId, pre.rowNo);
+  if (!pre.valid) return invalid_msg_(d, empCode, slotId, pre);
 
   // Lưu biên lai (việc chậm) trước khi khoá
   var link = '';
@@ -174,10 +325,11 @@ function payment_(d) {
   if (!lock.tryLock(LOCK_WAIT_MS)) {
     return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
   }
-  var found, dup = false;
+  var found, dup = false, bad = false;
   try {
     found = findOrder_(reg, slotId, empCode); // kiểm tra lại trong khoá
     if (found && found.paid) dup = true;
+    else if (found && !found.valid) bad = true;
     else if (found) {
       reg.getRange(found.rowNo, C.PAYER_NAME, 1, 6).setValues([[
         safe_(d.payerName), safe_(str_(d.payerCode).toUpperCase()), "'" + str_(d.amount),
@@ -190,6 +342,7 @@ function payment_(d) {
     lock.releaseLock();
   }
   if (!found) return { ok: false, message: 'Không tìm thấy đơn đăng ký. Vui lòng thử lại.' };
+  if (bad) return invalid_msg_(d, empCode, slotId, found);
   if (dup && found.txn === str_(d.bankTxn)) return { ok: true, row: found.rowNo, status: STATUS_PAID, repeat: true };
   if (dup) return paidAlready_(d, empCode, slotId, found.rowNo);
 
@@ -202,18 +355,28 @@ function paidAlready_(d, empCode, slotId, rowNo) {
   return { ok: false, message: 'Đơn này đã khai nộp tiền trước đó. Nếu cần sửa, vui lòng liên hệ PM phụ trách.' };
 }
 
-// Đơn gần nhất khớp Slot + Mã NV (đọc cột D..P)
+// Đơn gần nhất khớp Slot + Mã NV (đọc cột D..P), kèm cờ hợp lệ theo quy tắc hạn mức
 function findOrder_(reg, slotId, empCode) {
   var n = reg.getLastRow() - 1;
   if (n < 1) return null;
   var v = reg.getRange(2, C.EMP_CODE, n, C.BANK_TXN - C.EMP_CODE + 1).getValues();
+  var iSt = C.STATUS - C.EMP_CODE, iSl = C.SLOT - C.EMP_CODE;
+  var eff = effective_(v.map(function (x) { return x[0]; }), v.map(function (x) { return x[iSt]; }), maxPer_());
+  var validSlots = [];
+  for (var k = 0; k < v.length; k++) if (eff[k] && String(v[k][0]).toUpperCase() === empCode) validSlots.push(String(v[k][iSl]).replace(/^'+/, ''));
   for (var r = v.length - 1; r >= 0; r--) {
-    if (String(v[r][C.SLOT - C.EMP_CODE]) === slotId && String(v[r][0]).toUpperCase() === empCode) {
+    if (String(v[r][iSl]).replace(/^'+/, '') === slotId && String(v[r][0]).toUpperCase() === empCode) {
       var paid = !!(str_(v[r][C.PAYER_NAME - C.EMP_CODE]) || str_(v[r][C.BANK_TXN - C.EMP_CODE]));
-      return { rowNo: r + 2, paid: paid, txn: str_(v[r][C.BANK_TXN - C.EMP_CODE]) };
+      return { rowNo: r + 2, paid: paid, txn: str_(v[r][C.BANK_TXN - C.EMP_CODE]), valid: eff[r], validSlots: validSlots };
     }
   }
   return null;
+}
+function invalid_msg_(d, empCode, slotId, found) {
+  log_('PAYMENT_REJECTED_INVALID', empCode, slotId, d.userAgent, 'Dòng ' + found.rowNo + ' không hợp lệ (vượt hạn mức hoặc đã hủy). Đơn hợp lệ: ' + (found.validSlots.join(', ') || 'không có'));
+  return { ok: false, invalidOrder: true,
+    message: 'Đơn Slot ' + slotId + ' KHÔNG hợp lệ (vượt hạn mức 01 sản phẩm/nhân viên hoặc đã bị hủy) nên không được nộp tiền.' +
+             (found.validSlots.length ? ' Đơn hợp lệ của bạn là Slot ' + found.validSlots.join(', ') + '.' : '') };
 }
 
 /* ---------- Tra cứu đơn (Mã NV + 4 số cuối SĐT) ---------- */
@@ -225,6 +388,7 @@ function lookup_(d) {
   var reg = book_().getSheetByName(SHEET_REG);
   var n = reg.getLastRow() - 1;
   var v = n > 0 ? reg.getRange(2, 1, n, C.RECEIPT).getValues() : [];
+  var eff = effective_(v.map(function (x) { return x[C.EMP_CODE - 1]; }), v.map(function (x) { return x[C.STATUS - 1]; }), maxPer_());
   var out = [];
   for (var r = 0; r < v.length; r++) {
     if (String(v[r][C.EMP_CODE - 1]).toUpperCase() !== empCode) continue;
@@ -233,7 +397,8 @@ function lookup_(d) {
     out.push({
       time: v[r][0] instanceof Date ? fmt_(v[r][0]) : str_(v[r][0]),
       slot: str_(v[r][C.SLOT - 1]), kho: str_(v[r][C.KHO - 1]), model: str_(v[r][C.MODEL - 1]),
-      status: str_(v[r][C.STATUS - 1]) || 'Chưa có trạng thái',
+      status: (!eff[r] && STATUS_FREE.indexOf(String(v[r][C.STATUS - 1])) < 0) ? STATUS_OVER : (str_(v[r][C.STATUS - 1]) || 'Chưa có trạng thái'),
+      valid: !!eff[r],
       paid: !!str_(v[r][C.BANK_TXN - 1]), receipt: !!str_(v[r][C.RECEIPT - 1])
     });
   }
@@ -247,31 +412,31 @@ function lookup_(d) {
 /* ---------- Bộ nhớ đệm Config / Slots ---------- */
 function config_() {
   var cache = CacheService.getScriptCache();
-  var hit = cache.get('cfg');
+  var hit = cache.get(ck_('cfg'));
   if (hit) return JSON.parse(hit);
   var sh = book_().getSheetByName(SHEET_CONFIG);
   var v = sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 1), 2).getValues();
   var o = {};
   for (var i = 0; i < v.length; i++) if (v[i][0]) o[String(v[i][0])] = v[i][1] instanceof Date ? fmt_(v[i][1]) : v[i][1];
-  cache.put('cfg', JSON.stringify(o), CACHE_CONFIG_SEC);
+  cache.put(ck_('cfg'), JSON.stringify(o), CACHE_CONFIG_SEC);
   return o;
 }
 
 function slots_() {
   var cache = CacheService.getScriptCache();
-  var hit = cache.get('slots');
+  var hit = cache.get(ck_('slots'));
   if (hit) return JSON.parse(hit);
   var sh = book_().getSheetByName(SHEET_SLOTS);
   var v = sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 1), 4).getValues();
   var o = {};
   for (var i = 0; i < v.length; i++) if (v[i][2]) o[String(v[i][2])] = { kho: String(v[i][0]), model: String(v[i][3]) };
-  cache.put('slots', JSON.stringify(o), CACHE_SLOTS_SEC);
+  cache.put(ck_('slots'), JSON.stringify(o), CACHE_SLOTS_SEC);
   return o;
 }
 
 /** Chạy tay khi vừa sửa Config hoặc Slots để script thấy ngay. */
 function clearCache() {
-  CacheService.getScriptCache().removeAll(['cfg', 'slots']);
+  CacheService.getScriptCache().removeAll(['cfg', 'slots', 'taken', 't_cfg', 't_slots', 't_taken']);
   Logger.log('Đã xoá bộ nhớ đệm Config và Slots.');
 }
 
@@ -298,10 +463,23 @@ function receiptFolder_() {
   return it.hasNext() ? it.next() : parent.createFolder(RECEIPT_FOLDER_NAME);
 }
 
+// Nhật ký: cấp số dòng qua khoá riêng (UserLock) rồi ghi đúng dòng, để nhiều lượt cùng lúc không ghi đè nhau
 function log_(action, empCode, slotId, ua, details) {
   var sh = book_().getSheetByName(SHEET_LOG);
   if (!sh) return;
-  sh.appendRow([new Date(), action, safe_(empCode), slotId ? "'" + slotId : '', safe_(str_(ua).slice(0, 300)), safe_(details)]);
+  var line = [new Date(), action, safe_(empCode), slotId ? "'" + slotId : '', safe_(str_(ua).slice(0, 300)), safe_(details)];
+  var last = sh.getLastRow(), r = 0;
+  var lk = LockService.getUserLock();
+  if (lk.tryLock(10000)) {
+    try {
+      var p = PropertiesService.getScriptProperties();
+      r = Math.max(Number(p.getProperty(ck_('logNext'))) || 0, last + 1);
+      p.setProperty(ck_('logNext'), String(r + 1));
+    } finally { lk.releaseLock(); }
+  }
+  if (!r) { sh.appendRow(line); return; }
+  if (sh.getMaxRows() < r) sh.insertRowsAfter(sh.getMaxRows(), Math.max(50, r - sh.getMaxRows()));
+  sh.getRange(r, 1, 1, line.length).setValues([line]);
 }
 
 function str_(v) { return v === null || v === undefined ? '' : String(v).trim(); }
