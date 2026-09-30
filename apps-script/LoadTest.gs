@@ -10,9 +10,9 @@
 var SPREADSHEET_ID = '10aN5O3HL79asPGfug75IPv1w_ssGPo8edsASMuG3_aM';
 var SHEET_REG = 'Registrations', SHEET_SLOTS = 'Slots', SHEET_CONFIG = 'Config', SHEET_LOG = 'ActivityLog';
 var C = { TS: 1, EMP_CODE: 4, SLOT: 8, STATUS: 12, REQ: 23 };
-var STATUS_NEW = 'Chờ nộp tiền', STATUS_FREE = ['Hủy', 'Từ chối'];
+var STATUS_NEW = 'Chờ nộp tiền', STATUS_WAIT_PM = 'Chờ PM xác nhận', STATUS_FREE = ['Hủy', 'Từ chối'];
 function str_(v) { return v === null || v === undefined ? '' : String(v).trim(); }
-// Giống hệt quy tắc đơn hợp lệ trong web app (Code.gs v7.8+)
+// Giống hệt quy tắc đơn hợp lệ trong web app (Code.gs v7.12)
 function effective_(emps, stats, maxPer) {
   var cnt = {}, eff = [], i, e, st;
   for (i = 0; i < emps.length; i++) eff.push(false);
@@ -20,7 +20,7 @@ function effective_(emps, stats, maxPer) {
     for (i = 0; i < emps.length; i++) {
       st = String(stats[i]);
       if (STATUS_FREE.indexOf(st) >= 0) continue;
-      var progressed = !!st && st !== STATUS_NEW;
+      var progressed = !!st && st !== STATUS_NEW && st !== STATUS_WAIT_PM;
       if ((pass === 0) !== progressed) continue;
       e = String(emps[i]).toUpperCase();
       cnt[e] = (cnt[e] || 0) + 1;

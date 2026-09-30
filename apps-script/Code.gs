@@ -39,6 +39,8 @@
  *  - Dọn các ô giữ chỗ slot đã hết hạn (Script Property 'claims' giới hạn 9 KB).
  *  - Config PAGE_FILE_ID = ID file HTML trên Drive: link web app mở thẳng trang đăng ký (1 link cho mọi NV).
  *  - Chế độ thử nhận testSheet = file "LoadTest ..." do công cụ thử tải (project Apps Script riêng) tạo.
+ * v7.12 (30/09/2026): PM XÁC NHẬN ĐƠN TRƯỚC KHI NỘP TIỀN. Đơn mới = "Chờ PM xác nhận". PM đổi cột Trạng Thái
+ * sang "Chờ nộp tiền" = đã xác nhận. Nút Nộp tiền chỉ mở khi đơn đã được PM xác nhận VÀ đủ 2 giờ kể từ lúc đăng ký.
  * Chế độ thử tải: gửi test:true (POST) hoặc ?test=1 (GET) thì script dùng BẢN SAO sheet.
  *
  * Cách cài: xem docs/SETUP_APPS_SCRIPT.md
@@ -63,7 +65,8 @@ var LOCK_WAIT_MS = 30000;              // chờ tối đa 30 giây
 var CACHE_CONFIG_SEC = 300;            // Config đổi thì sau tối đa 5 phút script mới thấy
 var CACHE_SLOTS_SEC = 600;
 
-var STATUS_NEW = 'Chờ nộp tiền';
+var STATUS_NEW = 'Chờ nộp tiền';        // PM đã xác nhận đơn, chờ NV nộp tiền
+var STATUS_WAIT_PM = 'Chờ PM xác nhận'; // đơn mới đăng ký, PM chưa xác nhận: chưa được nộp tiền
 var STATUS_PAID = 'Đã khai nộp - chờ đối soát';
 var STATUS_FREE = ['Hủy', 'Từ chối']; // đơn ở trạng thái này không giữ slot
 
@@ -98,7 +101,7 @@ function doGet(e) {
   if (act === 'taken') return json_(withSchedule_(taken_()));
   if (act === 'status') return json_(withSchedule_({ ok: true }));
   if (!act && !_useTest) { var pg = page_(); if (pg) return pg; }
-  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.11', test: _useTest, time: new Date().toISOString() });
+  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.12', test: _useTest, time: new Date().toISOString() });
 }
 
 /* ---------- Danh sách slot đã có người (chỉ mã slot, không kèm tên / Mã NV) ---------- */
@@ -194,7 +197,7 @@ function register_(d) {
     if (sl === slotId && em === empCode) {
       // Chính người này đã giữ slot (gửi lại do mạng chập chờn): coi như thành công, không ghi thêm
       log_('REGISTER_REPEAT', empCode, slotId, d.userAgent, 'Gửi lại, đơn đã có ở dòng ' + (r + 2) + ', không ghi thêm');
-      return { ok: true, row: r + 2, status: STATUS_NEW, repeat: true, warnings: [] };
+      return { ok: true, row: r + 2, status: str_(rows[r][iSt]) || STATUS_WAIT_PM, repeat: true, warnings: [] };
     }
     if (sl === slotId) slotOther = true;
     else if (em === empCode) empSlots[sl] = r + 2;
@@ -250,7 +253,7 @@ function register_(d) {
   if (heldBy) {
     if (heldBy.emp === empCode) {
       log_('REGISTER_REPEAT', empCode, slotId, d.userAgent, 'Gửi lặp, đơn đang ghi ở dòng ' + heldBy.row + ', không ghi thêm');
-      return { ok: true, row: heldBy.row, status: STATUS_NEW, repeat: true, warnings: [] };
+      return { ok: true, row: heldBy.row, status: STATUS_WAIT_PM, repeat: true, warnings: [] };
     }
     log_('REGISTER_REJECTED_DUP_SLOT', empCode, slotId, d.userAgent, 'Slot vừa được người khác giữ chỗ (dòng ' + heldBy.row + '), không ghi đơn');
     return taken_msg_(slotId);
@@ -273,7 +276,7 @@ function register_(d) {
   row[C.PHONE - 1] = "'" + str_(d.phone);
   row[C.ADDRESS - 1] = safe_(d.address);
   row[C.AGREE - 1] = 'Đồng ý';
-  row[C.STATUS - 1] = STATUS_NEW;
+  row[C.STATUS - 1] = STATUS_WAIT_PM;
   row[C.NOTE - 1] = safe_(notes.join(' | '));
   row[C.UA - 1] = safe_(str_(d.userAgent).slice(0, 300));
   row[C.REQ - 1] = Utilities.getUuid();
@@ -287,7 +290,7 @@ function register_(d) {
 
   try { CacheService.getScriptCache().remove(ck_('taken')); } catch (e) {}
   log_('REGISTER', empCode, slotId, d.userAgent, 'Dòng ' + rowNo + (warnings.length ? ' | ' + warnings.join(' | ') : ''));
-  return { ok: true, row: rowNo, status: STATUS_NEW, timestamp: fmt_(ts), warnings: warnings };
+  return { ok: true, row: rowNo, status: STATUS_WAIT_PM, timestamp: fmt_(ts), warnings: warnings };
 }
 
 function releaseClaim_(slotId, rowNo) {
@@ -302,7 +305,7 @@ function releaseClaim_(slotId, rowNo) {
 }
 
 // eff[i] = true nếu dòng i là đơn hợp lệ. Mỗi Mã NV chỉ có tối đa maxPer đơn hợp lệ:
-// ưu tiên đơn đã khai nộp / đã xử lý (khác "Chờ nộp tiền"), sau đó đến đơn đăng ký sớm nhất.
+// ưu tiên đơn đã khai nộp / đã xử lý (khác "Chờ PM xác nhận" / "Chờ nộp tiền"), sau đó đến đơn đăng ký sớm nhất.
 // Đơn Hủy/Từ chối không bao giờ hợp lệ.
 function effective_(emps, stats, maxPer) {
   var cnt = {}, eff = [], i, e, st;
@@ -311,7 +314,7 @@ function effective_(emps, stats, maxPer) {
     for (i = 0; i < emps.length; i++) {
       st = String(stats[i]);
       if (STATUS_FREE.indexOf(st) >= 0) continue;
-      var progressed = !!st && st !== STATUS_NEW;
+      var progressed = !!st && st !== STATUS_NEW && st !== STATUS_WAIT_PM;
       if ((pass === 0) !== progressed) continue;
       e = String(emps[i]).toUpperCase();
       cnt[e] = (cnt[e] || 0) + 1;
@@ -358,6 +361,7 @@ function payment_(d) {
   if (pre.paid && pre.txn === str_(d.bankTxn)) return { ok: true, row: pre.rowNo, status: STATUS_PAID, repeat: true };
   if (pre.paid) return paidAlready_(d, empCode, slotId, pre.rowNo);
   if (!pre.valid) return invalid_msg_(d, empCode, slotId, pre);
+  if (pre.status === STATUS_WAIT_PM && !_useTest) return needPm_(empCode, slotId, d.userAgent, pre.rowNo);
   var early = payDelayCheck_(reg, pre.rowNo, empCode, slotId, d.userAgent);
   if (early) return early;
 
@@ -376,11 +380,12 @@ function payment_(d) {
   if (!lock.tryLock(LOCK_WAIT_MS)) {
     return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
   }
-  var found, dup = false, bad = false;
+  var found, dup = false, bad = false, waitPm = false;
   try {
     found = findOrder_(reg, slotId, empCode); // kiểm tra lại trong khoá
     if (found && found.paid) dup = true;
     else if (found && !found.valid) bad = true;
+    else if (found && found.status === STATUS_WAIT_PM && !_useTest) waitPm = true;
     else if (found) {
       reg.getRange(found.rowNo, C.PAYER_NAME, 1, 6).setValues([[
         safe_(d.payerName), safe_(str_(d.payerCode).toUpperCase()), "'" + str_(d.amount),
@@ -394,6 +399,7 @@ function payment_(d) {
   }
   if (!found) return { ok: false, message: 'Không tìm thấy đơn đăng ký. Vui lòng thử lại.' };
   if (bad) return invalid_msg_(d, empCode, slotId, found);
+  if (waitPm) return needPm_(empCode, slotId, d.userAgent, found.rowNo);
   if (dup && found.txn === str_(d.bankTxn)) return { ok: true, row: found.rowNo, status: STATUS_PAID, repeat: true };
   if (dup) return paidAlready_(d, empCode, slotId, found.rowNo);
 
@@ -418,7 +424,7 @@ function findOrder_(reg, slotId, empCode) {
   for (var r = v.length - 1; r >= 0; r--) {
     if (String(v[r][iSl]).replace(/^'+/, '') === slotId && String(v[r][0]).toUpperCase() === empCode) {
       var paid = !!(str_(v[r][C.PAYER_NAME - C.EMP_CODE]) || str_(v[r][C.BANK_TXN - C.EMP_CODE]));
-      return { rowNo: r + 2, paid: paid, txn: str_(v[r][C.BANK_TXN - C.EMP_CODE]), valid: eff[r], validSlots: validSlots };
+      return { rowNo: r + 2, paid: paid, txn: str_(v[r][C.BANK_TXN - C.EMP_CODE]), valid: eff[r], validSlots: validSlots, status: str_(v[r][iSt]) };
     }
   }
   return null;
@@ -522,6 +528,10 @@ function payDelayCheck_(reg, rowNo, empCode, slotId, ua) {
   if (Date.now() >= openAt) return null;
   log_('PAYMENT_REJECTED_EARLY', empCode, slotId, ua, 'Dòng ' + rowNo + ' | mở nộp tiền lúc ' + fmt_(new Date(openAt)));
   return { ok: false, tooEarly: true, payOpenAt: openAt, message: 'Chưa đến giờ khai nộp tiền cho Slot ' + slotId + '. Mở lúc ' + fmt_(new Date(openAt)) + '.' };
+}
+function needPm_(empCode, slotId, ua, rowNo) {
+  log_('PAYMENT_REJECTED_WAIT_PM', empCode, slotId, ua, 'Dòng ' + rowNo + ' chưa được PM xác nhận');
+  return { ok: false, needPmConfirm: true, message: 'Đơn Slot ' + slotId + ' chưa được PM xác nhận nên chưa được nộp tiền. Nút Nộp tiền sẽ mở khi PM xác nhận và đủ 2 giờ kể từ lúc đăng ký. Vui lòng CHƯA chuyển khoản.' };
 }
 // Bỏ các ô giữ chỗ đã hết hạn (quá CLAIM_GRACE_MS): khi đó sheet đã là nguồn đúng
 function pruneClaims_(claims) {
