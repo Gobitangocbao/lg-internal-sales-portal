@@ -15,12 +15,15 @@
  */
 
 // ID của Google Sheet "LG Internal Sales Database"
-var SPREADSHEET_ID = '10aN5O3HL79asPGfug75IPv1w_ssGPo8edsASMuG3_aM';
+var SPREADSHEET_ID = '18dK1OgZe78DA5vsosES017_lazJ23OUXd5fJwm9zx3I';
 
 var SHEET_REG = 'Registrations';
 var SHEET_SLOTS = 'Slots';
 var SHEET_CONFIG = 'Config';
 var SHEET_LOG = 'ActivityLog';
+var SHEET_USERS = 'Users';
+var SHEET_PROGRAMS = 'Programs';
+var SHEET_PRODUCTS = 'Products';
 var RECEIPT_FOLDER_NAME = 'Bien lai nop tien';
 var MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 var LOCK_WAIT_MS = 30000;              // chờ tối đa 30 giây
@@ -53,6 +56,13 @@ function doGet() {
 function doPost(e) {
   try {
     var data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    if (data.action === 'auth') return json_(auth_(data));
+    if (data.action === 'programs') return json_(programs_(data));
+    if (data.action === 'program_create') return json_(program_create_(data));
+    if (data.action === 'program_update') return json_(program_update_(data));
+    if (data.action === 'products') return json_(products_(data));
+    if (data.action === 'product_upload') return json_(product_upload_(data));
+    if (data.action === 'register_product') return json_(register_product_(data));
     if (data.action === 'register') return json_(register_(data));
     if (data.action === 'payment') return json_(payment_(data));
     if (data.action === 'lookup') return json_(lookup_(data));
@@ -61,6 +71,366 @@ function doPost(e) {
     try { log_('ERROR', '', '', '', String(err)); } catch (e2) {}
     return json_({ ok: false, message: 'Lỗi máy chủ: ' + err });
   }
+}
+
+/* ---------- P1: Multi-Program ---------- */
+var PROG_COL = { ID: 1, NAME: 2, PM_ID: 3, PM_NAME: 4, STATUS: 5, START: 6, END: 7, DESC: 8, MAX_PER: 9, CREATED: 10 };
+
+// List programs — users see Open only, PM sees all their programs
+function programs_(d) {
+  var sheet = book_().getSheetByName(SHEET_PROGRAMS);
+  if (!sheet) return { ok: true, programs: [] };
+  var n = sheet.getLastRow() - 1;
+  if (n <= 0) return { ok: true, programs: [] };
+  var data = sheet.getRange(2, 1, n, 10).getValues();
+  var role = str_(d.role) || 'USER';
+  var userId = str_(d.userId).toUpperCase();
+  var result = [];
+  for (var r = 0; r < n; r++) {
+    var status = String(data[r][PROG_COL.STATUS - 1]).trim();
+    var pmId = String(data[r][PROG_COL.PM_ID - 1]).trim().toUpperCase();
+    // Users only see Open programs; PM sees their own programs in any status
+    if (role === 'PM' && pmId === userId) {
+      // PM sees all their programs
+    } else if (status !== 'Open') {
+      continue;
+    }
+    result.push({
+      id: String(data[r][0]).trim(),
+      name: String(data[r][1]).trim(),
+      pmId: pmId,
+      pmName: String(data[r][3]).trim(),
+      status: status,
+      startDate: String(data[r][5]).trim(),
+      endDate: String(data[r][6]).trim(),
+      description: String(data[r][7]).trim(),
+      maxPerEmployee: Number(data[r][8]) || 1
+    });
+  }
+  return { ok: true, programs: result };
+}
+
+// PM creates a new program
+function program_create_(d) {
+  if (str_(d.role) !== 'PM') return { ok: false, message: 'Chỉ PM mới được tạo chương trình.' };
+  var req = ['programId', 'programName', 'startDate', 'endDate'];
+  for (var i = 0; i < req.length; i++) {
+    if (!str_(d[req[i]])) return { ok: false, message: 'Thiếu: ' + req[i] };
+  }
+  var sheet = book_().getSheetByName(SHEET_PROGRAMS);
+  if (!sheet) return { ok: false, message: 'Sheet Programs chưa tồn tại.' };
+
+  // Check duplicate ProgramID
+  var n = sheet.getLastRow() - 1;
+  if (n > 0) {
+    var ids = sheet.getRange(2, 1, n, 1).getValues();
+    for (var r = 0; r < n; r++) {
+      if (String(ids[r][0]).trim().toUpperCase() === str_(d.programId).toUpperCase()) {
+        return { ok: false, message: 'Mã chương trình đã tồn tại: ' + d.programId };
+      }
+    }
+  }
+
+  var row = [
+    str_(d.programId),
+    str_(d.programName),
+    str_(d.userId),
+    str_(d.userName),
+    'Draft',
+    str_(d.startDate),
+    str_(d.endDate),
+    str_(d.description) || '',
+    Number(d.maxPerEmployee) || 1,
+    new Date().toISOString()
+  ];
+  sheet.appendRow(row);
+  try { log_('PROGRAM_CREATE', str_(d.userId), str_(d.userName), '', 'program=' + d.programId); } catch (e2) {}
+  return { ok: true, message: 'Đã tạo chương trình ' + d.programId + ' (Draft).' };
+}
+
+// PM updates program status (Draft→Open, Open→Closed)
+function program_update_(d) {
+  if (str_(d.role) !== 'PM') return { ok: false, message: 'Chỉ PM mới được cập nhật chương trình.' };
+  var progId = str_(d.programId);
+  var newStatus = str_(d.newStatus);
+  if (!progId || !newStatus) return { ok: false, message: 'Thiếu programId hoặc newStatus.' };
+  if (['Open', 'Closed'].indexOf(newStatus) < 0) return { ok: false, message: 'Trạng thái không hợp lệ. Chỉ chấp nhận: Open, Closed.' };
+
+  var sheet = book_().getSheetByName(SHEET_PROGRAMS);
+  if (!sheet) return { ok: false, message: 'Sheet Programs chưa tồn tại.' };
+  var n = sheet.getLastRow() - 1;
+  if (n <= 0) return { ok: false, message: 'Không tìm thấy chương trình.' };
+
+  var data = sheet.getRange(2, 1, n, 5).getValues();
+  for (var r = 0; r < n; r++) {
+    if (String(data[r][0]).trim().toUpperCase() === progId.toUpperCase()) {
+      var currentStatus = String(data[r][4]).trim();
+      // Validate transition: Draft→Open, Open→Closed
+      if (newStatus === 'Open' && currentStatus !== 'Draft') {
+        return { ok: false, message: 'Chỉ có thể mở chương trình đang ở trạng thái Draft.' };
+      }
+      if (newStatus === 'Closed' && currentStatus !== 'Open') {
+        return { ok: false, message: 'Chỉ có thể kết sổ chương trình đang Open.' };
+      }
+      // Check PM ownership
+      if (String(data[r][2]).trim().toUpperCase() !== str_(d.userId).toUpperCase()) {
+        return { ok: false, message: 'Bạn không phải PM của chương trình này.' };
+      }
+      sheet.getRange(r + 2, PROG_COL.STATUS).setValue(newStatus);
+      try { log_('PROGRAM_' + newStatus.toUpperCase(), str_(d.userId), str_(d.userName), '', 'program=' + progId); } catch (e2) {}
+      return { ok: true, message: 'Đã chuyển chương trình ' + progId + ' sang ' + newStatus + '.' };
+    }
+  }
+  return { ok: false, message: 'Không tìm thấy chương trình ' + progId + '.' };
+}
+
+/* ---------- P2: Products ---------- */
+var PROD_COL = { PROG: 1, CODE: 2, KHO: 3, CAT: 4, MODEL: 5, DESC: 6, RRP: 7, PRICE: 8, QTY: 9, STATUS: 10, EMP: 11, TS: 12 };
+
+// List products for a program
+function products_(d) {
+  var programId = str_(d.programId);
+  if (!programId) return { ok: false, message: 'Thiếu programId.' };
+
+  var sheet = book_().getSheetByName(SHEET_PRODUCTS);
+  if (!sheet) return { ok: true, products: [] };
+  var n = sheet.getLastRow() - 1;
+  if (n <= 0) return { ok: true, products: [] };
+
+  var data = sheet.getRange(2, 1, n, 12).getValues();
+  var result = [];
+  for (var r = 0; r < n; r++) {
+    var pId = String(data[r][0]).trim();
+    if (pId.toUpperCase() !== programId.toUpperCase()) continue;
+    result.push({
+      programId: pId,
+      uniqueCode: String(data[r][1]).trim(),
+      kho: String(data[r][2]).trim(),
+      category: String(data[r][3]).trim(),
+      model: String(data[r][4]).trim(),
+      description: String(data[r][5]).trim(),
+      rrp: Number(data[r][6]) || 0,
+      internalPrice: Number(data[r][7]) || 0,
+      qty: Number(data[r][8]) || 1,
+      status: String(data[r][9]).trim() || 'Available',
+      empCode: String(data[r][10]).trim(),
+      timestamp: String(data[r][11]).trim()
+    });
+  }
+  return { ok: true, products: result };
+}
+
+// PM uploads products (batch)
+function product_upload_(d) {
+  if (str_(d.role) !== 'PM') return { ok: false, message: 'Chỉ PM mới được upload sản phẩm.' };
+  var programId = str_(d.programId);
+  if (!programId) return { ok: false, message: 'Thiếu programId.' };
+  var items = d.items; // array of {kho, category, model, description, rrp, internalPrice, qty}
+  if (!items || !items.length) return { ok: false, message: 'Danh sách sản phẩm trống.' };
+
+  var sheet = book_().getSheetByName(SHEET_PRODUCTS);
+  if (!sheet) return { ok: false, message: 'Sheet Products chưa tồn tại.' };
+
+  // Count existing products per kho for this program (to generate seq)
+  var n = sheet.getLastRow() - 1;
+  var khoSeq = {};
+  if (n > 0) {
+    var existing = sheet.getRange(2, 1, n, 3).getValues();
+    for (var r = 0; r < n; r++) {
+      if (String(existing[r][0]).trim().toUpperCase() === programId.toUpperCase()) {
+        var k = String(existing[r][2]).trim().toUpperCase();
+        khoSeq[k] = (khoSeq[k] || 0) + 1;
+      }
+    }
+  }
+
+  var rows = [];
+  var ts = new Date().toISOString();
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    var kho = str_(it.kho).toUpperCase();
+    if (!kho) continue;
+    khoSeq[kho] = (khoSeq[kho] || 0) + 1;
+    var seq = ('000' + khoSeq[kho]).slice(-3);
+    var uniqueCode = programId.toUpperCase() + '-' + kho + '-' + seq;
+    rows.push([
+      programId, uniqueCode, kho,
+      str_(it.category), str_(it.model), str_(it.description),
+      Number(it.rrp) || 0, Number(it.internalPrice) || 0,
+      Number(it.qty) || 1, 'Available', '', ts
+    ]);
+  }
+
+  if (rows.length > 0) {
+    var startRow = sheet.getLastRow() + 1;
+    sheet.getRange(startRow, 1, rows.length, 12).setValues(rows);
+  }
+
+  try { log_('PRODUCT_UPLOAD', str_(d.userId), str_(d.userName), '', 'program=' + programId + ' count=' + rows.length); } catch (e2) {}
+  return { ok: true, message: 'Đã upload ' + rows.length + ' sản phẩm vào chương trình ' + programId + '.' };
+}
+
+/* ---------- P3: Product Registration (optimized for 200-300 concurrent users) ---------- */
+function register_product_(d) {
+  // Validate required fields
+  var uniqueCode = str_(d.uniqueCode);
+  var empCode = str_(d.empCode).toUpperCase();
+  var empName = str_(d.empName);
+  var programId = str_(d.programId);
+  if (!uniqueCode || !empCode || !empName || !programId) {
+    return { ok: false, message: 'Thiếu thông tin đăng ký.' };
+  }
+
+  // Get max per employee from Programs sheet
+  var progSheet = book_().getSheetByName(SHEET_PROGRAMS);
+  var maxPer = 1;
+  if (progSheet) {
+    var pn = progSheet.getLastRow() - 1;
+    if (pn > 0) {
+      var pData = progSheet.getRange(2, 1, pn, 7).getValues();
+      for (var pi = 0; pi < pn; pi++) {
+        if (String(pData[pi][0]).trim().toUpperCase() === programId.toUpperCase()) {
+          maxPer = Number(pData[pi][6]) || 1;
+          // Check program is Open
+          if (String(pData[pi][3]).trim() !== 'Open') {
+            return { ok: false, message: 'Chương trình ' + programId + ' đã kết sổ, không thể đăng ký.' };
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  // Lock for atomic read-modify-write
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_WAIT_MS)) {
+    return { ok: false, busy: true, message: 'Hệ thống đang bận, vui lòng thử lại sau ít giây.' };
+  }
+
+  try {
+    var prodSheet = book_().getSheetByName(SHEET_PRODUCTS);
+    if (!prodSheet) return { ok: false, message: 'Sheet Products không tồn tại.' };
+    var n = prodSheet.getLastRow() - 1;
+    if (n <= 0) return { ok: false, message: 'Không tìm thấy sản phẩm.' };
+
+    var data = prodSheet.getRange(2, 1, n, 12).getValues();
+    var targetRow = -1;
+    var empCount = 0;
+
+    for (var r = 0; r < n; r++) {
+      var pId = String(data[r][0]).trim().toUpperCase();
+      if (pId !== programId.toUpperCase()) continue;
+
+      var code = String(data[r][1]).trim();
+      var status = String(data[r][9]).trim();
+      var emp = String(data[r][10]).trim().toUpperCase();
+
+      // Found our target product
+      if (code === uniqueCode) {
+        if (status !== 'Available') {
+          // Already taken — check if same employee (idempotent)
+          if (emp === empCode) {
+            return { ok: true, message: 'Bạn đã đăng ký sản phẩm này rồi.', repeat: true };
+          }
+          return { ok: false, message: 'Sản phẩm ' + uniqueCode + ' đã có người đăng ký trước. Vui lòng chọn sản phẩm khác.' };
+        }
+        targetRow = r;
+      }
+
+      // Count how many products this employee already registered in this program
+      if (status === 'Registered' && emp === empCode) {
+        empCount++;
+      }
+    }
+
+    if (targetRow < 0) return { ok: false, message: 'Không tìm thấy sản phẩm ' + uniqueCode + '.' };
+
+    // Check employee quota
+    if (empCount >= maxPer) {
+      return { ok: false, message: 'Bạn đã đăng ký ' + empCount + ' sản phẩm, vượt hạn mức ' + maxPer + ' SP/nhân viên.' };
+    }
+
+    // Mark product as Registered
+    var ts = new Date().toISOString();
+    var sheetRow = targetRow + 2; // 1-indexed + header
+    prodSheet.getRange(sheetRow, PROD_COL.STATUS).setValue('Registered');
+    prodSheet.getRange(sheetRow, PROD_COL.EMP).setValue(empCode);
+    prodSheet.getRange(sheetRow, PROD_COL.TS).setValue(ts);
+
+    // Also write to Registrations sheet for backward compatibility
+    var regSheet = book_().getSheetByName(SHEET_REG);
+    if (regSheet) {
+      var prodData = data[targetRow];
+      var regRow = new Array(22).fill('');
+      regRow[0] = ts;                          // Timestamp
+      regRow[1] = programId;                   // Campaign/Program
+      regRow[2] = str_(d.division);            // Division
+      regRow[3] = empCode;                     // Emp Code
+      regRow[4] = empName;                     // Emp Name
+      regRow[5] = String(prodData[2]).trim();   // Kho
+      regRow[6] = String(prodData[4]).trim();   // Model
+      regRow[7] = uniqueCode;                  // Slot/UniqueCode
+      regRow[8] = str_(d.phone);               // Phone
+      regRow[9] = str_(d.address);             // Address
+      regRow[10] = 'Đồng ý';                    // Agree
+      regRow[11] = 'Mới đăng ký';              // Status
+      regSheet.getRange(regSheet.getLastRow() + 1, 1, 1, 22).setValues([regRow]);
+    }
+
+    SpreadsheetApp.flush();
+  } finally {
+    lock.releaseLock();
+  }
+
+  try { log_('REGISTER_PRODUCT', empCode, empName, '', 'program=' + programId + ' product=' + uniqueCode); } catch (e2) {}
+  return { ok: true, message: 'Đăng ký thành công sản phẩm ' + uniqueCode + '!' };
+}
+
+/* ---------- P0: Xác thực (auth) ---------- */
+function auth_(d) {
+  var id = str_(d.id).toUpperCase();
+  var pw = str_(d.password);
+  if (!id || !pw) return { ok: false, message: 'Vui l\u00f2ng nh\u1eadp M\u00e3 NV v\u00e0 m\u1eadt kh\u1ea9u.' };
+
+  var sheet = book_().getSheetByName(SHEET_USERS);
+  if (!sheet) return { ok: false, message: 'H\u1ec7 th\u1ed1ng ch\u01b0a c\u1ea5u h\u00ecnh danh s\u00e1ch nh\u00e2n vi\u00ean.' };
+
+  var n = sheet.getLastRow() - 1;
+  if (n <= 0) return { ok: false, message: 'Danh s\u00e1ch nh\u00e2n vi\u00ean tr\u1ed1ng.' };
+
+  // Users sheet: A=ID, B=Password, C=Name, D=Dept, E=Phone, F=Email, G=Role, H=Status
+  var data = sheet.getRange(2, 1, n, 8).getValues();
+  for (var r = 0; r < n; r++) {
+    var rowId = String(data[r][0]).trim().toUpperCase();
+    if (rowId !== id) continue;
+
+    // Check status
+    var status = String(data[r][7]).trim();
+    if (status && status.toLowerCase() !== 'active') {
+      return { ok: false, message: 'T\u00e0i kho\u1ea3n \u0111\u00e3 b\u1ecb v\u00f4 hi\u1ec7u h\u00f3a. Li\u00ean h\u1ec7 PM Support.' };
+    }
+
+    // Check password (plaintext comparison — upgrade to SHA256 in P6)
+    var storedPw = String(data[r][1]);
+    if (storedPw !== pw) {
+      return { ok: false, message: 'M\u1eadt kh\u1ea9u kh\u00f4ng \u0111\u00fang.' };
+    }
+
+    // Success — return user profile
+    var user = {
+      id: rowId,
+      name: String(data[r][2]).trim(),
+      dept: String(data[r][3]).trim(),
+      phone: String(data[r][4]).trim(),
+      email: String(data[r][5]).trim(),
+      role: String(data[r][6]).trim() || 'USER'
+    };
+
+    try { log_('AUTH_LOGIN', id, user.name, '', 'role=' + user.role); } catch (e2) {}
+    return { ok: true, user: user };
+  }
+
+  return { ok: false, message: 'M\u00e3 nh\u00e2n vi\u00ean kh\u00f4ng t\u1ed3n t\u1ea1i.' };
 }
 
 /* ---------- Đăng ký (Tab 2) ---------- */
