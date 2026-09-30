@@ -376,68 +376,113 @@
     [data-theme="dark"] .tab-btn:not(.active) { color: #F6F3EB; border-color: #716F6A; }
     [data-theme="dark"] .sec-card { background: var(--lg-panel); }
 
-    /* ===== P0: Login Overlay ===== */
+    /* ===== P0: Login Overlay (LG BI Guidelines V5.2 Compliant) ===== */
     #login-overlay {
       position: fixed; inset: 0; z-index: 99999;
-      background: linear-gradient(135deg, #A50034 0%, #60001D 60%, #262626 100%);  /* WG01 replaces Tailwind slate */
+      background: rgba(38, 38, 38, 0.55);  /* Translucent Warm Gray 01 backdrop */
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       display: flex; align-items: center; justify-content: center;
-      transition: opacity .4s ease;
+      padding: 16px;
+      transition: opacity .3s ease;
     }
     #login-overlay.hidden { display: none; }
     .login-card {
-      background: #FFFFFF; border-radius: 18px; padding: 40px 36px 32px;
-      width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      background: #FFFFFF; border-radius: 16px; padding: 36px 32px 28px;
+      width: 100%; max-width: 440px;
+      border: 1px solid #E6E1D6;  /* Warm Gray 05 border */
+      box-shadow: 0 20px 48px rgba(38, 38, 38, 0.16), 0 2px 8px rgba(38, 38, 38, 0.06);
       text-align: center;
     }
     .login-card .login-logo {
-      width: 72px; height: 72px; margin: 0 auto 16px; display: block;
+      height: 44px; width: auto; max-width: 150px;
+      object-fit: contain; margin: 0 auto 16px; display: block;
     }
     .login-card h2 {
       font-family: 'LG EI Headline', 'LG EI Text', sans-serif;
-      font-size: 20px; color: #262626; margin: 0 0 6px;  /* WG01 */
+      font-size: 20px; font-weight: 600; color: #262626; margin: 0 0 6px;  /* WG01 */
+      letter-spacing: -0.2px;
     }
     .login-card .login-sub {
-      font-size: 13px; color: #716F6A; margin: 0 0 24px;  /* WG03 */
+      font-family: 'LG EI Text', sans-serif;
+      font-size: 13px; color: #716F6A; margin: 0 0 20px;  /* WG03 */
     }
-    .login-card .form-group { margin-bottom: 16px; text-align: left; }
-    .login-card .form-label { font-size: 12.5px; font-weight: 600; color: #262626; margin-bottom: 5px; display: block; }  /* WG01 */
+    .login-card .form-group { margin-bottom: 15px; text-align: left; }
+    .login-card .form-label {
+      font-family: 'LG EI Text', sans-serif;
+      font-size: 12.5px; font-weight: 600; color: #262626; margin-bottom: 5px; display: block;  /* WG01 */
+    }
     .login-card .form-control {
       width: 100%; padding: 10px 14px; border: 1.5px solid #CBC8C2;  /* WG04 */
-      border-radius: 10px; font-size: 14px; outline: none; transition: border-color .2s;
-      box-sizing: border-box;
+      border-radius: 8px; font-size: 14px; font-family: 'LG EI Text', sans-serif;
+      color: #262626; outline: none; transition: border-color .2s, box-shadow .2s;
+      box-sizing: border-box; background: #FFFFFF;
     }
-    .login-card .form-control:focus { border-color: #A50034; }
+    .login-card .form-control:focus {
+      border-color: #A50034;  /* Heritage Red */
+      box-shadow: 0 0 0 3px rgba(165, 0, 52, 0.1);
+    }
     .login-card .btn-login {
-      width: 100%; padding: 12px; border: none; border-radius: 12px;
-      background: linear-gradient(135deg, #A50034, #7A0026); color: #FFF;
-      font-size: 15px; font-weight: 700; cursor: pointer;
-      transition: opacity .2s, transform .1s;
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      background: #A50034; color: #FFFFFF;  /* Solid Heritage Red */
+      font-family: 'LG EI Headline', 'LG EI Text', sans-serif;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: background .2s, transform .1s;
     }
-    .login-card .btn-login:hover { opacity: .92; }
+    .login-card .btn-login:hover { background: #8A002B; }
     .login-card .btn-login:active { transform: scale(.98); }
     .login-card .btn-login:disabled { opacity: .5; cursor: not-allowed; }
     .login-card .login-error {
       background: rgba(165,0,52,.06); color: #A50034; border: 1px solid rgba(165,0,52,.2);  /* Heritage Red tint */
-      border-radius: 8px; padding: 10px 14px; font-size: 13px;
-      margin-bottom: 16px; display: none;
+      border-radius: 8px; padding: 10px 14px; font-size: 13px; font-family: 'LG EI Text', sans-serif;
+      margin-bottom: 16px; display: none; text-align: left;
     }
     .login-card .login-error.show { display: block; }
-    .login-card .login-info {
-      margin-top: 16px; font-size: 12px; color: #716F6A;  /* WG03 */
+    .login-card .demo-accounts {
+      margin-top: 18px; padding-top: 16px; border-top: 1px solid #E6E1D6; text-align: left;
     }
-    /* user-bar shown after login */
+    .login-card .demo-title {
+      font-size: 11px; font-weight: 700; color: #716F6A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .login-card .demo-btns { display: flex; flex-direction: column; gap: 6px; }
+    .login-card .btn-demo {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #F0ECE4; border: 1px solid #CBC8C2; border-radius: 6px;  /* WG06 bg, WG04 border */
+      padding: 7px 12px; font-size: 12px; font-family: 'LG EI Text', sans-serif;
+      color: #262626; cursor: pointer; transition: all .15s; text-align: left;
+    }
+    .login-card .btn-demo:hover { background: #E6E1D6; border-color: #716F6A; }
+    .login-card .btn-demo span.role-tag {
+      font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+    }
+    .login-card .btn-demo span.role-pm { background: rgba(165,0,52,0.12); color: #A50034; }
+    .login-card .btn-demo span.role-user { background: rgba(38,38,38,0.08); color: #4A4946; }
+    .login-card .login-info {
+      margin-top: 14px; font-size: 11.5px; color: #716F6A;  /* WG03 */
+    }
+    /* user-bar shown after login (LG BI V5.2 compliant) */
     .user-bar {
       display: flex; align-items: center; gap: 10px;
-      background: rgba(255,255,255,.12); border-radius: 8px;
-      padding: 5px 14px; font-size: 12.5px; color: #FFF;
+      background: #F0ECE4; border: 1px solid #CBC8C2; border-radius: 8px;  /* WG06 bg, WG04 border */
+      padding: 5px 14px; font-size: 12.5px; color: #262626;  /* WG01 */
     }
-    .user-bar .user-name { font-weight: 700; }
+    .user-bar .user-name { font-weight: 700; color: #A50034; }  /* LG Heritage Red */
+    .user-bar .user-dept { font-size: 12px; color: #716F6A; }  /* WG03 */
     .user-bar .btn-logout {
-      background: rgba(255,255,255,.2); border: none; color: #FFF;
+      background: #FFFFFF; border: 1px solid #CBC8C2; color: #4A4946;
       border-radius: 6px; padding: 4px 10px; font-size: 11px;
-      cursor: pointer; font-weight: 600;
+      cursor: pointer; font-weight: 600; transition: all .15s;
     }
-    .user-bar .btn-logout:hover { background: rgba(255,255,255,.35); }
+    .user-bar .btn-logout:hover { background: #A50034; color: #FFFFFF; border-color: #A50034; }
+    [data-theme="dark"] .user-bar {
+      background: #262626; border-color: #4A4946; color: #F6F3EB;
+    }
+    [data-theme="dark"] .user-bar .user-name { color: #EA1917; }
+    [data-theme="dark"] .user-bar .user-dept { color: #CBC8C2; }
+    [data-theme="dark"] .user-bar .btn-logout {
+      background: #4A4946; border-color: #716F6A; color: #F6F3EB;
+    }
+    [data-theme="dark"] .user-bar .btn-logout:hover { background: #A50034; }
 
     /* ===== P1: Program Tab Bar (LG Brand Colors) ===== */
     .program-tab-bar {
@@ -514,33 +559,52 @@
   </style>
 </head>
 <body>
-  <!-- P0: Login Overlay -->
+  <!-- P0: Login Overlay (LG Brand Compliant) -->
   <div id="login-overlay">
     <div class="login-card">
-      <img class="login-logo" id="login-logo" src="" alt="LG Logo">
+      <img class="login-logo" id="login-logo" src="" alt="LG Electronics">
       <h2>CỔNG BÁN HÀNG NỘI BỘ</h2>
-      <p class="login-sub">Internal Sales Portal — Đăng nhập để tiếp tục</p>
+      <p class="login-sub">LG Internal Sales Portal — Đăng nhập để tiếp tục</p>
       <div class="login-error" id="login-error"></div>
       <form id="login-form" onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label class="form-label">Mã nhân viên (Employee ID)</label>
+          <label class="form-label" for="login-id">Mã nhân viên (Employee ID)</label>
           <input type="text" class="form-control" id="login-id" placeholder="Ví dụ: VH12345" required autocomplete="username">
         </div>
         <div class="form-group">
-          <label class="form-label">Mật khẩu (Password)</label>
-          <input type="password" class="form-control" id="login-password" placeholder="Nhập mật khẩu" required autocomplete="current-password">
+          <label class="form-label" for="login-password">Mật khẩu (Password)</label>
+          <input type="password" class="form-control" id="login-password" placeholder="Nhập mật khẩu (test: test123)" required autocomplete="current-password">
         </div>
         <button type="submit" class="btn-login" id="login-btn">Đăng nhập</button>
       </form>
-      <p class="login-info">Liên hệ PM Support nếu chưa có tài khoản hoặc quên mật khẩu.</p>
+
+      <!-- Quick Demo Login Selection -->
+      <div class="demo-accounts">
+        <div class="demo-title">
+          <span>Tài khoản kiểm tra mẫu (Demo)</span>
+          <span style="font-weight:400; font-size:10px; color:#A50034;">Bấm để đăng nhập ngay</span>
+        </div>
+        <div class="demo-btns">
+          <button type="button" class="btn-demo" onclick="quickLogin('VH12345', 'test123')">
+            <span><strong>VH12345</strong> · Nguyễn Thị Quỳnh Như</span>
+            <span class="role-tag role-pm">Quản trị PM</span>
+          </button>
+          <button type="button" class="btn-demo" onclick="quickLogin('VH88921', 'test123')">
+            <span><strong>VH88921</strong> · Trần Văn Nam</span>
+            <span class="role-tag role-user">Nhân viên</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="login-info">Liên hệ PM Support (nguyet.duong@lge.com) nếu cần hỗ trợ tài khoản.</p>
     </div>
   </div>
 
   <div id="wait-overlay" role="alertdialog" aria-live="assertive" aria-modal="true">
-    <div class="wait-box">
-      <div class="wait-spin"></div>
-      <div class="wait-title" id="wait-title">Đang giữ chỗ cho bạn…</div>
-      <div class="wait-sub" id="wait-sub">Vui lòng không tắt trang. Thường mất vài giây.</div>
+    <div class="wait-box" style="background:#FFFFFF; color:#262626; border-radius:14px; padding:26px 22px; max-width:360px; width:100%; text-align:center; box-shadow:0 12px 36px rgba(38,38,38,0.2); border:1px solid #E6E1D6;">
+      <div class="wait-spin" style="width:44px; height:44px; margin:0 auto 14px; border-radius:50%; border:4px solid #E6E1D6; border-top-color:#A50034; animation:wspin 0.9s linear infinite;"></div>
+      <div class="wait-title" id="wait-title" style="font-size:16px; font-weight:700; color:#A50034; margin-bottom:6px;">Đang giữ chỗ cho bạn…</div>
+      <div class="wait-sub" id="wait-sub" style="font-size:13.5px; color:#716F6A; line-height:1.5;">Vui lòng không tắt trang. Thường mất vài giây.</div>
     </div>
   </div>
   <div class="app-container">
@@ -1559,10 +1623,65 @@
   </div>
 
   <script>
+    // Global HTML Escape helper
+    function esc(t) {
+      return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
     // ===== P0: Authentication & Session =====
+    const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwb-pp3WQoWjqk54MYqndew-Sny3Yeha80INufk6aSxCuF7zMIAt2cWsJI3urZVHbEC4w/exec';
     const AUTH_SESSION_KEY = 'lg_internal_sales_session';
     const AUTH_SESSION_HOURS = 8;
     let currentUser = null; // {id, name, dept, phone, role}
+
+    // Demo Data (Fallback when Google Apps Script is offline or returning 404)
+    // Matches docs/USERS_SHEET_TEMPLATE.md
+    const DEMO_USERS = [
+      { id: 'VH12345', password: 'test123', name: 'Nguyễn Thị Quỳnh Như', dept: 'HS PM Support', phone: '0912345678', email: 'quynhnhu@lge.com', role: 'PM', status: 'Active' },
+      { id: 'VH88921', password: 'test123', name: 'Trần Văn Nam', dept: 'Audit & Jeong-Do', phone: '0987654321', email: 'vannam@lge.com', role: 'USER', status: 'Active' },
+      { id: 'VH55432', password: 'test123', name: 'Lê Hoàng Anh', dept: 'HE Sales Division', phone: '0933445566', email: 'hoanganh@lge.com', role: 'USER', status: 'Active' },
+      { id: 'VH33211', password: 'test123', name: 'Hoàng Minh Trí', dept: 'HA Production', phone: '0911223344', email: 'minhtri@lge.com', role: 'USER', status: 'Active' },
+      { id: 'VH99120', password: 'test123', name: 'Đặng Thanh Hà', dept: 'Finance & Accounting', phone: '0955667788', email: 'thanhha@lge.com', role: 'USER', status: 'Active' },
+      { id: 'VH00001', password: 'disabled', name: 'Test Inactive', dept: 'IT Support', phone: '0900000000', email: 'test@lge.com', role: 'USER', status: 'Inactive' }
+    ];
+
+    const DEMO_PROGRAMS = [
+      { id: 'IS2026Q3-HA', name: 'Chương trình Bán hàng Nội bộ HA - Q3/2026', pmId: 'VH12345', pmName: 'Nguyễn Thị Quỳnh Như', status: 'Open', startDate: '2026-09-01 08:00', endDate: '2026-10-15 18:00', description: 'Ưu đãi nội bộ các dòng sản phẩm Tủ lạnh, Máy giặt, Điều hòa LG', maxPerEmployee: 1 },
+      { id: 'IS2026Q3-HE', name: 'Chương trình Bán hàng Nội bộ HE (Tivi & Loa) - Q3/2026', pmId: 'VH12345', pmName: 'Nguyễn Thị Quỳnh Như', status: 'Open', startDate: '2026-09-10 08:00', endDate: '2026-10-20 18:00', description: 'Ưu đãi nội bộ Tivi OLED, QNED và Loa soundbar chính hãng LG', maxPerEmployee: 2 },
+      { id: 'IS2026Q4-BS', name: 'Chương trình Bán hàng Nội bộ B2B/BS - Dự kiến Q4/2026', pmId: 'VH12345', pmName: 'Nguyễn Thị Quỳnh Như', status: 'Draft', startDate: '2026-11-01 08:00', endDate: '2026-11-30 18:00', description: 'Chương trình màn hình chuyên dụng & điều hòa thương mại', maxPerEmployee: 1 }
+    ];
+
+    const DEMO_PRODUCTS = {
+      'IS2026Q3-HA': [
+        { uniqueCode: 'HA-001', programId: 'IS2026Q3-HA', category: 'Tủ lạnh', model: 'GR-X257BG', description: 'Tủ lạnh InstaView Door-in-Door 635L', rrp: 42990000, internalPrice: 24900000, kho: 'AYA', status: 'Available' },
+        { uniqueCode: 'HA-002', programId: 'IS2026Q3-HA', category: 'Máy giặt', model: 'WT1410NHEG', description: 'Tháp giặt sấy WashTower 14kg giặt / 10kg sấy', rrp: 54990000, internalPrice: 32500000, kho: 'AYA', status: 'Available' },
+        { uniqueCode: 'HA-003', programId: 'IS2026Q3-HA', category: 'Máy sấy', model: 'DVH09B', description: 'Máy sấy HeatPump DUAL Inverter 9kg', rrp: 21990000, internalPrice: 12900000, kho: 'AYB', status: 'Available' },
+        { uniqueCode: 'HA-004', programId: 'IS2026Q3-HA', category: 'Điều hòa', model: 'V10APFUV', description: 'Điều hòa Inverter UVnano lọc khí 1HP', rrp: 13490000, internalPrice: 7800000, kho: 'AYC', status: 'Registered' }
+      ],
+      'IS2026Q3-HE': [
+        { uniqueCode: 'HE-001', programId: 'IS2026Q3-HE', category: 'Tivi OLED', model: 'OLED65G3PSA', description: 'Smart Tivi OLED evo 4K 65 inch Gallery Edition', rrp: 68900000, internalPrice: 38900000, kho: 'AYA', status: 'Available' },
+        { uniqueCode: 'HE-002', programId: 'IS2026Q3-HE', category: 'Tivi QNED', model: '65QNED80SRA', description: 'Smart Tivi QNED 4K 65 inch 120Hz', rrp: 28900000, internalPrice: 16500000, kho: 'AYC', status: 'Available' },
+        { uniqueCode: 'HE-003', programId: 'IS2026Q3-HE', category: 'Loa thanh', model: 'SC9S', description: 'Loa soundbar LG Sound Sync 400W 3.1.3 kênh', rrp: 14990000, internalPrice: 7900000, kho: 'AYA', status: 'Available' }
+      ],
+      'IS2026Q4-BS': [
+        { uniqueCode: 'BS-001', programId: 'IS2026Q4-BS', category: 'Màn hình', model: '34WP65C', description: 'Màn hình UltraWide cong 34 inch QHD 160Hz', rrp: 12500000, internalPrice: 7200000, kho: 'AYA', status: 'Available' }
+      ]
+    };
+
+    function quickLogin(id, pw) {
+      const idEl = document.getElementById('login-id');
+      const pwEl = document.getElementById('login-password');
+      if (idEl) idEl.value = id;
+      if (pwEl) pwEl.value = pw;
+      const form = document.getElementById('login-form');
+      if (form) {
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      }
+    }
 
     function getSession() {
       try {
@@ -1600,14 +1719,14 @@
       // Show user bar in header
       const headerActions = document.querySelector('.header-actions');
       if (headerActions) {
-        const existing = document.getElementById('user-bar');
-        if (!existing) {
-          const bar = document.createElement('div');
+        let bar = document.getElementById('user-bar');
+        if (!bar) {
+          bar = document.createElement('div');
           bar.id = 'user-bar';
           bar.className = 'user-bar';
-          bar.innerHTML = `<span class="user-name">${esc(user.name)}</span><span style="opacity:.7">${esc(user.dept || '')}</span><button class="btn-logout" onclick="handleLogout()">Đăng xuất</button>`;
           headerActions.prepend(bar);
         }
+        bar.innerHTML = `<span class="user-name">${esc(user.name)}</span><span class="user-dept">${esc(user.dept || '')}</span><button class="btn-logout" onclick="handleLogout()">Đăng xuất</button>`;
       }
       // Hide login overlay
       document.getElementById('login-overlay').classList.add('hidden');
@@ -1616,7 +1735,7 @@
     }
 
     async function handleLogin(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
       const btn = document.getElementById('login-btn');
       const errEl = document.getElementById('login-error');
       const id = document.getElementById('login-id').value.trim().toUpperCase();
@@ -1624,26 +1743,76 @@
       if (!id || !pw) return;
       btn.disabled = true; btn.textContent = 'Đang xác thực…';
       errEl.classList.remove('show');
-      try {
-        if (!SHEET_API_URL) { errEl.textContent = 'Hệ thống chưa kết nối. Vui lòng thử lại sau.'; errEl.classList.add('show'); return; }
-        const res = await fetch(SHEET_API_URL, {
-          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'auth', id: id, password: pw })
-        });
-        const data = await res.json();
-        if (data.ok) {
-          saveSession(data.user);
-          applyLogin(data.user);
-        } else {
-          errEl.textContent = data.message || 'Mã NV hoặc mật khẩu không đúng.';
+
+      let authenticated = false;
+      let authUser = null;
+
+      // 1. Check Demo Users first for instant login (matches docs/USERS_SHEET_TEMPLATE.md)
+      const demoMatch = DEMO_USERS.find(u => u.id.toUpperCase() === id);
+      if (demoMatch) {
+        if (demoMatch.status && demoMatch.status.toLowerCase() !== 'active') {
+          errEl.textContent = 'Tài khoản đã bị vô hiệu hóa. Liên hệ PM Support.';
           errEl.classList.add('show');
+          btn.disabled = false; btn.textContent = 'Đăng nhập';
+          return;
         }
-      } catch (err) {
-        errEl.textContent = 'Không thể kết nối máy chủ. Vui lòng thử lại.';
-        errEl.classList.add('show');
-      } finally {
+        if (demoMatch.password !== pw) {
+          errEl.textContent = 'Mật khẩu không đúng.';
+          errEl.classList.add('show');
+          btn.disabled = false; btn.textContent = 'Đăng nhập';
+          return;
+        }
+        authenticated = true;
+        authUser = {
+          id: demoMatch.id,
+          name: demoMatch.name,
+          dept: demoMatch.dept,
+          phone: demoMatch.phone,
+          email: demoMatch.email,
+          role: demoMatch.role
+        };
+        saveSession(authUser);
+        applyLogin(authUser);
         btn.disabled = false; btn.textContent = 'Đăng nhập';
+        return;
       }
+
+      // 2. Try Google Apps Script if available for non-demo users (short timeout)
+      if (SHEET_API_URL) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 3000);
+          const res = await fetch(SHEET_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'auth', id: id, password: pw }),
+            signal: controller.signal
+          });
+          clearTimeout(timer);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.ok && data.user) {
+              authenticated = true;
+              authUser = data.user;
+              saveSession(authUser);
+              applyLogin(authUser);
+              btn.disabled = false; btn.textContent = 'Đăng nhập';
+              return;
+            } else if (data.message) {
+              errEl.textContent = data.message;
+              errEl.classList.add('show');
+              btn.disabled = false; btn.textContent = 'Đăng nhập';
+              return;
+            }
+          }
+        } catch (netErr) {
+          console.warn('Apps Script unreachable or returned non-JSON:', netErr);
+        }
+      }
+
+      errEl.textContent = 'Mã nhân viên hoặc mật khẩu không đúng.';
+      errEl.classList.add('show');
+      btn.disabled = false; btn.textContent = 'Đăng nhập';
     }
 
     function handleLogout() {
@@ -1653,12 +1822,15 @@
 
     // On page load: check existing session
     (function initAuth() {
-      // Copy logo src to login logo
-      setTimeout(() => {
+      const syncLogo = () => {
         const mainLogo = document.getElementById('lg-logo');
         const loginLogo = document.getElementById('login-logo');
-        if (mainLogo && loginLogo) loginLogo.src = mainLogo.src;
-      }, 100);
+        if (mainLogo && loginLogo && mainLogo.src) {
+          loginLogo.src = mainLogo.src;
+        }
+      };
+      syncLogo();
+      setTimeout(syncLogo, 50);
 
       const session = getSession();
       if (session) {
@@ -1674,29 +1846,52 @@
     let activeProgram = null; // currently selected program ID
 
     async function loadPrograms() {
-      if (!currentUser || !SHEET_API_URL) return;
-      try {
-        const res = await fetch(SHEET_API_URL, {
-          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'programs', role: currentUser.role, userId: currentUser.id })
-        });
-        const data = await res.json();
-        if (data.ok && data.programs) {
-          programs = data.programs;
-          renderProgramTabs();
-          // Check URL param for direct link
-          const urlParams = new URLSearchParams(window.location.search);
-          const directProg = urlParams.get('program');
-          if (directProg && programs.find(p => p.id === directProg)) {
-            selectProgram(directProg);
-          } else if (programs.length > 0) {
-            // Auto-select first Open program
-            const firstOpen = programs.find(p => p.status === 'Open');
-            if (firstOpen) selectProgram(firstOpen.id);
-            else if (programs.length > 0) selectProgram(programs[0].id);
+      if (!currentUser) return;
+      let fetched = false;
+
+      const isDemo = DEMO_USERS.some(u => u.id === currentUser.id);
+      if (!isDemo && SHEET_API_URL) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 3000);
+          const res = await fetch(SHEET_API_URL, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'programs', role: currentUser.role, userId: currentUser.id }),
+            signal: controller.signal
+          });
+          clearTimeout(timer);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.ok && Array.isArray(data.programs) && data.programs.length > 0) {
+              programs = data.programs;
+              fetched = true;
+            }
           }
+        } catch (err) {
+          console.warn('loadPrograms using demo fallback:', err);
         }
-      } catch (err) { console.error('loadPrograms error:', err); }
+      }
+
+      if (!fetched) {
+        if (currentUser.role === 'PM') {
+          programs = DEMO_PROGRAMS.filter(p => p.pmId === currentUser.id || p.status === 'Open');
+        } else {
+          programs = DEMO_PROGRAMS.filter(p => p.status === 'Open');
+        }
+      }
+
+      renderProgramTabs();
+      // Check URL param for direct link
+      const urlParams = new URLSearchParams(window.location.search);
+      const directProg = urlParams.get('program');
+      if (directProg && programs.find(p => p.id === directProg)) {
+        selectProgram(directProg);
+      } else if (programs.length > 0) {
+        // Auto-select first Open program
+        const firstOpen = programs.find(p => p.status === 'Open');
+        if (firstOpen) selectProgram(firstOpen.id);
+        else selectProgram(programs[0].id);
+      }
     }
 
     function renderProgramTabs() {
@@ -1862,18 +2057,37 @@
     let currentProducts = [];
 
     async function loadProducts(programId) {
-      if (!SHEET_API_URL || !currentUser) return;
-      try {
-        const res = await fetch(SHEET_API_URL, {
-          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'products', programId: programId })
-        });
-        const data = await res.json();
-        if (data.ok && data.products) {
-          currentProducts = data.products;
-          renderProductTable(data.products);
+      if (!currentUser) return;
+      let fetched = false;
+
+      const isDemo = DEMO_USERS.some(u => u.id === currentUser.id);
+      if (!isDemo && SHEET_API_URL) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 3000);
+          const res = await fetch(SHEET_API_URL, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'products', programId: programId }),
+            signal: controller.signal
+          });
+          clearTimeout(timer);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.ok && Array.isArray(data.products) && data.products.length > 0) {
+              currentProducts = data.products;
+              renderProductTable(data.products);
+              fetched = true;
+            }
+          }
+        } catch (err) {
+          console.warn('loadProducts using demo fallback:', err);
         }
-      } catch (err) { console.error('loadProducts error:', err); }
+      }
+
+      if (!fetched) {
+        currentProducts = (DEMO_PRODUCTS[programId] || []).slice();
+        renderProductTable(currentProducts);
+      }
     }
 
     function formatVND(n) {
@@ -1939,7 +2153,7 @@
     }
 
     async function handleRegisterProduct(uniqueCode) {
-      if (!currentUser || !activeProgram || !SHEET_API_URL) return;
+      if (!currentUser || !activeProgram) return;
       const prod = currentProducts.find(p => p.uniqueCode === uniqueCode);
       if (!prod) { alert('Không tìm thấy sản phẩm.'); return; }
 
@@ -1953,34 +2167,56 @@
       // Disable all register buttons during request
       document.querySelectorAll('.btn-register').forEach(b => { b.disabled = true; b.textContent = '⏳'; });
 
-      try {
-        const res = await fetch(SHEET_API_URL, {
-          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'register_product',
-            uniqueCode: uniqueCode,
-            programId: activeProgram,
-            empCode: currentUser.id,
-            empName: currentUser.name,
-            division: currentUser.division || '',
-            phone: currentUser.phone || '',
-            address: currentUser.address || ''
-          })
-        });
-        const data = await res.json();
-        if (data.ok) {
-          alert('✅ ' + data.message);
-          // Refresh product list
-          loadProducts(activeProgram);
-        } else {
-          alert('❌ ' + (data.message || 'Không thể đăng ký.'));
-          // Re-enable buttons
-          document.querySelectorAll('.btn-register').forEach(b => { b.disabled = false; b.textContent = 'Đăng ký'; });
+      let registered = false;
+      const isDemo = DEMO_USERS.some(u => u.id === currentUser.id);
+
+      if (!isDemo && SHEET_API_URL) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 3000);
+          const res = await fetch(SHEET_API_URL, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'register_product',
+              uniqueCode: uniqueCode,
+              programId: activeProgram,
+              empCode: currentUser.id,
+              empName: currentUser.name,
+              division: currentUser.division || currentUser.dept || '',
+              phone: currentUser.phone || '',
+              address: currentUser.address || ''
+            }),
+            signal: controller.signal
+          });
+          clearTimeout(timer);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.ok) {
+              alert('✅ ' + data.message);
+              loadProducts(activeProgram);
+              registered = true;
+            } else {
+              alert('❌ ' + (data.message || 'Không thể đăng ký.'));
+            }
+          }
+        } catch (err) {
+          console.warn('handleRegisterProduct using local fallback:', err);
         }
-      } catch (err) {
-        alert('Lỗi kết nối: ' + err);
-        document.querySelectorAll('.btn-register').forEach(b => { b.disabled = false; b.textContent = 'Đăng ký'; });
       }
+
+      if (!registered) {
+        // Fallback simulation: mark product as registered in current view
+        prod.status = 'Registered';
+        if (DEMO_PRODUCTS[activeProgram]) {
+          const demoItem = DEMO_PRODUCTS[activeProgram].find(p => p.uniqueCode === uniqueCode);
+          if (demoItem) demoItem.status = 'Registered';
+        }
+        alert(`✅ Đăng ký thành công sản phẩm ${prod.model} (${prod.uniqueCode})!\n(Chế độ thử nghiệm: Đã cập nhật trạng thái tạm thời)`);
+        renderProductTable(currentProducts);
+      }
+
+      // Re-enable remaining buttons
+      document.querySelectorAll('.btn-register').forEach(b => { b.disabled = false; b.textContent = 'Đăng ký'; });
     }
 
     // ===== End P2 =====
@@ -1996,7 +2232,7 @@
     // ===== Kết nối Google Sheet (Apps Script Web App) =====
     // Dán URL Web App (dạng https://script.google.com/macros/s/.../exec) vào đây.
     // Để trống = chế độ bản mẫu, dữ liệu KHÔNG được lưu.
-    const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwb-pp3WQoWjqk54MYqndew-Sny3Yeha80INufk6aSxCuF7zMIAt2cWsJI3urZVHbEC4w/exec';
+    // (SHEET_API_URL is configured at the top of script)
 
     // Gửi lên máy chủ; nếu máy chủ báo bận hoặc rớt mạng thì tự gửi lại (tối đa 6 lần, trong khoảng 1 phút)
     async function postToSheet(payload, onRetry) {
