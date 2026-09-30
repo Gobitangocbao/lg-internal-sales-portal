@@ -40,7 +40,8 @@
  *  - Config PAGE_FILE_ID = ID file HTML trên Drive: link web app mở thẳng trang đăng ký (1 link cho mọi NV).
  *  - Chế độ thử nhận testSheet = file "LoadTest ..." do công cụ thử tải (project Apps Script riêng) tạo.
  * v7.12 (30/09/2026): PM XÁC NHẬN ĐƠN TRƯỚC KHI NỘP TIỀN. Đơn mới = "Chờ PM xác nhận". PM đổi cột Trạng Thái
- * sang "Chờ nộp tiền" = đã xác nhận. Nút Nộp tiền chỉ mở khi đơn đã được PM xác nhận VÀ đủ 2 giờ kể từ lúc đăng ký.
+ * sang "Chờ nộp tiền" = đã xác nhận.
+ * v7.13 (30/09/2026): nộp tiền mở NGAY khi PM xác nhận (PAY_OPEN_DELAY_HOURS mặc định 0; điền số giờ trong Config nếu muốn chờ thêm).
  * Chế độ thử tải: gửi test:true (POST) hoặc ?test=1 (GET) thì script dùng BẢN SAO sheet.
  *
  * Cách cài: xem docs/SETUP_APPS_SCRIPT.md
@@ -101,7 +102,7 @@ function doGet(e) {
   if (act === 'taken') return json_(withSchedule_(taken_()));
   if (act === 'status') return json_(withSchedule_({ ok: true }));
   if (!act && !_useTest) { var pg = page_(); if (pg) return pg; }
-  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.12', test: _useTest, time: new Date().toISOString() });
+  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.13', test: _useTest, time: new Date().toISOString() });
 }
 
 /* ---------- Danh sách slot đã có người (chỉ mã slot, không kèm tên / Mã NV) ---------- */
@@ -519,7 +520,7 @@ function windowCheck_(empCode, slotId, ua) {
 function payDelayCheck_(reg, rowNo, empCode, slotId, ua) {
   if (_useTest) return null;
   var h = Number(config_().PAY_OPEN_DELAY_HOURS);
-  if (!(h >= 0)) h = 2;
+  if (!(h >= 0)) h = 0; // mặc định: không chờ, nộp tiền mở khi PM xác nhận
   if (!h) return null;
   var ts = reg.getRange(rowNo, C.TS).getValue();
   var t = ts instanceof Date ? ts.getTime() : vnTime_(ts);
@@ -531,7 +532,7 @@ function payDelayCheck_(reg, rowNo, empCode, slotId, ua) {
 }
 function needPm_(empCode, slotId, ua, rowNo) {
   log_('PAYMENT_REJECTED_WAIT_PM', empCode, slotId, ua, 'Dòng ' + rowNo + ' chưa được PM xác nhận');
-  return { ok: false, needPmConfirm: true, message: 'Đơn Slot ' + slotId + ' chưa được PM xác nhận nên chưa được nộp tiền. Nút Nộp tiền sẽ mở khi PM xác nhận và đủ 2 giờ kể từ lúc đăng ký. Vui lòng CHƯA chuyển khoản.' };
+  return { ok: false, needPmConfirm: true, message: 'Đơn Slot ' + slotId + ' chưa được PM xác nhận nên chưa được nộp tiền. Nút Nộp tiền sẽ mở khi PM xác nhận. Vui lòng CHƯA chuyển khoản.' };
 }
 // Bỏ các ô giữ chỗ đã hết hạn (quá CLAIM_GRACE_MS): khi đó sheet đã là nguồn đúng
 function pruneClaims_(claims) {
