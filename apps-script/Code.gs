@@ -41,6 +41,7 @@
  *  - Chế độ thử nhận testSheet = file "LoadTest ..." do công cụ thử tải (project Apps Script riêng) tạo.
  * v7.12 (30/09/2026): PM XÁC NHẬN ĐƠN TRƯỚC KHI NỘP TIỀN. Đơn mới = "Chờ PM xác nhận". PM đổi cột Trạng Thái
  * sang "Chờ nộp tiền" = đã xác nhận.
+ * v7.14 (01/10/2026): trang đăng ký nhúng được vào Google Sites (XFrameOptions ALLOWALL).
  * v7.13 (30/09/2026): nộp tiền mở NGAY khi PM xác nhận (PAY_OPEN_DELAY_HOURS mặc định 0; điền số giờ trong Config nếu muốn chờ thêm).
  * Chế độ thử tải: gửi test:true (POST) hoặc ?test=1 (GET) thì script dùng BẢN SAO sheet.
  *
@@ -102,7 +103,7 @@ function doGet(e) {
   if (act === 'taken') return json_(withSchedule_(taken_()));
   if (act === 'status') return json_(withSchedule_({ ok: true }));
   if (!act && !_useTest) { var pg = page_(); if (pg) return pg; }
-  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.13', test: _useTest, time: new Date().toISOString() });
+  return json_({ ok: true, service: 'LG Internal Sales API', version: '7.14', test: _useTest, time: new Date().toISOString() });
 }
 
 /* ---------- Danh sách slot đã có người (chỉ mã slot, không kèm tên / Mã NV) ---------- */
@@ -565,7 +566,8 @@ function page_() {
   }
   return HtmlService.createHtmlOutput(html)
     .setTitle('LG Internal Sales Portal')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL); // v7.14: cho phép nhúng vào Google Sites
 }
 
 /* ---------- Danh sách nhân viên được mua (v7.10) ---------- */
