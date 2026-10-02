@@ -2,6 +2,10 @@
 
 Hệ thống số hóa toàn diện quy trình đăng ký, giữ chỗ theo nguyên tắc First-Come, First-Served (FCFS), thanh toán đối soát qua VietQR và quản trị các đợt bán hàng nội bộ ưu đãi dành riêng cho cán bộ công nhân viên **LG Electronics Việt Nam (LGEVH)**.
 
+> 🚀 **TRẢI NGHIỆM TRỰC TUYẾN (GO-LIVE DEMO LINK):**  
+> 🔗 **[https://gobitangocbao.github.io/lg-internal-sales-portal/](https://gobitangocbao.github.io/lg-internal-sales-portal/)**  
+> *Hệ thống đã Go-Live chính thức: Tự động chạy chế độ Demo Offline, hỗ trợ kết nối Google Sheet cá nhân 1-Click, VietQR thanh toán 1-chạm và tối ưu hóa 100% trên điện thoại di động chuẩn LG Brand Guidelines V5.2.*
+
 > 🔒 **LƯU Ý BẢO MẬT & BẢN QUYỀN:** Kho lưu trữ chứa thông tin tài khoản ngân hàng thụ hưởng pháp nhân, danh mục sản phẩm và quy trình kiểm toán Jeong-Do. Dữ liệu đã được **khử định danh (sanitized)** toàn diện để có thể triển khai an toàn trên môi trường cá nhân hóa mà không làm rò rỉ dữ liệu cá nhân của bất kỳ ai.
 
 ---
