@@ -35,7 +35,7 @@ graph TD
 
 | Pha | Mục tiêu | Tài liệu cần đọc | Trọng tâm cần nắm |
 |---|---|---|---|
-| **Pha 1** | **Thiết lập & CSDL riêng** | [`docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md`](docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md)<br>[`docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md`](docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md)<br>[`docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md`](docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md) | **1-Click setupNewDatabase():** Hướng dẫn PIC chạy hàm để Google Apps Script tự tạo Google Sheet trên Drive cá nhân của họ, lấy `SPREADSHEET_ID` và dán Web App URL vào Modal Cấu hình API trên giao diện web. |
+| **Pha 1** | **Thiết lập, Git & CSDL riêng** | [`docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md`](docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md)<br>[`docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md`](docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md)<br>[`docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md`](docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md)<br>[`docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md`](docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md) | **Cấu hình mạng Git kép (all, origin, gobita):** Đẩy đồng bộ cả 2 kho bằng `git push all main`.<br>**1-Click setupNewDatabase():** Hướng dẫn PIC chạy hàm để Google Apps Script tự tạo Google Sheet trên Drive cá nhân của họ, lấy `SPREADSHEET_ID` và dán Web App URL vào Modal Cấu hình API trên giao diện web. |
 | **Pha 2** | **Vận hành & Nghiệp vụ** | [`docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md`](docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md) | **Luồng 4 bước của Nhân viên:** Chọn đợt bán → Đặt suất FCFS → Nhận thông báo mở cổng → Quét VietQR nộp tiền.<br>**Luồng 5 bước của PM:** Tạo đợt bán mới → Nạp Excel sản phẩm → Hẹn giờ tự động → Duyệt/từ chối đơn qua Lightbox → Kết sổ. |
 | **Pha 3** | **Hỗ trợ User & Sự cố** | [`docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md`](docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md) *(Mục 6)*<br>[`assets/content/bank_accounts.json`](assets/content/bank_accounts.json)<br>[`assets/templates/`](assets/templates/) | **Sự cố mạng Intranet:** Hướng dẫn user chuyển sang **4G/5G** nếu mạng nội bộ nhà máy chặn Webhook Google.<br>**Cập nhật cấu hình:** Sửa số tài khoản ngân hàng hoặc nạp thêm máy từ file mẫu `.xlsx`. |
 | **Pha 4** | **Brand & Bảo mật** | [`docs/03-architecture-and-analysis/LG_BRAND_ARTISTIC_GAP_ANALYSIS.md`](docs/03-architecture-and-analysis/LG_BRAND_ARTISTIC_GAP_ANALYSIS.md)<br>[`docs/03-architecture-and-analysis/GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md`](docs/03-architecture-and-analysis/GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md) | Tuân thủ tuyệt đối **LG Brand Guidelines V5.2** (Đỏ Heritage `#A50034`, Warm Gray `#F0ECE4`, font LG EI, trợ lý Digital Logo Play) và khóa `LockService` chống tranh chấp slot. |
@@ -82,6 +82,7 @@ lg-internal-sales-portal/
 │   └── Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx # File mẫu sẵn sàng tải xuống
 ├── docs/                                    # Hệ thống tài liệu kỹ thuật & cẩm nang vận hành
 │   ├── 01-setup-and-deployment/             # Hướng dẫn clone GitHub, cài đặt và cloud setup
+│   │   ├── GIT_CONFIGURATION_AND_HANDOVER.md # [CẨM NANG GIT & BÀN GIAO PIC] Cấu hình kép & chuyển giao
 │   │   ├── AGENT_GUIDE_AUTO_SETUP_SHEET.md  # [CẨM NANG AGENT & PIC] Tạo CSDL riêng 1-Click
 │   │   ├── GITHUB_CLONE_AND_LOCAL_SETUP.md  # [HƯỚNG DẪN CLONE & THIẾT LẬP CHI TIẾT]
 │   │   ├── SETUP_APPS_SCRIPT.md             # Hướng dẫn triển khai Apps Script Backend
@@ -124,6 +125,9 @@ Hệ thống tích hợp sẵn các tài khoản demo trên thanh đăng nhập 
 3. **Xử lý sự cố mạng nội bộ nhà máy (Intranet Firewall):**
    - Một số khu vực nhà máy LG có tường lửa chặn kết nối Webhook tới Google Scripts.
    - Khi gặp sự cố chậm hoặc lỗi mạng, nhân viên chỉ cần **chuyển sang mạng di động 4G/5G cá nhân** hoặc Wi-Fi ngoài để hoàn tất giữ chỗ và gửi chứng từ chuyển khoản. Biểu mẫu có tính năng Auto-Draft nên không bị mất dữ liệu đã điền.
+4. **Bàn giao kỹ thuật & Đồng bộ Git kép (Multi-Agent & PIC Handover):**
+   - Đọc cẩm nang chi tiết: [`docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md`](docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md).
+   - Đẩy cập nhật đồng bộ lên cả 2 kho lưu trữ GitHub bằng 1 lệnh duy nhất: `git push all main`.
 
 ---
 

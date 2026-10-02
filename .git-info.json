@@ -1,0 +1,34 @@
+{
+  "project": "LG Internal Sales Portal",
+  "version": "8.0-production",
+  "organization": "LG Electronics Vietnam (LGEVH)",
+  "default_branch": "main",
+  "remotes": {
+    "origin": {
+      "name": "origin",
+      "url": "https://github.com/minhhienlge/lg-internal-sales-portal.git",
+      "purpose": "Primary Upstream Repository (Owner: LGEVH Internal Audit & Jeong-Do)"
+    },
+    "gobita": {
+      "name": "gobita",
+      "url": "https://github.com/Gobitangocbao/lg-internal-sales-portal.git",
+      "purpose": "Public Deployment Mirror & GitHub Pages Host"
+    },
+    "all": {
+      "name": "all",
+      "purpose": "Dual-remote push target to update origin and gobita simultaneously with 'git push all main'"
+    }
+  },
+  "live_deployment": {
+    "provider": "GitHub Pages (HTTPS, .nojekyll)",
+    "url": "https://gobitangocbao.github.io/lg-internal-sales-portal/",
+    "entrypoint": "index.html -> Mau_Dang_Ky_Internal_Sales_3009.html"
+  },
+  "standard_operating_procedure": {
+    "pull_command": "git pull origin main",
+    "push_command": "git push all main",
+    "handover_guide": "docs/01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md",
+    "database_setup_guide": "docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md",
+    "operational_guide": "docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md"
+  }
+}

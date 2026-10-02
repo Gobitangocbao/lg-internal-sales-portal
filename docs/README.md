@@ -15,6 +15,7 @@ docs/
 
 | Tài liệu | Mô tả chi tiết | Đối tượng |
 |---|---|---|
+| **[`GIT_CONFIGURATION_AND_HANDOVER.md`](01-setup-and-deployment/GIT_CONFIGURATION_AND_HANDOVER.md)** | **[CẨM NANG GIT & BÀN GIAO PIC]** Thông tin cấu hình mạng Git kép (origin & gobita), quy trình đồng bộ giữa các AI Agent, lệnh `git push all main` và SOP bàn giao khi chuyển PIC. | AI Agent, Quản trị viên, PIC mới |
 | **[`AGENT_GUIDE_AUTO_SETUP_SHEET.md`](01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md)** | **[CẨM NANG AGENT & PIC]** Hướng dẫn tác nhân AI tự động dẫn dắt PIC khởi tạo CSDL riêng biệt trên Google Drive cá nhân qua 1-click `setupNewDatabase()`. | AI Agent, Kỹ sư PIC, Devs |
 | **[`GITHUB_CLONE_AND_LOCAL_SETUP.md`](01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md)** | **[QUAN TRỌNG NHẤT]** Hướng dẫn clone mã nguồn từ GitHub về thiết bị mới (macOS, Windows, Linux) và khởi chạy hoàn hảo với chế độ Zero-Install hoặc Local Server. | Lập trình viên, AI Agent, Quản trị viên |
 | **[`SETUP_APPS_SCRIPT.md`](01-setup-and-deployment/SETUP_APPS_SCRIPT.md)** | Chi tiết các bước triển khai mã nguồn Google Apps Script (`Code.gs`) làm Web App REST API kết nối Google Sheets. | IT Engineer, Cloud Admin |
