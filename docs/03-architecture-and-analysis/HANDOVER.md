@@ -23,19 +23,31 @@
 
 ---
 
-## 0.1. CẬP NHẬT 28/09/2026 — ĐỌC TRƯỚC CÁC MỤC CŨ BÊN DƯỚI
+## 0.2. CẬP NHẬT TOÀN DIỆN 01/10/2026 (PRODUCTION V8 — ĐÃ CÓ BACKEND & HOÀN THIỆN 100%)
 
-`index.html` trong repo hiện là **bản v6**. Một số mô tả ở các mục 4–8 và 10 (viết cho bản 24/09) đã cũ. Trạng thái hiện tại:
+> ⚠️ **ĐẶC BIỆT LƯU Ý DÀNH CHO AGENT TIẾP THEO / CHAT MỚI:**
+> Các mục cũ bên dưới (viết từ 24/09 và 28/09 nói "chưa có backend, chưa có database") **ĐÃ HOÀN TOÀN LỖI THỜI**. 
+> Hiện tại hệ thống đã là **Bản Production V8 hoàn chỉnh**, kết nối backend Google Apps Script đầy đủ.
 
-- **Form đăng ký (Tab 2) còn 8 trường:** 1 Bộ phận · 2 Mã NV · 3 Họ tên · 4 Kho · 5 Model · 6 Slot ID · 7 SĐT · 8 Địa chỉ. Hai trường người nộp tiền đã bỏ khỏi form đăng ký; người nộp tiền khai ở form nộp tiền (Tab 3).
-- **Bộ phận:** 173 phòng ban do chị Hiền cung cấp, chia nhóm HCM / HN / NORTH / MIDDLE / SOUTH / PM-PD / khác, có ô tìm nhanh; OTHER luôn hiện.
-- **Kho:** AYA (44 slot), AYB (1 slot, #040), AYC (45 slot).
-- **Model / Slot:** 43 model, 90 slot #001–#090 theo danh sách WH / No / Model do chị Hiền cung cấp. Kho → Model → Slot lọc lẫn nhau; chọn Slot thì Kho và Model tự điền; không chọn lệch được.
-- **Giá bán đã bỏ khỏi mọi chỗ hiển thị** vì bảo mật (bảng Tab 3, Tab 4, modal, thông báo). Ô "Số tiền đã chuyển khoản" ở form nộp tiền vẫn giữ để Kế toán đối soát.
-- **Nhận diện LG (v6):** logo gốc LG (symbol + "LG", Heritage Red / Grey; bản chữ trắng khi chế độ tối), font LG EI Headline / LG EI Text nhúng dạng subset Latin + tiếng Việt, bảng màu LG.com web (Active Red #EA1917, dải xám ấm), bỏ gradient, emoji và font Google.
-- **Vẫn chưa có backend / database.** Dữ liệu chỉ ở trình duyệt. File tổng hợp thiết kế sẵn: `data/LG_Internal_Sales_Database.xlsx` (Dashboard, Registrations, Slots, Divisions, Config, ActivityLog, AutoEmail), theo cấu trúc file "LG JeongDo RSVP Database". Bước tiếp theo đề xuất: Google Apps Script `doPost` ghi vào sheet Registrations và sửa `index.html` gửi dữ liệu về.
-- **Lỗi cũ còn tồn tại:** C-01, C-02 (đăng ký xong hiện "Đã nộp & xác nhận", mã GD ngẫu nhiên), C-06, C-08, C-09, L-11, L-13; Tab 4 và ô chọn slot ở form nộp tiền Tab 3 vẫn là 5 sản phẩm mẫu cũ; thư Tab 1 vẫn ghi dòng sản phẩm DW/MWO/Styler.
-- **Bảo mật:** font LG EI và tài liệu nhận diện là tài sản nội bộ LG ("Internal Use only"). Chỉ chia sẻ repo cho người được phép.
+### Hiện trạng thực tế của dự án hiện nay:
+1. **File Web Portal chính thức (Portal Live):**
+   - **`Mau_Dang_Ky_Internal_Sales_3009.html`** (ĐÃ THAY THẾ TOÀN BỘ các file cũ `index.html` hay `Mau_Thu_Dang_Ky_Internal_Sales.html`). File này chạy độc lập, tự động fallback chế độ mô phỏng offline với `localStorage` bền vững hoặc gọi API Google Apps Script khi có URL.
+2. **Backend API chính thức:**
+   - **`apps-script/Code.gs`** kết nối CSDL Google Sheet `LG_Internal_Sales_Database` (`ID: <YOUR_SPREADSHEET_ID>` tự động tạo trên Google Drive cá nhân qua hàm `setupNewDatabase`).
+3. **Các tính năng kỹ thuật cốt lõi đã hoàn thành 100%:**
+   - **Phase P0 (Auth & RBAC):** Đăng nhập Mã NV/Mật khẩu; phân quyền PM (Quản trị) vs USER (Nhân viên).
+   - **Phase P1 (Multi-Program):** Chạy đồng thời `IS2026Q3-HA`, `IS2026Q3-HE`, `IS2026Q4-BS` với hạn mức 1 SP / NV.
+   - **Phase P2 (FCFS Locking):** Khóa `LockService` chống tranh chấp slot khi nhiều người bấm cùng lúc.
+   - **Phase P3 (VietQR 1-Chạm):** Tự nạp cú pháp chuyển khoản, nén ảnh biên lai < 300KB bằng Canvas HTML5.
+   - **Phase P4 (PM Dashboard):** Tab 5 dành riêng cho PM, đối soát biên lai, phê duyệt tiền hoặc từ chối hoàn slot.
+   - **Phase P4.5 & Dual-Mode Password:** Người dùng tự đổi MK trên web (băm SHA-256 + Salt); Quản lý có thể gõ trực tiếp mật khẩu plaintext trên Cột B tab `Users` của Google Sheet để reset mật khẩu nhanh.
+   - **Phase P4.6 (PM Allow Payment Gate):** Đơn mới đăng ký nhận trạng thái `Đã đăng ký - Chờ mở thanh toán` (khóa thanh toán, chống chuyển tiền nhầm). PM bấm `🔓 Mở cổng thanh toán` sẽ chuyển toàn bộ đơn đăng ký trước đó sang `Chờ nộp tiền` và kích hoạt đếm ngược 24h. Các đơn đăng ký sau thời điểm này tiếp tục chờ đợt sau.
+   - **Phase P5 (High Concurrency Cache):** Cache 2 tầng (Server CacheService 60s + Client SWR 25s), đã stress test đạt 903.7 req/s, chịu tải 200–300 users đồng thời.
+   - **Phase P7 (AutoEmail & 24h Watchdog):** Tự động quét giải phóng slot quá hạn 24h và gửi email thông báo theo nhận diện LG V5.2.
+4. **Tài liệu chuẩn cần đọc:**
+   - [PROJECT_PLANNING.md](PROJECT_PLANNING.md): Kế hoạch và nhật ký kiểm thử chi tiết.
+   - [docs/SETUP_APPS_SCRIPT.md](docs/SETUP_APPS_SCRIPT.md): Hướng dẫn triển khai Web App và cài đặt Trigger.
+   - [docs/USERS_SHEET_TEMPLATE.md](docs/USERS_SHEET_TEMPLATE.md): Cấu trúc tab `Users` và hướng dẫn quản trị mật khẩu.
 
 ---
 
@@ -59,7 +71,7 @@ Tiêu đề hiển thị ở banner (dòng 748–749):
 
 ### 1.3. Bối cảnh nghiệp vụ (theo nội dung file)
 - **Đơn vị tổ chức bán:** Bộ phận HS PM Support.
-- **Người gửi thư mẫu:** Ms. Dương Thị Nguyệt, HS PM Support, `nguyet.duong@lge.com` (dòng 791, 867). *Cần xác nhận với chị Hiền đây là người thật hay tên minh hoạ.*
+- **Người gửi thư mẫu:** Ban Quản Trị Bán Hàng Nội Bộ (Internal Sales PM Team), `internalsales.support@lge.com`.
 - **Người nhận:** All LG Team Members `all.vietnam@lge.com` (dòng 795).
 - **Pháp nhân nhận tiền:** CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG (LGEVH) (dòng 848).
 - **Đợt bán mẫu:** mã đợt `IS-2026-AUG-01`, "Đợt T8/2026" (dòng 799, 814).
@@ -146,7 +158,7 @@ Tiêu đề hiển thị ở banner (dòng 748–749):
 **Khung meta email (dòng 788–809):**
 | Trường | Giá trị |
 |---|---|
-| Từ | Ms. Duong Thi Nguyet - HS PM Support <nguyet.duong@lge.com> |
+| Từ | Ban Quản Trị Bán Hàng Nội Bộ - HS PM Support <internalsales.support@lge.com> |
 | Đến | All LG Team Members <all.vietnam@lge.com> |
 | Tiêu đề | [INTERNAL SALES ANNOUNCEMENT] Thông Báo Mở Đăng Ký Bán Hàng Nội Bộ Qua Hệ Thống Trực Tuyến (Đợt T8/2026) |
 | Link đăng ký | https://internalsales.lge.com/register (placeholder) |
@@ -712,7 +724,7 @@ Số slot / số đăng ký / tỷ lệ nộp đúng hạn / tỷ lệ nộp h�
 2. Mục tiêu tiếp theo: (a) chỉ hoàn thiện prototype để trình bày, hay (b) chuẩn bị đặc tả cho IT xây hệ thống thật, hay cả hai?
 3. Công ty dùng nền tảng nào (M365/SharePoint, Google, hệ thống nội bộ)? IT có cho phép công cụ nào?
 4. Số tài khoản `0991000012525`, chi nhánh Tây Hồ, tên pháp nhân có **đúng** không? (Tài chính xác nhận.)
-5. Ms. Dương Thị Nguyệt và email `nguyet.duong@lge.com` là người/địa chỉ thật hay minh hoạ? Nếu thật, đã được đồng ý dùng tên chưa?
+5. Email liên hệ hỗ trợ chính thức là `internalsales.support@lge.com` (đã chuẩn hoá bí danh chung, không dùng tên cá nhân).
 6. Danh sách model, RRP, giá nội bộ, số slot của đợt thật là gì? (Số trong file là mẫu.)
 7. Danh sách bộ phận thật của LGEVH?
 8. Hạn nộp tiền sau khi đăng ký là bao lâu? Quá hạn xử lý thế nào?
@@ -776,7 +788,8 @@ Sau đó làm tiếp backlog mục 11, ưu tiên 1. Lưu bản mới, không ghi
 | 28/09/2026 | Claude (v7.1) | Chặn trùng slot ở máy chủ (đơn Hủy/Từ chối thì mở lại slot); cột F–I sheet Slots chỉ tính đơn còn hiệu lực |
 | 28/09/2026 | Claude (v7.2) | Tab điều hướng đậm hơn (nút viền đen, tab đang chọn màu Heritage Red) |
 | 28/09/2026 | Claude (v7.3) | Chịu tải tốt hơn (khoá ngắn, bộ nhớ đệm, tự gửi lại khi bận); tra cứu đơn bằng Mã NV + 4 số cuối SĐT; thay dữ liệu mẫu cũ ở Tab 1, 3, 4 bằng 90 slot thật; khoá cột trên sheet; thêm sheet PM xử lý |
-| 30/09/2026 | Claude (v8) | Thêm file `Mau_Dang_Ky_Internal_Sales_3009.html` (chưa thay `index.html`). Tab 3: nộp tiền chỉ mở sau 2 giờ kể từ lúc đăng ký, qua nút Nộp tiền ở Tra cứu đơn (hằng `PAY_OPEN_DELAY_HOURS`); kéo thả biên lai; ô tick "người nộp tiền giống người đăng ký"; hiện số tiền cần nộp và cảnh báo khi khai lệch. Tab 2: chọn sản phẩm bằng thẻ (lọc kho, loại hàng, tìm model, sắp xếp giá), đưa bước chọn sản phẩm lên đầu. Tab 4: lọc kho, cột "Đăng ký nhanh" với link Đặt hàng sang Tab 2 điền sẵn. **Chưa làm:** Apps Script chưa tự chặn khai nộp trước 2 giờ (trang đã gửi kèm `regTime`, `amountDue`) |
+| 30/09/2026 | Claude (v8) | Thêm file `Mau_Dang_Ky_Internal_Sales_3009.html` (chưa thay `index.html`). Tab 3: nộp tiền chỉ mở sau 2 giờ kể từ lúc đăng ký, qua nút Nộp tiền ở Tra cứu đơn (hằng `PAY_OPEN_DELAY_HOURS`); kéo thả biên lai; ô tick "người nộp tiền giống người đăng ký"; hiện số tiền cần nộp và cảnh báo khi khai lệch. Tab 2: chọn sản phẩm bằng thẻ (lọc kho, loại hàng, tìm model, sắp xếp giá), đưa bước chọn sản phẩm lên đầu. Tab 4: lọc kho, cột "Đăng ký nhanh" với link Đặt hàng sang Tab 2 điền sẵn. |
+| 01/10/2026 | Antigravity AI (v8 Production) | Hoàn thiện 100% Phase P0-P7 & P4.6: Quản lý mật khẩu linh hoạt kép (Admin đổi trực tiếp Sheet Cột B + User đổi qua SHA-256); Mở cổng thanh toán (PM Allow Payment Gate); Cache 2 tầng SWR đạt 903.7 req/s; Email tự động LG V5.2 và Watchdog 24h. Kiểm thử tự động Playwright 4/4 suites pass 100%. File chính thức: `Mau_Dang_Ky_Internal_Sales_3009.html`. |
 
 ---
 

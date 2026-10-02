@@ -1,0 +1,31 @@
+{
+  "company_name": "CÔNG TY TNHH LG ELECTRONICS VIỆT NAM HẢI PHÒNG",
+  "short_name": "CTY TNHH LG Electronics VN HP",
+  "banks": [
+    {
+      "id": "vcb",
+      "bank_name": "Ngân hàng TMCP Ngoại thương Việt Nam (Vietcombank)",
+      "short_name": "Vietcombank",
+      "account_number": "0991000012525",
+      "account_holder": "CTY TNHH LG Electronics VN HP",
+      "branch": "Chi nhánh Tây Hà Nội",
+      "transfer_syntax_template": "[MãNV]_[MãSlot]",
+      "transfer_syntax_example": "VH12345_HA001",
+      "color": "#1B5E20",
+      "is_primary": true
+    },
+    {
+      "id": "tcb",
+      "bank_name": "Ngân hàng TMCP Kỹ Thương Việt Nam (Techcombank)",
+      "short_name": "Techcombank",
+      "account_number": "19128765432018",
+      "account_holder": "CTY TNHH LG Electronics VN HP",
+      "branch": "Chi nhánh Hội Sở Miền Bắc",
+      "transfer_syntax_template": "[MãNV]_[MãSlot]",
+      "transfer_syntax_example": "VH12345_HA001",
+      "color": "#E51937",
+      "is_primary": false
+    }
+  ],
+  "note": "Cú pháp chuyển khoản bắt buộc gồm Mã Nhân Viên và Mã Slot (cách nhau bởi dấu gạch dưới). Mọi giao dịch nộp thiếu hoặc sai cú pháp sẽ phải thực hiện tra soát thủ công qua kế toán LGEVH."
+}

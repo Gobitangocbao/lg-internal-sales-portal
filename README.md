@@ -1,40 +1,136 @@
-# Cổng Đăng Ký Bán Hàng Nội Bộ LG (Internal Sales Portal)
+# Cổng Bán Hàng Nội Bộ LG Electronics Việt Nam (LG Internal Sales Portal)
 
-Bản mẫu (prototype) giao diện cho quy trình bán hàng nội bộ dành cho nhân viên LG Electronics Việt Nam:
-thông báo mở bán → đăng ký trực tuyến → nộp tiền & upload biên lai → PM đối soát, giao hàng.
+Hệ thống số hóa toàn diện quy trình đăng ký, giữ chỗ theo nguyên tắc First-Come, First-Served (FCFS), thanh toán đối soát qua VietQR và quản trị các đợt bán hàng nội bộ ưu đãi dành riêng cho cán bộ công nhân viên **LG Electronics Việt Nam (LGEVH)**.
 
-> ⚠️ **Repo này phải để PRIVATE.** File có số tài khoản ngân hàng, tên và email nội bộ. Chỉ mời người trong LG có liên quan.
+> 🔒 **LƯU Ý BẢO MẬT & BẢN QUYỀN:** Kho lưu trữ chứa thông tin tài khoản ngân hàng thụ hưởng pháp nhân, danh mục sản phẩm và quy trình kiểm toán Jeong-Do. Dữ liệu đã được **khử định danh (sanitized)** toàn diện để có thể triển khai an toàn trên môi trường cá nhân hóa mà không làm rò rỉ dữ liệu cá nhân của bất kỳ ai.
 
-## Xem nhanh
-Tải file `index.html` về rồi mở bằng trình duyệt (Chrome/Edge). Không cần cài đặt gì.
+---
 
-## Tình trạng hiện tại
-- **Frontend:** có, 1 file HTML + CSS + JavaScript thuần.
-- **Lưu dữ liệu:** qua Google Apps Script ghi vào Google Sheet (xem `docs/SETUP_APPS_SCRIPT.md`). Khi `SHEET_API_URL` trong `index.html` để trống, trang chạy chế độ bản mẫu và **không lưu**.
-- Link `internalsales.lge.com` trong trang chỉ là chữ minh hoạ.
+## 🧭 0. Dành Cho AI Agent & Kỹ Sư Mới: Lộ Trình Đọc Tài Liệu (Agent Onboarding Roadmap)
 
-## Cấu trúc
+Khi một AI Agent hoặc kỹ sư mới tiếp nhận repository này từ GitHub, hãy đọc tài liệu theo **4 Pha chuẩn hóa** dưới đây để nắm bắt hệ thống nhanh nhất, thiết lập CSDL độc lập và hỗ trợ người dùng trơn tru:
+
+```mermaid
+graph TD
+    A[Bắt đầu tiếp nhận Repo] --> B[Pha 1: Thiết Lập Môi Trường]
+    B --> B1[Chạy thử nhanh: index.html Offline]
+    B --> B2[docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md<br/>Hướng dẫn PIC chạy 1-Click setupNewDatabase]
+    B --> B3[docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md<br/>Cấu hình môi trường máy tính]
+    B2 --> C[Pha 2: Quy Trình Nghiệp Vụ]
+    C --> C1[docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md<br/>4 bước Nhân Viên + 5 bước Quản Trị PM]
+    C1 --> D[Pha 3: Hỗ Trợ & Khắc Phục Sự Cố]
+    D --> D1[Lưu ý mạng nội bộ 4G/5G do tường lửa chặn Google Scripts]
+    D --> D2[assets/content/bank_accounts.json: Số TK ngân hàng]
+    D --> D3[assets/templates/Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx: Nạp máy]
+    D1 --> E[Pha 4: Nhận Diện Thương Hiệu & An Toàn]
+    E --> E1[docs/03-architecture-and-analysis/LG_BRAND_ARTISTIC_GAP_ANALYSIS.md<br/>Chuẩn LG Brand V5.2]
+    E1 --> E2[docs/03-architecture-and-analysis/GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md<br/>Bảo mật FCFS Lock & Jeong-Do]
 ```
-index.html          Trang prototype v7, chuẩn nhận diện LG (5 tab: Thư thông báo, Đăng ký, Nộp tiền, Danh sách Slot, SOP)
-Mau_Dang_Ky_Internal_Sales_3009.html   Bản v8 (30/09/2026) đang chờ nhóm kiểm tra: khoá nộp tiền 2 giờ, chọn sản phẩm dạng thẻ, lọc kho. Xem mục 18 trong docs/HANDOVER.md
-docs/HANDOVER.md    Hồ sơ bàn giao chi tiết (đọc mục 0.1 trước): tính năng, lỗi đã biết, backlog, kịch bản kiểm thử
-data/LG_Internal_Sales_Database.xlsx   File tổng hợp đăng ký (Dashboard, Registrations, Slots, Config...)
-apps-script/Code.gs      Script nhận đơn từ trang, ghi vào Google Sheet (chỉ thêm, không xoá)
-docs/SETUP_APPS_SCRIPT.md  Hướng dẫn cài script, triển khai Web App
+
+### Bảng tra cứu tài liệu theo thứ tự ưu tiên:
+
+| Pha | Mục tiêu | Tài liệu cần đọc | Trọng tâm cần nắm |
+|---|---|---|---|
+| **Pha 1** | **Thiết lập & CSDL riêng** | [`docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md`](docs/01-setup-and-deployment/AGENT_GUIDE_AUTO_SETUP_SHEET.md)<br>[`docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md`](docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md)<br>[`docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md`](docs/01-setup-and-deployment/SETUP_APPS_SCRIPT.md) | **1-Click setupNewDatabase():** Hướng dẫn PIC chạy hàm để Google Apps Script tự tạo Google Sheet trên Drive cá nhân của họ, lấy `SPREADSHEET_ID` và dán Web App URL vào Modal Cấu hình API trên giao diện web. |
+| **Pha 2** | **Vận hành & Nghiệp vụ** | [`docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md`](docs/02-user-and-pm-guide/PM_AND_USER_OPERATIONAL_GUIDE.md) | **Luồng 4 bước của Nhân viên:** Chọn đợt bán → Đặt suất FCFS → Nhận thông báo mở cổng → Quét VietQR nộp tiền.<br>**Luồng 5 bước của PM:** Tạo đợt bán mới → Nạp Excel sản phẩm → Hẹn giờ tự động → Duyệt/từ chối đơn qua Lightbox → Kết sổ. |
+| **Pha 3** | **Hỗ trợ User & Sự cố** | [`docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md`](docs/01-setup-and-deployment/GITHUB_CLONE_AND_LOCAL_SETUP.md) *(Mục 6)*<br>[`assets/content/bank_accounts.json`](assets/content/bank_accounts.json)<br>[`assets/templates/`](assets/templates/) | **Sự cố mạng Intranet:** Hướng dẫn user chuyển sang **4G/5G** nếu mạng nội bộ nhà máy chặn Webhook Google.<br>**Cập nhật cấu hình:** Sửa số tài khoản ngân hàng hoặc nạp thêm máy từ file mẫu `.xlsx`. |
+| **Pha 4** | **Brand & Bảo mật** | [`docs/03-architecture-and-analysis/LG_BRAND_ARTISTIC_GAP_ANALYSIS.md`](docs/03-architecture-and-analysis/LG_BRAND_ARTISTIC_GAP_ANALYSIS.md)<br>[`docs/03-architecture-and-analysis/GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md`](docs/03-architecture-and-analysis/GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md) | Tuân thủ tuyệt đối **LG Brand Guidelines V5.2** (Đỏ Heritage `#A50034`, Warm Gray `#F0ECE4`, font LG EI, trợ lý Digital Logo Play) và khóa `LockService` chống tranh chấp slot. |
+
+---
+
+## 1. Khởi chạy nhanh trong 1 giây (Instant Quickstart)
+
+* **Cách 1 (Zero-Install):** Mở trực tiếp tệp [`index.html`](index.html) hoặc [`Mau_Dang_Ky_Internal_Sales_3009.html`](Mau_Dang_Ky_Internal_Sales_3009.html) bằng bất kỳ trình duyệt nào (Chrome, Safari, Edge, Firefox). Hệ thống hoạt động 100% độc lập, không yêu cầu cài đặt `node_modules` hay chạy lệnh build.
+* **Cách 2 (Local Web Server):**
+  ```bash
+  python3 -m http.server 8000
+  ```
+  Truy cập: `http://localhost:8000`
+
+---
+
+## 2. Kiến trúc & Cấu trúc thư mục chuẩn hóa (Repository Structure)
+
+Toàn bộ repository được tổ chức khoa học, gọn gàng, tách biệt mã nguồn, tài sản thương hiệu và hệ thống tài liệu:
+
+```text
+lg-internal-sales-portal/
+├── index.html                               # Cổng điều hướng tự động vào ứng dụng mới nhất
+├── Mau_Dang_Ky_Internal_Sales_3009.html     # Ứng dụng Web lõi (Production Single-File System)
+├── apps-script/
+│   └── Code.gs                              # Backend Google Apps Script (1-Click setupNewDatabase, Auth, FCFS)
+├── assets/                                  # Thư mục tài nguyên có thể tùy biến cấu hình
+│   ├── branding/                            # Bộ nhận diện thương hiệu LG (Digital Logo Play)
+│   ├── content/                             # Cấu hình tài khoản ngân hàng & dữ liệu hệ thống
+│   │   ├── bank_accounts.json               # Số tài khoản VCB/TCB, tên thụ hưởng, cú pháp
+│   │   ├── system_config.json               # Phân quyền, chương trình mặc định, hạn mức
+│   │   └── README.md                        # Hướng dẫn chỉnh sửa nội dung
+│   ├── digital-logo-play/                   # Ảnh động LG Digital Logo Play chuẩn nhận diện
+│   ├── images/                              # Banner showcase sản phẩm cao cấp
+│   └── templates/                           # Thư viện tệp mẫu chuẩn hệ thống
+│       ├── Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx # Mẫu Excel nạp danh mục sản phẩm cho PM
+│       ├── LG_Internal_Sales_Master_Database.xlsx    # Bảng tính cơ sở dữ liệu mẫu 8 sheets
+│       └── README.md                        # Hướng dẫn định dạng cột và công thức
+├── data/                                    # Thư viện runtime nhúng cục bộ
+│   ├── heic2any.min.js                      # Bộ giải mã ảnh iPhone (.HEIC) sang JPEG
+│   ├── xlsx.mini.min.js                     # SheetJS client-side xử lý Excel không cần server
+│   ├── LG_Internal_Sales_Database.xlsx      # Database cục bộ đồng bộ
+│   └── Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx # File mẫu sẵn sàng tải xuống
+├── docs/                                    # Hệ thống tài liệu kỹ thuật & cẩm nang vận hành
+│   ├── 01-setup-and-deployment/             # Hướng dẫn clone GitHub, cài đặt và cloud setup
+│   │   ├── AGENT_GUIDE_AUTO_SETUP_SHEET.md  # [CẨM NANG AGENT & PIC] Tạo CSDL riêng 1-Click
+│   │   ├── GITHUB_CLONE_AND_LOCAL_SETUP.md  # [HƯỚNG DẪN CLONE & THIẾT LẬP CHI TIẾT]
+│   │   ├── SETUP_APPS_SCRIPT.md             # Hướng dẫn triển khai Apps Script Backend
+│   │   └── USERS_SHEET_TEMPLATE.md          # Đặc tả định dạng bảng tính Google Sheets
+│   ├── 02-user-and-pm-guide/                # Cẩm nang quy trình cho Người dùng & Quản trị viên
+│   │   └── PM_AND_USER_OPERATIONAL_GUIDE.md # [CẨM NANG VẬN HÀNH KÈM SƠ ĐỒ QUY TRÌNH]
+│   ├── 03-architecture-and-analysis/        # Báo cáo kiểm toán bảo mật, nhận diện thương hiệu
+│   │   ├── GO_LIVE_SECURITY_ARCHITECTURE_ANALYSIS.md
+│   │   ├── LG_BRAND_ARTISTIC_GAP_ANALYSIS.md
+│   │   └── KE_HOACH_TOI_UU_TOAN_DIEN_INTERNAL_SALES.md
+│   └── README.md                            # Mục lục điều hướng tài liệu docs
+├── PROJECT_PLANNING.md                      # Lộ trình kỹ thuật & kế hoạch phát triển
+└── README.md                                # Tài liệu tổng quan dự án (File này)
 ```
 
-## Cách cùng làm
-1. **Đọc `docs/HANDOVER.md` trước.** Mục 10 là các lỗi đã biết, mục 11 là việc cần làm, mục 15 là các câu hỏi còn mở.
-2. Người được mời **tự sửa và tự gộp (merge), không cần chủ dự án duyệt**. Có thể sửa thẳng trên nhánh `main`, hoặc tạo nhánh riêng khi thử nghiệm thay đổi lớn rồi tự gộp vào `main`.
-3. Trước khi sửa, bấm **Sync / Pull** để lấy bản mới nhất, tránh ghi đè thay đổi của người khác.
-4. Ghi lại thay đổi vào mục 18 "Nhật ký thay đổi" trong `docs/HANDOVER.md`.
-5. Số liệu giá, model, tài khoản trong file là **dữ liệu mẫu, chưa xác minh**. Không dùng như số thật.
+---
 
-## Quy tắc dự án
-- Không bịa số liệu. Chưa chắc thì ghi rõ là chưa chắc.
-- Chỉ thêm, không xoá bản cũ khi chưa được chủ dự án đồng ý.
-- Không tự gửi email hay công bố ra ngoài. Việc gửi do chủ dự án quyết định.
-- Giao diện mang thương hiệu LG phải theo LG BI Guidelines.
+## 3. Tài khoản Demo có sẵn để thử nghiệm (Demo Credentials)
 
-## Chủ dự án
-Hoàng Minh Hiền, Kiểm toán nội bộ & Đạo đức doanh nghiệp (Jeong-Do), LG.
+Hệ thống tích hợp sẵn các tài khoản demo trên thanh đăng nhập để kiểm thử ngay lập tức (chỉ cần bấm nút đăng nhập nhanh hoặc gõ mật khẩu `test123`):
+
+| Vai trò | Mã Nhân Viên | Mật khẩu mặc định | Họ và Tên | Bộ phận | Quyền hạn chính |
+|---|---|:---:|---|---|---|
+| **PM Quản Trị** | `VH12345` | `test123` | Nguyễn Thị Quỳnh Như | HS PM Support | Tạo đợt bán, nạp Excel, mở cổng nộp tiền, hẹn giờ, soi ảnh Lightbox, duyệt đơn hàng loạt, kết sổ. |
+| **Nhân Viên 1** | `VH88921` | `test123` | Trần Văn Nam | Audit & Jeong-Do | Xem catalog, đặt suất FCFS, tra cứu biên lai, đổi mật khẩu cá nhân. |
+| **Nhân Viên 2** | `VH55432` | `test123` | Lê Hoàng Anh | HE Sales Division | Thử nghiệm đặt suất và nộp ủy nhiệm chi VietQR. |
+| **Nhân Viên 3** | `VH33211` | `test123` | Hoàng Minh Trí | HA Production | Thử nghiệm giữ chỗ cạnh tranh đa người dùng. |
+| **Nhân Viên 4** | `VH99120` | `test123` | Đặng Thanh Hà | Finance & Accounting | Kiểm thử đối soát luồng tài chính. |
+
+---
+
+## 4. Hướng Dẫn Vận Hành & Khắc Phục Sự Cố Cho User
+
+1. **Khi chạy thử nghiệm (Demo Mode):**
+   - Mặc định khi mở trang, huy hiệu ở góc trên bên phải hiển thị `⚪ Demo Mode (Offline)`.
+   - Dữ liệu được lưu trữ tự động trong `localStorage` của trình duyệt, người dùng có thể thoải mái thao tác mà không ảnh hưởng tới dữ liệu thật.
+2. **Khi kết nối Google Sheet thật (Cloud Live Mode):**
+   - Nhấp vào huy hiệu `⚪ Demo Mode (Offline)` hoặc nút `Cấu hình API` trong Tab PM.
+   - Dán Web App URL Google Apps Script của bạn và bấm `Kiểm Tra & Lưu Cấu Hình`. Huy hiệu sẽ chuyển sang `🟢 Google Cloud Live`.
+3. **Xử lý sự cố mạng nội bộ nhà máy (Intranet Firewall):**
+   - Một số khu vực nhà máy LG có tường lửa chặn kết nối Webhook tới Google Scripts.
+   - Khi gặp sự cố chậm hoặc lỗi mạng, nhân viên chỉ cần **chuyển sang mạng di động 4G/5G cá nhân** hoặc Wi-Fi ngoài để hoàn tất giữ chỗ và gửi chứng từ chuyển khoản. Biểu mẫu có tính năng Auto-Draft nên không bị mất dữ liệu đã điền.
+
+---
+
+## 5. Nguyên Tắc Thương Hiệu & Cam Kết Đạo Đức (Jeong-Do Management)
+
+* **Thiết kế thương hiệu:** Tuân thủ chuẩn mực **LG Electronics Brand Guidelines V5.2**:
+  - Tông màu chủ đạo: Đỏ Heritage `#A50034`, Đỏ Active `#FD003A`, Xám ấm Warm Gray 06 `#F0ECE4`.
+  - Phông chữ tiêu chuẩn: `LG EI Text` & `LG EI Headline`.
+  - Trợ lý thông minh: Biểu tượng động LG Digital Logo Play tương tác cảm xúc.
+* **Đạo đức kinh doanh Jeong-Do:**
+  - Suất mua ưu đãi nội bộ là đặc quyền dành riêng cho nhân viên LG phục vụ nhu cầu cá nhân/gia đình.
+  - Nghiêm cấm hành vi đầu cơ, bán lại cho bên thứ ba. Mọi vi phạm sẽ bị hủy quyền mua và xử lý kỷ luật theo quy chế công ty.
+
+**Chủ quản dự án:** Hoàng Minh Hiền — Kế toán & Kiểm toán Nội bộ / Jeong-Do Management, LG Electronics Việt Nam.

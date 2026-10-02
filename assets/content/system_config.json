@@ -1,0 +1,51 @@
+{
+  "system_info": {
+    "app_name": "LG Internal Sales Portal",
+    "organization": "LG Electronics Vietnam Hai Phong (LGEVH)",
+    "version": "2026.10-FINAL",
+    "theme": "Heritage Red (#A50034)",
+    "font_family": "LG EI Text / LG EI Headline",
+    "default_gate_status": "GATED_AFTER_REGISTRATION"
+  },
+  "roles": [
+    {
+      "role": "EMPLOYEE",
+      "name": "Nhân viên LG",
+      "permissions": ["view_catalog", "register_slot", "submit_payment", "lookup_receipt", "cancel_unpaid_slot"]
+    },
+    {
+      "role": "PM",
+      "name": "Quản trị đợt bán (PM)",
+      "permissions": ["create_program", "import_excel_catalog", "control_gate", "set_timers", "review_receipt_lightbox", "batch_approve_payments", "reject_payments", "close_program", "export_csv_excel"]
+    }
+  ],
+  "default_programs": [
+    {
+      "id": "IS2026Q3-HA",
+      "name": "Chương trình Bán hàng Nội bộ HA - Q3/2026",
+      "category": "Gia dụng (HA)",
+      "pmId": "VH12345",
+      "pmName": "Nguyễn Thị Quỳnh Như",
+      "status": "Open",
+      "maxPerEmployee": 1
+    },
+    {
+      "id": "IS2026Q3-HE",
+      "name": "Chương trình Bán hàng Nội bộ HE (Tivi & Loa) - Q3/2026",
+      "category": "Nghe nhìn (HE)",
+      "pmId": "VH12345",
+      "pmName": "Nguyễn Thị Quỳnh Như",
+      "status": "Open",
+      "maxPerEmployee": 2
+    },
+    {
+      "id": "IS2026Q4-BS",
+      "name": "Chương trình Bán hàng Nội bộ B2B/BS - Dự kiến Q4/2026",
+      "category": "Giải pháp doanh nghiệp (BS)",
+      "pmId": "VH12345",
+      "pmName": "Nguyễn Thị Quỳnh Như",
+      "status": "Open",
+      "maxPerEmployee": 1
+    }
+  ]
+}
