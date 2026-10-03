@@ -44,3 +44,4 @@ docs/
 | **[`UX_GAP_ANALYSIS_OPERATIONAL.md`](03-architecture-and-analysis/UX_GAP_ANALYSIS_OPERATIONAL.md)** | Phân tích khoảng cách vận hành trải nghiệm người dùng thực tế. |
 | **[`UX_IMPROVEMENT_PLAN_PROPOSAL.md`](03-architecture-and-analysis/UX_IMPROVEMENT_PLAN_PROPOSAL.md)** | Đề xuất giải pháp nâng cấp trải nghiệm luồng thao tác. |
 | **[`HANDOVER.md`](03-architecture-and-analysis/HANDOVER.md)** | Biên bản bàn giao kỹ thuật giai đoạn trước. |
+| **[`../assets/images/quick-links-ani/README.md`](../assets/images/quick-links-ani/README.md)** | **[BỘ MOTION ICONS & KINETIC SVG]** Đặc tả kỹ thuật hoạt ảnh GIF từ CDN LG.com, vector SVG động học và 4 SOP thay thế icon hot-swapping. |

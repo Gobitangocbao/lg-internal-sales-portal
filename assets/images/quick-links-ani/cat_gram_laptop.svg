@@ -1,0 +1,18 @@
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .laptop-lid {
+      transform-origin: 32px 44px;
+      animation: gramOpen 4.5s cubic-bezier(.22,.61,.36,1) infinite;
+    }
+    @keyframes gramOpen {
+      0%, 20% { transform: rotateX(25deg); }
+      35%, 70% { transform: rotateX(0deg); }
+      85%, 100% { transform: rotateX(25deg); }
+    }
+  </style>
+  <path d="M12 43H52L50 46H14L12 43Z" stroke="#262626" stroke-width="2" fill="#FFFFFF" stroke-linejoin="round"/>
+  <line x1="28" y1="44.5" x2="36" y2="44.5" stroke="#EA1917" stroke-width="1.2" stroke-linecap="round"/>
+  <rect class="laptop-lid" x="16" y="18" width="32" height="22" rx="3" stroke="#262626" stroke-width="2.2" fill="#FFFFFF"/>
+  <rect x="19" y="21" width="26" height="16" rx="1.5" fill="#F0ECE4"/>
+  <circle cx="32" cy="29" r="1.2" fill="#EA1917"/>
+</svg>

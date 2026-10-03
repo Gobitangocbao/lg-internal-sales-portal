@@ -1,0 +1,32 @@
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .washer-drum {
+      transform-origin: 32px 42px;
+      animation: drumSpin 4.2s cubic-bezier(.45, .05, .55, .95) infinite;
+    }
+    .center-ctrl {
+      animation: ctrlBlink 4.2s ease infinite;
+    }
+    @keyframes drumSpin {
+      0%, 25% { transform: rotate(0deg); }
+      40% { transform: rotate(180deg); }
+      55% { transform: rotate(360deg); }
+      70% { transform: rotate(540deg); }
+      85%, 100% { transform: rotate(720deg); }
+    }
+    @keyframes ctrlBlink {
+      0%, 20% { fill: #262626; }
+      30%, 75% { fill: #EA1917; }
+      85%, 100% { fill: #262626; }
+    }
+  </style>
+  <rect x="17" y="9" width="30" height="46" rx="4" stroke="#262626" stroke-width="2.2" fill="#FFFFFF"/>
+  <rect x="17" y="29" width="30" height="6" fill="#F0ECE4" stroke="#262626" stroke-width="1.5"/>
+  <circle class="center-ctrl" cx="32" cy="32" r="1.8" fill="#EA1917"/>
+  <circle cx="32" cy="19" r="6.5" stroke="#262626" stroke-width="1.8" fill="#FFFFFF"/>
+  <g class="washer-drum">
+    <circle cx="32" cy="42" r="7.5" stroke="#262626" stroke-width="2" fill="#FFFFFF"/>
+    <circle cx="32" cy="42" r="4.5" stroke="#EA1917" stroke-dasharray="3 3" stroke-width="1.5" fill="none"/>
+    <circle cx="34" cy="40" r="1" fill="#EA1917"/>
+  </g>
+</svg>

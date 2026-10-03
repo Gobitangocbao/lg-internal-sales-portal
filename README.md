@@ -63,14 +63,20 @@ lg-internal-sales-portal/
 ├── Mau_Dang_Ky_Internal_Sales_3009.html     # Ứng dụng Web lõi (Production Single-File System)
 ├── apps-script/
 │   └── Code.gs                              # Backend Google Apps Script (1-Click setupNewDatabase, Auth, FCFS)
-├── assets/                                  # Thư mục tài nguyên có thể tùy biến cấu hình
+├── assets/                                  # Thư mục tài nguyên có thể tùy biến cấu hình (Xem assets/README.md)
+│   ├── README.md                            # Cẩm nang tổng quan phân mục tài nguyên hệ thống
 │   ├── branding/                            # Bộ nhận diện thương hiệu LG (Digital Logo Play)
 │   ├── content/                             # Cấu hình tài khoản ngân hàng & dữ liệu hệ thống
 │   │   ├── bank_accounts.json               # Số tài khoản VCB/TCB, tên thụ hưởng, cú pháp
 │   │   ├── system_config.json               # Phân quyền, chương trình mặc định, hạn mức
 │   │   └── README.md                        # Hướng dẫn chỉnh sửa nội dung
 │   ├── digital-logo-play/                   # Ảnh động LG Digital Logo Play chuẩn nhận diện
-│   ├── images/                              # Banner showcase sản phẩm cao cấp
+│   ├── images/                              # Banner showcase & biểu tượng chuyển động
+│   │   ├── lg_hero_banner.jpg               # Banner showcase sản phẩm cao cấp
+│   │   └── quick-links-ani/                 # [MỚI] Bộ Motion Icons & Kinetic SVG Suite chuẩn LG.com
+│   │       ├── *.gif                        # Hoạt ảnh GIF chính thức trích xuất từ CDN LG.com
+│   │       ├── *.svg                        # Biểu tượng vector động học có CSS keyframes nhúng sẵn
+│   │       └── README.md                    # Cẩm nang kỹ thuật & SOP thay thế icon hot-swapping
 │   └── templates/                           # Thư viện tệp mẫu chuẩn hệ thống
 │       ├── Mau_Danh_Muc_San_Pham_Internal_Sales.xlsx # Mẫu Excel nạp danh mục sản phẩm cho PM
 │       ├── LG_Internal_Sales_Master_Database.xlsx    # Bảng tính cơ sở dữ liệu mẫu 8 sheets
@@ -134,9 +140,10 @@ Hệ thống tích hợp sẵn các tài khoản demo trên thanh đăng nhập 
 ## 5. Nguyên Tắc Thương Hiệu & Cam Kết Đạo Đức (Jeong-Do Management)
 
 * **Thiết kế thương hiệu:** Tuân thủ chuẩn mực **LG Electronics Brand Guidelines V5.2**:
-  - Tông màu chủ đạo: Đỏ Heritage `#A50034`, Đỏ Active `#FD003A`, Xám ấm Warm Gray 06 `#F0ECE4`.
-  - Phông chữ tiêu chuẩn: `LG EI Text` & `LG EI Headline`.
-  - Trợ lý thông minh: Biểu tượng động LG Digital Logo Play tương tác cảm xúc.
+  - **Tông màu chủ đạo:** Đỏ Heritage `#A50034`, Đỏ Active `#EA1917` (LG.com Web), Xám ấm Warm Gray 06 `#F0ECE4`.
+  - **Phông chữ tiêu chuẩn:** `LG EI Text` & `LG EI Headline`.
+  - **Trợ lý thông minh:** Biểu tượng động LG Digital Logo Play tương tác cảm xúc.
+  - **Bộ Biểu Tượng Chuyển Động (LG.com Motion Icons & Kinetic SVG Suite):** Thanh điều hướng danh mục nhanh (`.lg-quick-category-bar`) 8 đĩa tròn tích hợp hoạt ảnh GIF chính thức từ CDN LG.com (`ico_offer1_ani.gif`) và bộ vector SVG động học chế tác riêng (`cat_tv_soundbar.svg`, `cat_instaview_refrigerator.svg`, `cat_washtower.svg`, `cat_air_conditioner.svg`, `cat_gram_laptop.svg`, `cat_vcb_security.svg`, `ico_epc.svg`). Toàn bộ được mô-đun hóa trong [`assets/images/quick-links-ani/`](assets/images/quick-links-ani/), cho phép thay thế và cập nhật hot-swapping mà không cần sửa code.
 * **Đạo đức kinh doanh Jeong-Do:**
   - Suất mua ưu đãi nội bộ là đặc quyền dành riêng cho nhân viên LG phục vụ nhu cầu cá nhân/gia đình.
   - Nghiêm cấm hành vi đầu cơ, bán lại cho bên thứ ba. Mọi vi phạm sẽ bị hủy quyền mua và xử lý kỷ luật theo quy chế công ty.

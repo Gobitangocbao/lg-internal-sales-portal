@@ -1717,92 +1717,264 @@
       background: #FFE0E6;
     }
 
-    /* ===== SPRINT 3: LG.com Circular Quick Category Bar ===== */
+    /* ===== LG.com Style Master Kinetic Quick Category Bar ===== */
     .lg-quick-category-bar {
       margin: 10px 0 16px 0;
-      padding: 12px 18px;
+      padding: 14px 20px;
       background: #FFFFFF;
       border: 1px solid #E6E1D6;
-      border-radius: 16px;
-      box-shadow: 0 2px 10px rgba(38, 38, 38, 0.03);
+      border-radius: 20px;
+      box-shadow: 0 4px 16px rgba(38, 38, 38, 0.04);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    [data-theme="dark"] .lg-quick-category-bar {
+      background: #1F1F1F;
+      border-color: #333333;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
     }
     .lg-quick-cat-scroll {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
       overflow-x: auto;
       scrollbar-width: thin;
-      padding: 4px 2px;
+      padding: 8px 4px 4px 4px;
+      -webkit-overflow-scrolling: touch;
     }
     .cat-circle-item {
       flex: 0 0 auto;
+      width: 96px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: transparent;
       border: none;
       cursor: pointer;
-      padding: 6px 10px;
+      padding: 4px 4px;
       border-radius: 12px;
-      transition: all 0.25s cubic-bezier(.22,.61,.36,1);
+      position: relative;
+      text-decoration: none;
+      transition: transform 0.25s cubic-bezier(.22,.61,.36,1);
     }
     .cat-circle-item:hover {
       transform: translateY(-3px);
     }
+    .cat-circle-item:active {
+      transform: scale(0.95);
+    }
     .cat-disc {
-      width: 58px;
-      height: 58px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
-      background: #F6F3EB;
+      background-color: #FFFFFF;
       border: 1.5px solid #E6E1D6;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(38, 38, 38, 0.04);
+      box-shadow: 0 2px 10px rgba(38, 38, 38, 0.06);
       transition: all 0.25s cubic-bezier(.22,.61,.36,1);
+      position: relative;
+      overflow: visible;
+    }
+    [data-theme="dark"] .cat-disc {
+      background-color: #262626;
+      border-color: #383838;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    .cat-disc.type-ani {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+    .cat-disc img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      transition: transform 0.25s cubic-bezier(.22,.61,.36,1);
+    }
+    .cat-disc.type-ani img {
+      width: 64px;
+      height: 64px;
     }
     .cat-disc svg {
-      width: 24px;
-      height: 24px;
-      stroke: #262626;
-      stroke-width: 1.5px;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      transition: stroke 0.2s ease, transform 0.2s ease;
+      width: 44px;
+      height: 44px;
+      transition: transform 0.25s cubic-bezier(.22,.61,.36,1);
     }
-    .cat-circle-item:hover .cat-disc {
-      background: #FFFFFF;
+    .cat-circle-item:hover .cat-disc:not(.type-ani) {
+      background-color: #F6F3EB;
       border-color: #A50034;
-      box-shadow: 0 6px 16px rgba(165, 0, 52, 0.15);
+      box-shadow: 0 6px 18px rgba(165, 0, 52, 0.16);
       transform: scale(1.04);
     }
-    .cat-circle-item:hover .cat-disc svg {
-      stroke: #A50034;
+    [data-theme="dark"] .cat-circle-item:hover .cat-disc:not(.type-ani) {
+      background-color: #2F2F2F;
+      border-color: #EA1917;
+      box-shadow: 0 6px 18px rgba(234, 25, 23, 0.25);
+    }
+    .cat-circle-item:hover .cat-disc.type-ani img {
       transform: scale(1.08);
     }
-    .cat-circle-item.active .cat-disc {
-      background: #A50034;
+    .cat-circle-item.active .cat-disc:not(.type-ani) {
+      background-color: #FFFFFF;
       border-color: #A50034;
-      box-shadow: 0 4px 12px rgba(165, 0, 52, 0.25);
+      box-shadow: 0 0 0 2px #A50034, 0 4px 14px rgba(165, 0, 52, 0.22);
     }
-    .cat-circle-item.active .cat-disc svg {
-      stroke: #FFFFFF;
+    [data-theme="dark"] .cat-circle-item.active .cat-disc:not(.type-ani) {
+      background-color: #262626;
+      border-color: #EA1917;
+      box-shadow: 0 0 0 2px #EA1917, 0 4px 14px rgba(234, 25, 23, 0.35);
     }
     .cat-label {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #4A4946;
+      font-size: 12px;
+      font-weight: 500;
+      color: #262626;
       text-align: center;
-      white-space: nowrap;
+      line-height: 1.3;
+      max-width: 90px;
       transition: color 0.2s ease;
     }
-    .cat-circle-item:hover .cat-label,
+    [data-theme="dark"] .cat-label {
+      color: #E6E1D6;
+    }
+    .cat-circle-item:hover .cat-label {
+      color: #EA1917;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1.5px;
+    }
     .cat-circle-item.active .cat-label {
       color: #A50034;
       font-weight: 700;
+    }
+    [data-theme="dark"] .cat-circle-item.active .cat-label {
+      color: #EA1917;
+    }
+    /* Floating Emphasis Badge (HOT / VIP / NEW) */
+    .c-quick-links__emphasis {
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #EA1917;
+      color: #FFFFFF;
+      font-size: 8.5px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      z-index: 2;
+      animation: catEmphasisBounce 0.55s ease-out infinite alternate;
+      box-shadow: 0 2px 6px rgba(234, 25, 23, 0.4);
+      pointer-events: none;
+    }
+    .c-quick-links__emphasis::before {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 5px;
+      height: 5px;
+      background-color: inherit;
+    }
+    @keyframes catEmphasisBounce {
+      0% { transform: translateX(-50%) translateY(0); }
+      100% { transform: translateX(-50%) translateY(-3px); }
+    }
+    /* Kinetic SVG Animations for Product Categories */
+    .svg-icon-tv .screen-scan {
+      transform-origin: center;
+      animation: tvScan 3.2s cubic-bezier(.4, 0, .2, 1) infinite;
+    }
+    .svg-icon-tv .sound-pulse {
+      animation: soundPulse 3.2s ease-in-out infinite;
+    }
+    @keyframes tvScan {
+      0%, 20% { opacity: 0; transform: scaleX(0.2); }
+      35% { opacity: 0.8; transform: scaleX(1); }
+      60%, 100% { opacity: 0; transform: scaleX(1); }
+    }
+    @keyframes soundPulse {
+      0%, 25% { transform: scale(1); opacity: 0.4; }
+      40% { transform: scale(1.1); opacity: 1; fill: #EA1917; }
+      55%, 100% { transform: scale(1); opacity: 0.4; }
+    }
+    .svg-icon-ref .glass-panel {
+      transition: fill 0.3s ease;
+      animation: instaviewKnock 4.8s ease-in-out infinite;
+    }
+    .svg-icon-ref .knock-waves {
+      animation: knockRipples 4.8s ease-out infinite;
+    }
+    @keyframes instaviewKnock {
+      0%, 20% { fill: #262626; fill-opacity: 0.9; }
+      25%, 28% { fill: #262626; }
+      30%, 33% { fill: #333333; }
+      38%, 65% { fill: #FFF2D6; fill-opacity: 0.85; }
+      75%, 100% { fill: #262626; fill-opacity: 0.9; }
+    }
+    @keyframes knockRipples {
+      0%, 22% { opacity: 0; transform: scale(0.5); }
+      25% { opacity: 0.8; transform: scale(1); }
+      32% { opacity: 0.9; transform: scale(1.2); }
+      40%, 100% { opacity: 0; }
+    }
+    .svg-icon-wm .washer-drum {
+      transform-origin: 32px 42px;
+      animation: drumSpin 4.2s cubic-bezier(.45, .05, .55, .95) infinite;
+    }
+    .svg-icon-wm .center-ctrl {
+      animation: ctrlBlink 4.2s ease infinite;
+    }
+    @keyframes drumSpin {
+      0%, 25% { transform: rotate(0deg); }
+      40% { transform: rotate(180deg); }
+      55% { transform: rotate(360deg); }
+      70% { transform: rotate(540deg); }
+      85%, 100% { transform: rotate(720deg); }
+    }
+    @keyframes ctrlBlink {
+      0%, 20% { fill: #262626; }
+      30%, 75% { fill: #EA1917; }
+      85%, 100% { fill: #262626; }
+    }
+    .svg-icon-ac .ac-flap {
+      transform-origin: 12px 30px;
+      animation: flapSwing 4.2s ease-in-out infinite;
+    }
+    .svg-icon-ac .ac-breeze {
+      animation: breezeFlow 4.2s ease-out infinite;
+    }
+    @keyframes flapSwing {
+      0%, 20% { transform: rotate(0deg); }
+      35%, 65% { transform: rotate(8deg); }
+      80%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes breezeFlow {
+      0%, 25% { opacity: 0; transform: translateY(0) scaleY(0.8); }
+      45% { opacity: 1; transform: translateY(4px) scaleY(1); }
+      70%, 100% { opacity: 0; transform: translateY(8px) scaleY(1.1); }
+    }
+    .svg-icon-gram .laptop-lid {
+      transform-origin: 32px 44px;
+      animation: gramOpen 4.5s cubic-bezier(.22,.61,.36,1) infinite;
+    }
+    @keyframes gramOpen {
+      0%, 20% { transform: rotateX(25deg); }
+      35%, 70% { transform: rotateX(0deg); }
+      85%, 100% { transform: rotateX(25deg); }
+    }
+    .svg-icon-vcb .shield-lock {
+      transform-origin: center;
+      animation: shieldPulse 3.6s ease-in-out infinite;
+    }
+    @keyframes shieldPulse {
+      0%, 20% { transform: scale(1); }
+      35% { transform: scale(1.08); stroke: #EA1917; }
+      50%, 100% { transform: scale(1); stroke: #262626; }
     }
 
     /* ===== SPRINT 4: LG.com Style Product Merchandising Cards ===== */
@@ -2700,67 +2872,103 @@
       </div>
     </section>
 
-    <!-- SPRINT 3: LG.com Style Circular Quick Category Bar (8 Discs) -->
+    <!-- SPRINT 3: LG.com Style Master Kinetic Quick Category Bar (8 Discs) -->
     <section class="lg-quick-category-bar" aria-label="Điều hướng nhanh danh mục sản phẩm LG">
       <div class="lg-quick-cat-scroll">
-        <!-- 1. Tất Cả Ưu Đãi -->
-        <button type="button" class="cat-circle-item active" id="quick-cat-all" title="Tất cả ưu đãi">
-          <div class="cat-disc">
-            <svg class="lg-icon" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <!-- 1. Ưu Đãi Độc Quyền (Official LG.com Motion GIF) -->
+        <button type="button" class="cat-circle-item active" id="quick-cat-all" onclick="selectQuickCategory('all', this)" title="Ưu đãi độc quyền LGEVH">
+          <span class="c-quick-links__emphasis">HOT</span>
+          <div class="cat-disc type-ani">
+            <img src="assets/images/quick-links-ani/ico_offer1_ani.gif" alt="Ưu đãi độc quyền" loading="lazy">
           </div>
-          <span class="cat-label">Tất Cả Ưu Đãi</span>
+          <span class="cat-label">Ưu Đãi Độc Quyền</span>
         </button>
-        <!-- 2. TV OLED & Loa -->
-        <button type="button" class="cat-circle-item" id="quick-cat-tv" title="Tivi OLED & Loa thanh">
-          <div class="cat-disc">
-            <svg class="lg-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+
+        <!-- 2. TV OLED & Loa Thanh (Handcrafted Kinetic SVG Asset) -->
+        <button type="button" class="cat-circle-item" id="quick-cat-tv" onclick="selectQuickCategory('tv', this)" title="Tivi OLED & Loa thanh">
+          <div class="cat-disc svg-icon-tv">
+            <img src="assets/images/quick-links-ani/cat_tv_soundbar.svg" alt="TV & Loa Thanh" loading="lazy">
           </div>
           <span class="cat-label">TV & Loa Thanh</span>
         </button>
-        <!-- 3. Tủ Lạnh InstaView -->
-        <button type="button" class="cat-circle-item" id="quick-cat-ref" title="Tủ lạnh InstaView & Side by Side">
-          <div class="cat-disc">
-            <svg class="lg-icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="10" y1="2" x2="10" y2="22"/></svg>
+
+        <!-- 3. Tủ Lạnh InstaView (Handcrafted Kinetic SVG Asset) -->
+        <button type="button" class="cat-circle-item" id="quick-cat-ref" onclick="selectQuickCategory('ref', this)" title="Tủ lạnh InstaView & Side by Side">
+          <span class="c-quick-links__emphasis" style="background:#262626;">NEW</span>
+          <div class="cat-disc svg-icon-ref">
+            <img src="assets/images/quick-links-ani/cat_instaview_refrigerator.svg" alt="Tủ Lạnh" loading="lazy">
           </div>
           <span class="cat-label">Tủ Lạnh</span>
         </button>
-        <!-- 4. Máy Giặt WashTower -->
-        <button type="button" class="cat-circle-item" id="quick-cat-wm" title="Máy giặt WashTower & AI DD">
-          <div class="cat-disc">
-            <svg class="lg-icon" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><circle cx="12" cy="6" r="1"/></svg>
+
+        <!-- 4. Máy Giặt WashTower (Handcrafted Kinetic SVG Asset) -->
+        <button type="button" class="cat-circle-item" id="quick-cat-wm" onclick="selectQuickCategory('wm', this)" title="Máy giặt WashTower & AI DD">
+          <div class="cat-disc svg-icon-wm">
+            <img src="assets/images/quick-links-ani/cat_washtower.svg" alt="Máy Giặt" loading="lazy">
           </div>
           <span class="cat-label">Máy Giặt</span>
         </button>
-        <!-- 5. Điều Hòa Không Khí -->
-        <button type="button" class="cat-circle-item" id="quick-cat-ac" title="Điều hòa không khí Inverter UVnano">
-          <div class="cat-disc">
-            <svg class="lg-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="8" rx="2"/><line x1="6" y1="16" x2="18" y2="16"/><line x1="8" y1="19" x2="16" y2="19"/></svg>
+
+        <!-- 5. Điều Hòa Không Khí (Handcrafted Kinetic SVG Asset) -->
+        <button type="button" class="cat-circle-item" id="quick-cat-ac" onclick="selectQuickCategory('ac', this)" title="Điều hòa không khí Inverter UVnano">
+          <div class="cat-disc svg-icon-ac">
+            <img src="assets/images/quick-links-ani/cat_air_conditioner.svg" alt="Điều Hòa" loading="lazy">
           </div>
           <span class="cat-label">Điều Hòa</span>
         </button>
-        <!-- 6. Màn Hình & gram -->
-        <button type="button" class="cat-circle-item" id="quick-cat-it" title="Laptop LG gram & Màn hình UltraWide">
-          <div class="cat-disc">
-            <svg class="lg-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+
+        <!-- 6. Màn Hình & gram (Handcrafted Kinetic SVG Asset) -->
+        <button type="button" class="cat-circle-item" id="quick-cat-it" onclick="selectQuickCategory('it', this)" title="Laptop LG gram & Màn hình UltraWide">
+          <div class="cat-disc svg-icon-gram">
+            <img src="assets/images/quick-links-ani/cat_gram_laptop.svg" alt="Màn Hình · gram" loading="lazy">
           </div>
           <span class="cat-label">Màn Hình · gram</span>
         </button>
-        <!-- 7. Thể Lệ & Thanh Toán -->
-        <button type="button" class="cat-circle-item" onclick="openFullLetterModal()" title="Xem thể lệ & quy định nộp tiền">
-          <div class="cat-disc">
-            <svg class="lg-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+
+        <!-- 7. Thể Lệ & Thanh Toán (Handcrafted Kinetic SVG Asset - Preserves Approved Modal) -->
+        <button type="button" class="cat-circle-item" id="quick-cat-rules" onclick="openFullLetterModal()" title="Xem thể lệ & quy định nộp tiền VCB">
+          <div class="cat-disc svg-icon-vcb">
+            <img src="assets/images/quick-links-ani/cat_vcb_security.svg" alt="Quy Chế & VCB" loading="lazy">
           </div>
           <span class="cat-label">Quy Chế & VCB</span>
         </button>
-        <!-- 8. Hỗ Trợ Tư Vấn LGE -->
-        <button type="button" class="cat-circle-item" onclick="openSupportModal()" title="Hỗ trợ nội bộ & tư vấn viên LGE">
+
+        <!-- 8. Hỗ Trợ Tư Vấn LGE (Official SVG Asset - Preserves Approved Modal) -->
+        <button type="button" class="cat-circle-item" id="quick-cat-support" onclick="openSupportModal()" title="Hỗ trợ nội bộ & tư vấn viên LGE">
           <div class="cat-disc">
-            <svg class="lg-icon" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <img src="assets/images/quick-links-ani/ico_epc.svg" alt="Hỗ Trợ Nội Bộ" loading="lazy" style="width:38px; height:38px;">
           </div>
           <span class="cat-label">Hỗ Trợ Nội Bộ</span>
         </button>
       </div>
     </section>
+
+    <script>
+      // Non-intrusive Quick Category Bar Selection Helper
+      function selectQuickCategory(catKey, btn) {
+        document.querySelectorAll('.lg-quick-category-bar .cat-circle-item').forEach(el => el.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        
+        // If employee is on Tab 1, smoothly switch to Tab 2 to view products
+        const tab1Btn = document.getElementById('tab1-btn');
+        const tab2Btn = document.getElementById('tab2-btn');
+        if (tab1Btn && tab1Btn.classList.contains('active') && tab2Btn && typeof switchTab === 'function') {
+          switchTab('tab2', tab2Btn);
+        }
+
+        // Smoothly scroll down to product container if visible
+        const prodCont = document.getElementById('product-container');
+        if (prodCont && prodCont.offsetParent !== null) {
+          prodCont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+
+      function openSupportModal() {
+        if (typeof showToast === 'function') {
+          showToast('Hỗ trợ nội bộ: PIC Nguyễn Thị Quỳnh Như (HS PM Support) · Hotline: 0912 345 678 · Email: quynhnhu@lge.com', 'info', 6000);
+        }
+      }
+    </script>
 
     <!-- Tabs Navigation -->
     <nav class="nav-tabs" id="main-nav-tabs">

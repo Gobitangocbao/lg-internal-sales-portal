@@ -1,0 +1,25 @@
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ac-flap {
+      transform-origin: 12px 30px;
+      animation: flapSwing 4.2s ease-in-out infinite;
+    }
+    .ac-breeze {
+      animation: breezeFlow 4.2s ease-out infinite;
+    }
+    @keyframes flapSwing {
+      0%, 20% { transform: rotate(0deg); }
+      35%, 65% { transform: rotate(8deg); }
+      80%, 100% { transform: rotate(0deg); }
+    }
+    @keyframes breezeFlow {
+      0%, 25% { opacity: 0; transform: translateY(0) scaleY(0.8); }
+      45% { opacity: 1; transform: translateY(4px) scaleY(1); }
+      70%, 100% { opacity: 0; transform: translateY(8px) scaleY(1.1); }
+    }
+  </style>
+  <rect x="11" y="16" width="42" height="18" rx="4" stroke="#262626" stroke-width="2.2" fill="#FFFFFF"/>
+  <path class="ac-flap" d="M14 31H50" stroke="#262626" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="46" cy="22" r="1.5" fill="#EA1917"/>
+  <path class="ac-breeze" d="M22 36C22 39 24 43 27 46M32 36C32 40 35 44 38 47M42 36C42 39 44 42 46 44" stroke="#EA1917" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.7"/>
+</svg>

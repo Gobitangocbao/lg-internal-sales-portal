@@ -1,0 +1,15 @@
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .shield-lock {
+      transform-origin: center;
+      animation: shieldPulse 3.6s ease-in-out infinite;
+    }
+    @keyframes shieldPulse {
+      0%, 20% { transform: scale(1); }
+      35% { transform: scale(1.08); stroke: #EA1917; }
+      50%, 100% { transform: scale(1); stroke: #262626; }
+    }
+  </style>
+  <path d="M32 10L48 16V29C48 40.5 41.2 50.5 32 54C22.8 50.5 16 40.5 16 29V16L32 10Z" stroke="#262626" stroke-width="2.2" fill="#FFFFFF" stroke-linejoin="round"/>
+  <path class="shield-lock" d="M25 31L30 36L39 25" stroke="#EA1917" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
