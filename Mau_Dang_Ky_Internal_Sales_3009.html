@@ -4091,9 +4091,9 @@
             <div style="font-size:11.5px; color:#716F6A;">Chính sách Jeong-Do Management · Bảo vệ quyền lợi cán bộ công nhân viên LGE</div>
           </div>
         </div>
-        <div class="slogan-kinetic" style="display:flex; align-items:center; gap:8px;">
-          <span style="font-family:var(--font-heading); font-size:19px; font-weight:700; color:#A50034; letter-spacing:0.02em;">Life's Good.</span>
-          <span style="background:#F0ECE4; color:#716F6A; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px;">2026 EDITION</span>
+        <div class="slogan-signoff" style="display:flex; align-items:center; gap:16px;">
+          <img src="assets/slogan/LGE_Electronics_Slogan_Horizontal_Mono_ActiveRed_RGB.png" alt="Life's Good." style="height:26px; width:auto; display:block; object-fit:contain;">
+          <span style="background:#F0ECE4; color:#4A4946; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; letter-spacing:0.04em;">2026 EDITION</span>
         </div>
       </div>
     </footer>
@@ -9534,9 +9534,9 @@ Sau khi hủy, slot sẽ được giải phóng lập tức về kho để đồ
 
     // ===== Bộ chọn sản phẩm dạng thẻ: dữ liệu lấy từ bảng Tab 4 =====
     var PK_CATALOG = null;
-    const pkEsc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const pkMoney = n => (n || 0).toLocaleString('en-US') + ' đ';
-    const pkNum = t => parseInt(String(t).replace(/[^0-9]/g, ''), 10) || 0;
+    function pkEsc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function pkMoney(n) { return (n || 0).toLocaleString('en-US') + ' đ'; }
+    function pkNum(t) { return parseInt(String(t).replace(/[^0-9]/g, ''), 10) || 0; }
     function getCatalog() {
       if (PK_CATALOG) return PK_CATALOG;
       PK_CATALOG = [];
